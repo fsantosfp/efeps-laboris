@@ -14,6 +14,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -75,7 +76,21 @@ public class TimeEntryService {
         return timeEntryRepository.save(newTimeEntry);
     }
 
+    public List<TimeEntry> findAllByEmployeeAndPeriod(User employee, Instant start, Instant end){
+
+        if(start.isAfter(end)){
+            throw new IllegalArgumentException("A data de início não pode ser posterior à data final.");
+        }
+
+        return timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(
+            employee.getId(),
+            start,
+            end
+        );
+    }
+
     private void validateRulesForManualEntry(TimeEntryRequestDto request, Optional<TimeEntry> lastTimeEntry) {
+
         if(request.getReportedTimestamp() == null){
             throw new IllegalStateException("É preciso informar uma data e hora.");
         }
@@ -84,7 +99,7 @@ public class TimeEntryService {
             throw  new IllegalStateException("A batida de ponto manual não pode ser anterior ou igual à última batida registrada.");
         }
 
-        if( request.getJustification() == null){
+        if( request.getJustification() == null || request.getJustification().isBlank()){
             throw new IllegalStateException("É preciso informar o motivo da batida manual.");
         }
     }
