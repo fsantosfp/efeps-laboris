@@ -35,6 +35,9 @@ public class TimeEntry {
 
     private String justification;
 
+    @Column(name = "payroll_id")
+    private UUID payrollId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User employee;
