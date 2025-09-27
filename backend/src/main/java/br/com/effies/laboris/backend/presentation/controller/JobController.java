@@ -56,7 +56,7 @@ public class JobController {
         @Valid @RequestBody UpdateJobRequestDto request,
         @AuthenticationPrincipal User manager
         ){
-         Job updatedJob = jobService.updateStatus(jobId, request.getStatus(), manager);
+         Job updatedJob = jobService.updateStatus(jobId, request, manager);
          JobResponseDto response = new JobResponseDto(updatedJob);
 
          return ResponseEntity.ok(response);

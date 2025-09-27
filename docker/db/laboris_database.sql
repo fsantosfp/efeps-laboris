@@ -66,7 +66,8 @@ CREATE TABLE time_entries (
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     is_manual BOOLEAN NOT NULL DEFAULT FALSE,
-    justification TEXT, -- Justificativa para entradas manuais
+    justification TEXT, -- Justificativa para entradas manuais,
+    payroll_id UUID,
     CONSTRAINT check_time_entry_type CHECK (entry_type IN ('CLOCK_IN', 'START_BREAK', 'END_BREAK', 'CLOCK_OUT'))
 );
 

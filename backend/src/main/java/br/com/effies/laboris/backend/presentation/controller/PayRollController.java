@@ -31,7 +31,7 @@ public class PayRollController {
         @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant start,
         @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant end
     ){
-     MyPayrollResponseDto response = payrollService.calculateMyPayroll(employee, start, end);
+     MyPayrollResponseDto response = payrollService.calculateEmployeePayroll(employee, start, end);
      return ResponseEntity.ok(response);
     }
 }
