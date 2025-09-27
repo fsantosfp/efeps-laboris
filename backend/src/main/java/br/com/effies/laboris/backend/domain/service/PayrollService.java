@@ -3,8 +3,13 @@ package br.com.effies.laboris.backend.domain.service;
 import br.com.effies.laboris.backend.domain.entity.SalaryHistory;
 import br.com.effies.laboris.backend.domain.entity.TimeEntry;
 import br.com.effies.laboris.backend.domain.entity.User;
+import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
+import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
+import br.com.effies.laboris.backend.domain.helper.TimeEntryCalculationHelper;
 import br.com.effies.laboris.backend.domain.repository.SalaryHistoryRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import br.com.effies.laboris.backend.domain.repository.UserRepository;
+import br.com.effies.laboris.backend.presentation.dto.response.CompanyPayrollResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.MyPayrollResponseDto;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +31,58 @@ public class PayrollService {
 
     private final TimeEntryRepository timeEntryRepository;
     private final SalaryHistoryRepository salaryRepository;
+    private final UserRepository userRepository;
 
-    public PayrollService(TimeEntryRepository timeEntryRepository, SalaryHistoryRepository salaryRepository){
+    public PayrollService(
+        TimeEntryRepository timeEntryRepository,
+        SalaryHistoryRepository salaryRepository,
+        UserRepository userRepository
+    ){
         this.salaryRepository = salaryRepository;
         this.timeEntryRepository = timeEntryRepository;
+        this.userRepository = userRepository;
     }
 
-    public MyPayrollResponseDto calculateMyPayroll(User employee, Instant start, Instant end){
+    public MyPayrollResponseDto calculateEmployeePayroll(User employee, Instant start, Instant end){
+        return calculatePayroll(employee, start, end);
+    }
+
+    public CompanyPayrollResponseDto calculateCompanyPayroll(User manager, Instant start, Instant end){
+        List<User> employees = userRepository.findByCompanyIdAndRoleAndStatus(
+            manager.getCompany().getId(), UserRole.EMPLOYEE, UserStatus.ACTIVE);
+
+        BigDecimal grandTotalAmount = BigDecimal.ZERO;
+        BigDecimal grandTotalHours = BigDecimal.ZERO;
+        List<CompanyPayrollResponseDto.EmployeePayrollDto> employeePayrolls = new ArrayList<>();
+
+        for (User employee : employees) {
+
+            MyPayrollResponseDto individualPayroll = calculatePayroll(employee, start, end);
+
+            BigDecimal employeeTotalAmount = individualPayroll.getOpenToReceive().getTotalAmount();
+            BigDecimal employeeTotalHours = individualPayroll.getOpenToReceive().getTotalHours();
+
+            grandTotalAmount = grandTotalAmount.add(employeeTotalAmount);
+            grandTotalHours = grandTotalHours.add(employeeTotalHours);
+
+            employeePayrolls.add(CompanyPayrollResponseDto.EmployeePayrollDto.builder()
+                .employeeId(employee.getId())
+                .employeeName(employee.getName())
+                .totalHours(employeeTotalHours)
+                .totalAmount(employeeTotalAmount)
+                .build());
+        }
+
+        return CompanyPayrollResponseDto.builder()
+            .periodTotals(CompanyPayrollResponseDto.PeriodSummary.builder()
+                .totalHours(grandTotalHours)
+                .totalAmount(grandTotalAmount)
+                .build())
+            .employeePayrolls(employeePayrolls)
+            .build();
+    }
+
+    private MyPayrollResponseDto calculatePayroll(User employee, Instant start, Instant end){
 
         List<TimeEntry> entries = timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(employee.getId(), start, end);
 
@@ -50,7 +100,7 @@ public class PayrollService {
             LocalDate workDate = dayEntry.getKey();
             List<TimeEntry> dayEntries = dayEntry.getValue();
 
-            BigDecimal hoursWorkedOnDay = calculateHoursWorked(dayEntries);
+            BigDecimal hoursWorkedOnDay = TimeEntryCalculationHelper.calculateHoursWorked(dayEntries);
 
             Optional<SalaryHistory> salary = salaryRepository
                 .findTopByUser_IdAndEffectiveDateLessThanEqualOrderByEffectiveDateDesc(employee.getId(), workDate);
@@ -88,44 +138,6 @@ public class PayrollService {
             .dailyBreakdown(dailyBreakdown)
             .build();
 
-    }
-
-    private BigDecimal calculateHoursWorked(List<TimeEntry> entries){
-
-        long totalSeconds = 0;
-        Instant startWork = null;
-        Instant startBreak = null;
-
-        for( TimeEntry entry : entries) {
-            switch (entry.getEntryType()){
-                case CLOCK_IN -> { startWork = entry.getEntryTimestamp(); }
-                case START_BREAK -> {
-                    if( startWork != null ){
-                        totalSeconds += Duration.between(startWork, entry.getEntryTimestamp()).getSeconds();
-                        startWork = null;
-                    }
-                    startBreak = entry.getEntryTimestamp();
-                }
-                case END_BREAK -> {
-                    if( startBreak != null ){
-                        startWork = entry.getEntryTimestamp();
-                        startBreak = null;
-                    }
-                }
-                case CLOCK_OUT -> {
-                    if ( startWork != null ){
-                        totalSeconds += Duration.between(startWork, entry.getEntryTimestamp()).getSeconds();
-                        startWork = null;
-                    }
-                }
-            }
-        }
-
-        return convertToHours(totalSeconds);
-    }
-
-    private BigDecimal convertToHours(long seconds){
-        return BigDecimal.valueOf(seconds / 3600.0).setScale(2, RoundingMode.HALF_UP);
     }
 
     private MyPayrollResponseDto.PeriodSummary periodSummaryBuilder(BigDecimal amount, BigDecimal hours){

@@ -9,6 +9,7 @@ import br.com.effies.laboris.backend.domain.repository.JobAssignmentRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import br.com.effies.laboris.backend.presentation.dto.request.CreateJobRequestDto;
+import br.com.effies.laboris.backend.presentation.dto.request.UpdateJobRequestDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -92,7 +93,7 @@ public class JobService {
     }
 
     @Transactional
-    public Job updateStatus(UUID jobId, JobStatus status, User manager){
+    public Job updateStatus(UUID jobId, UpdateJobRequestDto request, User manager){
 
         Job job = findJobById(jobId);
 
@@ -102,7 +103,8 @@ public class JobService {
         // TODO: Adicionar regras de transição de status. Ex: não pode ir de COMPLETED para PENDING.
         // Por agora, permitimos qualquer mudança.
 
-        job.setStatus(status);
+        job.setStatus(request.getStatus());
+        job.setBillingRate(request.getBillingRate());
         return jobRepository.save(job);
 
     }

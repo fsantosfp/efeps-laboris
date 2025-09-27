@@ -1,12 +1,17 @@
 package br.com.effies.laboris.backend.domain.service;
 
+import br.com.effies.laboris.backend.domain.entity.Company;
 import br.com.effies.laboris.backend.domain.entity.Job;
 import br.com.effies.laboris.backend.domain.entity.SalaryHistory;
 import br.com.effies.laboris.backend.domain.entity.TimeEntry;
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
+import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
+import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
 import br.com.effies.laboris.backend.domain.repository.SalaryHistoryRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import br.com.effies.laboris.backend.domain.repository.UserRepository;
+import br.com.effies.laboris.backend.presentation.dto.response.CompanyPayrollResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.MyPayrollResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +35,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +46,9 @@ public class PayrollServiceTest {
 
     @Mock
     private SalaryHistoryRepository salaryRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private PayrollService payrollService;
@@ -79,7 +88,7 @@ public class PayrollServiceTest {
             .thenReturn(Optional.of(salary));
 
         // Act
-        MyPayrollResponseDto result = payrollService.calculateMyPayroll(employee, start, end);
+        MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
         assertThat(result.getOpenToReceive().getTotalHours()).isEqualTo(8.0);
@@ -117,7 +126,7 @@ public class PayrollServiceTest {
             .thenReturn(Optional.of(newSalary));
 
         // Act
-        MyPayrollResponseDto result = payrollService.calculateMyPayroll(employee, start, end);
+        MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
         assertThat(result.getDailyBreakdown()).hasSize(2);
@@ -154,7 +163,7 @@ public class PayrollServiceTest {
             .thenReturn(Optional.of(salary));
 
         // Act
-        MyPayrollResponseDto result = payrollService.calculateMyPayroll(employee, start, end);
+        MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
         assertThat(result.getAlreadyPaid().getTotalHours()).isEqualTo(5.0);
@@ -178,7 +187,7 @@ public class PayrollServiceTest {
             .thenReturn(Collections.emptyList());
 
         // Act
-        MyPayrollResponseDto result = payrollService.calculateMyPayroll(employee, start, end);
+        MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
         assertThat(result.getOpenToReceive().getTotalAmount()).isEqualByComparingTo("0");
@@ -207,7 +216,7 @@ public class PayrollServiceTest {
             .thenReturn(Optional.of(salary));
 
         // Act
-        MyPayrollResponseDto result = payrollService.calculateMyPayroll(employee, start, end);
+        MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
         assertThat(result.getOpenToReceive().getTotalAmount()).isEqualByComparingTo("0");
@@ -237,7 +246,7 @@ public class PayrollServiceTest {
             .thenReturn(Optional.of(salary));
 
         // Act
-        MyPayrollResponseDto result = payrollService.calculateMyPayroll(employee, start, end);
+        MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
         assertThat(result.getOpenToReceive().getTotalAmount()).isEqualByComparingTo("30.00");
@@ -245,13 +254,73 @@ public class PayrollServiceTest {
         assertThat(result.getDailyBreakdown()).hasSize(1);
     }
 
+    @Test
+    @DisplayName("Should aggregate results from multiples employees")
+    void calculateCompanyPayroll_ShouldAggregateResultsFromMultipleEmployees(){
+        // Arrange
+        var company = new Company();
+        company.setId(UUID.randomUUID());
+
+        var manager = createUser(UUID.randomUUID(), company);
+        var employee1 = createUser(UUID.randomUUID(), company);
+        var employee2 = createUser(UUID.randomUUID(), company);
+
+        LocalDate workDate = LocalDate.now();
+        Instant start = workDate.atStartOfDay().toInstant(ZoneOffset.UTC);
+        Instant end = start.plus(1, ChronoUnit.DAYS);
+
+        List<TimeEntry> entries1 = List.of(
+            createTimeEntry(employee1, TimeEntryType.CLOCK_IN, start.plus(8, ChronoUnit.HOURS)),
+            createTimeEntry(employee1, TimeEntryType.CLOCK_OUT, start.plus(16, ChronoUnit.HOURS))
+        );
+
+        List<TimeEntry> entries2 = List.of(
+            createTimeEntry(employee2, TimeEntryType.CLOCK_IN, start.plus(8, ChronoUnit.HOURS)),
+            createTimeEntry(employee2, TimeEntryType.CLOCK_OUT, start.plus(13, ChronoUnit.HOURS))
+        );
+
+        SalaryHistory salary1 = createSalaryHistory(employee1, new BigDecimal("20.00"), workDate.minusDays(1));
+        SalaryHistory salary2 = createSalaryHistory(employee2, new BigDecimal("30.00"), workDate.minusDays(1));
+
+        when(userRepository.findByCompanyIdAndRoleAndStatus(company.getId(), UserRole.EMPLOYEE, UserStatus.ACTIVE))
+            .thenReturn(List.of(employee1, employee2));
+
+        when(timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(eq(employee1.getId()), any(), any())).thenReturn(entries1);
+        when(salaryRepository.findTopByUser_IdAndEffectiveDateLessThanEqualOrderByEffectiveDateDesc(eq(employee1.getId()), any())).thenReturn(Optional.of(salary1));
+
+        when(timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(eq(employee2.getId()), any(), any())).thenReturn(entries2);
+        when(salaryRepository.findTopByUser_IdAndEffectiveDateLessThanEqualOrderByEffectiveDateDesc(eq(employee2.getId()), any())).thenReturn(Optional.of(salary2));
+
+        // Act
+        CompanyPayrollResponseDto result = payrollService.calculateCompanyPayroll(manager, start, end);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getEmployeePayrolls()).hasSize(2);
+
+        // Verifica os totais consolidados
+        // Horas: 8h (Func1) + 5h (Func2) = 13h
+        assertThat(result.getPeriodTotals().getTotalHours()).isEqualByComparingTo("13.00");
+
+        // Valor: (8 * 20 = 160) + (5 * 30 = 150) = 310
+        assertThat(result.getPeriodTotals().getTotalAmount()).isEqualByComparingTo("310.00");
+    }
+
     private TimeEntry createTimeEntry(TimeEntryType type, Instant timestamp){
-        return createTimeEntry(type, timestamp, null);
+        return createTimeEntry(type, timestamp, null, null);
     }
 
     private TimeEntry createTimeEntry(TimeEntryType type, Instant timestamp, UUID payrollId){
+        return createTimeEntry(type, timestamp, null, null);
+    }
+
+    private TimeEntry createTimeEntry(User user,TimeEntryType type, Instant timestamp){
+        return createTimeEntry(type, timestamp, null, user);
+    }
+
+    private TimeEntry createTimeEntry(TimeEntryType type, Instant timestamp, UUID payrollId, User user){
         TimeEntry entry = new TimeEntry();
-        entry.setEmployee(this.employee);
+        entry.setEmployee(user == null ? this.employee : user);
         entry.setJob(this.job);
         entry.setEntryType(type);
         entry.setEntryTimestamp(timestamp);
@@ -265,6 +334,22 @@ public class PayrollServiceTest {
         salary.setEffectiveDate(effectiveDate);
         salary.setUser(this.employee);
         return salary;
+    }
+
+    private SalaryHistory createSalaryHistory(User user, BigDecimal rate, LocalDate effectiveDate){
+        SalaryHistory salary = new SalaryHistory();
+        salary.setHourlyRate(rate);
+        salary.setEffectiveDate(effectiveDate);
+        salary.setUser(user);
+        return salary;
+    }
+
+    private User createUser(UUID id, Company company){
+        User user = new User();
+        user.setId(id);
+        user.setCompany(company);
+
+        return user;
     }
 
 }
