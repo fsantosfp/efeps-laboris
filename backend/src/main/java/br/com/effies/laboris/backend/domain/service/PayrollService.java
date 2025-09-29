@@ -1,22 +1,27 @@
 package br.com.effies.laboris.backend.domain.service;
 
+import br.com.effies.laboris.backend.domain.entity.Payroll;
+import br.com.effies.laboris.backend.domain.entity.PayrollDetail;
 import br.com.effies.laboris.backend.domain.entity.SalaryHistory;
 import br.com.effies.laboris.backend.domain.entity.TimeEntry;
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
 import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
 import br.com.effies.laboris.backend.domain.helper.TimeEntryCalculationHelper;
+import br.com.effies.laboris.backend.domain.repository.PayrollDetailRepository;
+import br.com.effies.laboris.backend.domain.repository.PayrollRepository;
 import br.com.effies.laboris.backend.domain.repository.SalaryHistoryRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.domain.repository.UserRepository;
+import br.com.effies.laboris.backend.presentation.dto.request.SettlePayrollRequestDto;
 import br.com.effies.laboris.backend.presentation.dto.response.CompanyPayrollResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.MyPayrollResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.MyPayrollResponseDto.PeriodSummary;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Time;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -24,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,15 +38,21 @@ public class PayrollService {
     private final TimeEntryRepository timeEntryRepository;
     private final SalaryHistoryRepository salaryRepository;
     private final UserRepository userRepository;
+    private final PayrollRepository payrollRepository;
+    private final PayrollDetailRepository payrollDetailRepository;
 
     public PayrollService(
         TimeEntryRepository timeEntryRepository,
         SalaryHistoryRepository salaryRepository,
-        UserRepository userRepository
+        UserRepository userRepository,
+        PayrollRepository payrollRepository,
+        PayrollDetailRepository payrollDetailRepository
     ){
         this.salaryRepository = salaryRepository;
         this.timeEntryRepository = timeEntryRepository;
         this.userRepository = userRepository;
+        this.payrollRepository = payrollRepository;
+        this.payrollDetailRepository = payrollDetailRepository;
     }
 
     public MyPayrollResponseDto calculateEmployeePayroll(User employee, Instant start, Instant end){
@@ -80,6 +92,44 @@ public class PayrollService {
                 .build())
             .employeePayrolls(employeePayrolls)
             .build();
+    }
+
+    @Transactional
+    public void settlePayroll(SettlePayrollRequestDto request, User manager){
+        List<TimeEntry> openEntries = timeEntryRepository.findOpenEntriesForEmployeesInPeriod(
+            request.getEmployeeIds(),
+            request.getStartDate(),
+            request.getEndDate());
+
+        if(openEntries.isEmpty()){ throw new IllegalStateException("Não há horas em aberto para os funcionários selecionados neste período.");}
+
+        Payroll payrollRun = new Payroll();
+        payrollRun.setCompany(manager.getCompany());
+        payrollRun.setPeriodStart(request.getStartDate());
+        payrollRun.setPeriodEnd(request.getEndDate());
+        payrollRun.setSettledByUser(manager);
+
+        Payroll savedPayroll = payrollRepository.saveAndFlush(payrollRun);
+
+        Map<User, List<TimeEntry>> entriesByEmployee = openEntries.stream()
+            .collect(Collectors.groupingBy(TimeEntry::getEmployee));
+
+        for (Map.Entry<User, List<TimeEntry>> employeeEntry :  entriesByEmployee.entrySet()){
+            User employee = employeeEntry.getKey();
+
+            MyPayrollResponseDto individualPayroll = calculatePayroll(employee, request.getStartDate(), request.getEndDate());
+
+            PayrollDetail payrollDetail = new PayrollDetail();
+            payrollDetail.setEmployee(employee);
+            payrollDetail.setTotalAmount(individualPayroll.getOpenToReceive().getTotalAmount());
+            payrollDetail.setTotalHours(individualPayroll.getOpenToReceive().getTotalHours());
+            payrollDetail.setPayroll(savedPayroll);
+
+            payrollDetailRepository.save(payrollDetail);
+
+            List<UUID> entryIdsToUpdate = openEntries.stream().map(TimeEntry::getId).toList();
+            timeEntryRepository.updatePayrollIdForEntries(entryIdsToUpdate, savedPayroll.getId());
+        }
     }
 
     private MyPayrollResponseDto calculatePayroll(User employee, Instant start, Instant end){
@@ -140,7 +190,7 @@ public class PayrollService {
 
     }
 
-    private MyPayrollResponseDto.PeriodSummary periodSummaryBuilder(BigDecimal amount, BigDecimal hours){
+    private PeriodSummary periodSummaryBuilder(BigDecimal amount, BigDecimal hours){
         return MyPayrollResponseDto.PeriodSummary.builder()
             .totalAmount(amount)
             .totalHours(hours)
