@@ -11,6 +11,7 @@ import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
 import br.com.effies.laboris.backend.domain.repository.SalaryHistoryRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.domain.repository.UserRepository;
+import br.com.effies.laboris.backend.domain.utils.TimeEntryBuilder;
 import br.com.effies.laboris.backend.presentation.dto.response.CompanyPayrollResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.MyPayrollResponseDto;
 import org.junit.jupiter.api.BeforeEach;
