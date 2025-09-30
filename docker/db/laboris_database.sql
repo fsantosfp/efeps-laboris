@@ -68,7 +68,26 @@ CREATE TABLE time_entries (
     is_manual BOOLEAN NOT NULL DEFAULT FALSE,
     justification TEXT, -- Justificativa para entradas manuais,
     payroll_id UUID,
-    CONSTRAINT check_time_entry_type CHECK (entry_type IN ('CLOCK_IN', 'START_BREAK', 'END_BREAK', 'CLOCK_OUT'))
+    CONSTRAINT check_time_entry_type CHECK (entry_type IN ('CLOCK_IN', 'START_BREAK', 'END_BREAK', 'CLOCK_OUT')),
+    CONSTRAINT fk_time_entries_payroll FOREIGN KEY (payroll_id) REFERENCES payrolls(id)
+);
+
+-- Tabela para armazenar as folhas de pagamentos.
+CREATE TABLE payrolls (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id),
+    period_start TIMESTAMPTZ NOT NULL,
+    period_end TIMESTAMPTZ NOT NULL,
+    settled_by_user_id UUID NOT NULL REFERENCES users(id), -- Quem executou o pagamento
+    settled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE payroll_details (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    payroll_id UUID NOT NULL REFERENCES payrolls(id),
+    employee_id UUID NOT NULL REFERENCES users(id),
+    total_hours NUMERIC(10, 2) NOT NULL,
+    total_amount NUMERIC(10, 2) NOT NULL
 );
 
 -- Criando um índice para otimizar a busca por salário em uma data específica, analisar primeiro o desempenho
