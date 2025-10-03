@@ -15,12 +15,6 @@ public class CreateJobRequestDto {
     @NotBlank(message = "O endereço é obrigatório.")
     private String address;
 
-    @NotNull(message = "A latitude é obrigatória.")
-    private Double latitude;
-
-    @NotNull(message = "A latitude é obrigatória.")
-    private Double longitude;
-
     @NotBlank(message = "O nome do contratante é obrigatório.")
     private  String clientName;
 
