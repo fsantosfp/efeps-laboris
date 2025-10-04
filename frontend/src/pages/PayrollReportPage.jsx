@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from '../services/api';
+import { formatDecimalHours } from "../utils/formatters";
 
 function PayrollReportPage(){
 
@@ -54,7 +55,7 @@ function PayrollReportPage(){
             { reportData && (
                 <div>
                     <h3>Resumo do Período</h3>
-                    <p><strong>Total de Horas:</strong> {reportData.periodTotals.totalHours.toFixed(2)}h </p>
+                    <p><strong>Total de Horas:</strong> {formatDecimalHours(reportData.periodTotals.totalHours)} </p>
                     <p><strong>Valor Total a Pagar:</strong> $ {reportData.periodTotals.totalAmount.toFixed(2)} </p>
 
                     <h3 style={{ marginTop:'30px'}}>Detalhamento por Funcionário</h3>
@@ -71,7 +72,7 @@ function PayrollReportPage(){
                             {reportData.employeePayrolls.map( data => (
                                 <tr key={data.employeeId}>
                                     <td>{data.employeeName}</td>
-                                    <td>{data.totalHours.toFixed(2)}</td>
+                                    <td>{formatDecimalHours(data.totalHours)}</td>
                                     <td>$ {data.totalAmount.toFixed(2)}</td>
                                 </tr>
                             ))}
