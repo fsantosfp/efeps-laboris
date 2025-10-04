@@ -19,6 +19,7 @@
 **/.mvn/
 **/.gradle/
 **/HELP.md
+**/application.properties.local
 
 # Maven Wrapper scripts
 **/mvnw

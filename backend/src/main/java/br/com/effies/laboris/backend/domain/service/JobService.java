@@ -10,6 +10,7 @@ import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import br.com.effies.laboris.backend.presentation.dto.request.CreateJobRequestDto;
 import br.com.effies.laboris.backend.presentation.dto.request.UpdateJobRequestDto;
+import com.google.maps.model.LatLng;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -23,25 +24,30 @@ public class JobService {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final JobAssignmentRepository jobAssignmentRepository;
+    private final GeoService geoService;
 
     public JobService(
         JobRepository jobRepository,
         UserRepository userRepository,
-        JobAssignmentRepository jobAssignmentRepository
+        JobAssignmentRepository jobAssignmentRepository,
+        GeoService geoService
     ){
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.jobAssignmentRepository = jobAssignmentRepository;
+        this.geoService = geoService;
     }
 
     public Job create(CreateJobRequestDto request, User manager){
 
         // TODO: Adicionar a regra de negócio para não permitir criar jobs no mesmo endereço se um já estiver ativo.
 
+        LatLng coordinates = geoService.geocodeAddress(request.getAddress());
+
         Job newJob = new Job();
         newJob.setAddress(request.getAddress());
-        newJob.setLatitude(request.getLatitude());
-        newJob.setLongitude(request.getLongitude());
+        newJob.setLatitude(coordinates.lat);
+        newJob.setLongitude(coordinates.lng);
         newJob.setClientName(request.getClientName());
         newJob.setBudget(request.getBudget());
         newJob.setBillingRate(request.getBillingRate());
