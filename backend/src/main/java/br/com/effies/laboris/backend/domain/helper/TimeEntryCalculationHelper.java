@@ -46,7 +46,7 @@ public class TimeEntryCalculationHelper {
     }
 
     private static BigDecimal convertToHours(long seconds){
-        long oneHourInSecond = 3600;
+        double oneHourInSecond = 3600.0;
         return BigDecimal.valueOf(seconds / oneHourInSecond).setScale(2, RoundingMode.HALF_UP);
     }
 }
