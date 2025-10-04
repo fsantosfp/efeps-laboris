@@ -9,6 +9,7 @@ function DashboardPage(){
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const STATUS = {'PENDING':'A fazer', 'IN_PROGRESS':'Em andamento', 'COMPLETED': 'Concluído'}
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -54,7 +55,7 @@ function DashboardPage(){
                             jobs.map( job => (
                                 <tr key={job.id}>
                                     <td style={{padding:'8px'}}><Link to={`/jobs/${job.id}`}>{job.address}</Link></td>
-                                    <td style={{padding:'8px'}}>{job.status}</td>
+                                    <td style={{padding:'8px'}}>{STATUS[job.status]}</td>
                                     <td style={{padding:'8px'}}>{job.startDate}</td>
                                 </tr>
                             ))
