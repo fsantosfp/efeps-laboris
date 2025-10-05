@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link, Navigate, useNavigate } from 'react-router-dom'; 
+import { useParams, Link, useNavigate } from 'react-router-dom'; 
 import api from '../services/api';
 import ManageTeamModal from '../components/ManageTeamModal';
 
@@ -64,6 +64,13 @@ function JobDetailPage(){
         <div>
             <Link to="/dashboard">{ "< Voltar para o Dashboard" }</Link>
             <h1>Detalhe do trabalho</h1>
+
+            <div style={{ marginBottom:'20px'}}>
+                <Link to={`/reports/jobs/${jobId}`}>
+                    <button>Gerar Relatório de Custo</button>
+                </Link>
+            </div>
+
             { job && (
                 <div>
                     <p><strong>Endereço:</strong> { job.address }</p>

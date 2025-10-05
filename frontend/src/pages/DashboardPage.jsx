@@ -31,10 +31,6 @@ function DashboardPage(){
 
     return (
         <div>
-            <h2>Dashboard</h2>
-            <button onClick={logout} style={{float:'right'}}>Sair</button>
-            <hr style={{ clear: 'both', marginBottom: '20px' }}/>
-
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3>Seus Trabalhos</h3>
                 <Link to="/jobs/new"><button>+ Novo Trabalho</button></Link>
