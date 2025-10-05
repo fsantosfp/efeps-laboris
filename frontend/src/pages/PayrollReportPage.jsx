@@ -72,8 +72,8 @@ function PayrollReportPage(){
                             {reportData.employeePayrolls.map( data => (
                                 <tr key={data.employeeId}>
                                     <td>{data.employeeName}</td>
-                                    <td>{formatDecimalHours(data.totalHours)}</td>
-                                    <td>$ {data.totalAmount.toFixed(2)}</td>
+                                    <td style={{textAlign:'right'}}>{formatDecimalHours(data.totalHours)}</td>
+                                    <td style={{textAlign:'right'}}>$ {data.totalAmount.toFixed(2)}</td>
                                 </tr>
                             ))}
                         </tbody>

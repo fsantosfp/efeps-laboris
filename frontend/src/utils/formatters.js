@@ -19,5 +19,5 @@ export const formatDecimalHours = (decimalHours) => {
 
     const paddedMinutes = String(minutes).padStart(2, '0');
 
-    return `${hours}:${paddedMinutes}h`;
+    return `${hours}:${paddedMinutes} h`;
 }

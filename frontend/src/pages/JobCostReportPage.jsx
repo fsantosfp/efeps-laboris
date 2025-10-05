@@ -90,11 +90,11 @@ function JobCostReportPage(){
                             { reportData.dailyBreakdown.map((item, index)=>(
                                 <tr key={ index }>
                                     <td>{ item.date }</td>
-                                    <td>{ item.start }</td>
-                                    <td>{ item.end }</td>
-                                    <td>{ item.employeesCount }</td>
-                                    <td>{ formatDecimalHours(item.hoursWorked)}</td>
-                                    <td>{ item.amountToBill.toFixed(2)}</td>
+                                    <td style={{textAlign:'right'}}>{ item.start } h</td>
+                                    <td style={{textAlign:'right'}}>{ item.end } h</td>
+                                    <td style={{textAlign:'right'}}>{ item.employeesCount }</td>
+                                    <td style={{textAlign:'right'}}>{ formatDecimalHours(item.hoursWorked)}</td>
+                                    <td style={{textAlign:'right'}}>$ { item.amountToBill.toFixed(2)}</td>
                                 </tr>
                             )) }
                         </tbody>
