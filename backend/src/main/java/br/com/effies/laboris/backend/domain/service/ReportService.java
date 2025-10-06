@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ReportService {
@@ -100,39 +102,63 @@ public class ReportService {
     }
 
     private List<DailyShift> processEntriesIntoShifts(List<TimeEntry> allEntries){
-        Map<User, List<TimeEntry>> entriesByEmployee = allEntries.stream().collect(Collectors.groupingBy(TimeEntry::getEmployee));
-        List<DailyShift> shifts = new ArrayList<>();
 
-        for(List<TimeEntry> employeeEntries : entriesByEmployee.values()){
-            employeeEntries.sort(Comparator.comparing(TimeEntry::getEntryTimestamp));
+        Map<User, Map<LocalDate, List<TimeEntry>>> entriesByUserAndDay = groupEntriesByUserAndDay(allEntries);
+        return entriesByUserAndDay.entrySet().stream()
+            .flatMap(this::processEmployeeDailyEntries)
+            .collect(Collectors.toList());
+    }
 
-            Instant clockInTime = null;
-            List<TimeEntry> currentShiftEntries = new ArrayList<>();
+    private Map<User, Map<LocalDate, List<TimeEntry>>> groupEntriesByUserAndDay(List<TimeEntry> allEntries){
+        return allEntries.stream()
+            .collect(Collectors.groupingBy(
+                TimeEntry::getEmployee,
+                Collectors.groupingBy( entry -> entry.getEntryTimestamp()
+                    .atZone(ZoneOffset.UTC)
+                    .toLocalDate()
+                )
+            ));
+    }
 
-            for (TimeEntry entry : employeeEntries){
+    private Stream<DailyShift> processEmployeeDailyEntries(Map.Entry<User, Map<LocalDate, List<TimeEntry>>> userEntry){
+        User employee = userEntry.getKey();
+        Map<LocalDate, List<TimeEntry>> dailyEntries = userEntry.getValue();
 
-                if(entry.getEntryType() == TimeEntryType.CLOCK_IN){
-                    clockInTime = entry.getEntryTimestamp();
-                    currentShiftEntries.clear();
-                }
+        return dailyEntries.entrySet().stream()
+            .flatMap(dailyEntry ->
+                createShiftFromDailyEntries(employee, dailyEntry.getKey(), dailyEntry.getValue())
+            );
 
-                if(clockInTime != null){
-                    currentShiftEntries.add(entry);
-                }
+    }
 
-                if(entry.getEntryType() == TimeEntryType.CLOCK_OUT && clockInTime != null) {
-                    BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(currentShiftEntries);
+    private Stream<DailyShift> createShiftFromDailyEntries(User employee, LocalDate date, List<TimeEntry> dailyEntries){
+        Optional<TimeEntry> firstIn = dailyEntries.stream()
+            .filter(entry -> entry.getEntryType() == TimeEntryType.IN)
+            .min(Comparator.comparing(TimeEntry::getEntryTimestamp));
 
-                    LocalDate date = clockInTime.atZone(ZoneOffset.UTC).toLocalDate();
-                    LocalTime startTime = clockInTime.atZone(ZoneOffset.UTC).toLocalTime().truncatedTo(ChronoUnit.MINUTES);
-                    LocalTime endTime = entry.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime().truncatedTo(ChronoUnit.MINUTES);
+        Optional<TimeEntry> lastOut = dailyEntries.stream()
+            .filter(entry -> entry.getEntryType() == TimeEntryType.OUT)
+            .max(Comparator.comparing(TimeEntry::getEntryTimestamp));
 
-                    shifts.add(new DailyShift(date, startTime, endTime, hoursWorked, entry.getEmployee()));
-                    clockInTime = null;
-                }
+        if( firstIn.isPresent() && lastOut.isPresent()){
+            TimeEntry in = firstIn.get();
+            TimeEntry out = lastOut.get();
+
+            if(out.getEntryTimestamp().isAfter(in.getEntryTimestamp())){
+                LocalTime startTime = in.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                    .truncatedTo(ChronoUnit.MINUTES);
+
+                LocalTime endTime = out.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                    .truncatedTo(ChronoUnit.MINUTES);
+
+                BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dailyEntries);
+
+                DailyShift shift = new DailyShift(date, startTime, endTime, hoursWorked, employee);
+
+                return Stream.of(shift);
             }
         }
 
-        return shifts;
+        return Stream.empty();
     }
 }

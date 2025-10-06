@@ -25,22 +25,12 @@ public class TimeEntryBuilder {
     }
 
     public TimeEntryBuilder withClockIn(){
-        this.type = TimeEntryType.CLOCK_IN;
-        return this;
-    }
-
-    public TimeEntryBuilder withStartBreak(){
-        this.type = TimeEntryType.START_BREAK;
-        return this;
-    }
-
-    public TimeEntryBuilder withEndBreak(){
-        this.type = TimeEntryType.END_BREAK;
+        this.type = TimeEntryType.IN;
         return this;
     }
 
     public TimeEntryBuilder withClockOut(){
-        this.type = TimeEntryType.CLOCK_OUT;
+        this.type = TimeEntryType.OUT;
         return this;
     }
 

@@ -68,12 +68,12 @@ class ReportServiceTest {
         // Ambos funcionários trabalharam das 08:00 às 17:00 (9h totais, 8h líquidas)
         List<TimeEntry> entries = List.of(
             TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(8).forUser(employee1).build(),
-            TimeEntryBuilder.aTimeEntry().withStartBreak().withJob(job).atTime(12).forUser(employee1).build(),
-            TimeEntryBuilder.aTimeEntry().withEndBreak().withJob(job).atTime(13).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(12).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(13).forUser(employee1).build(),
             TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(17).forUser(employee1).build(),
             TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(8).forUser(employee2).build(),
-            TimeEntryBuilder.aTimeEntry().withStartBreak().withJob(job).atTime(12).forUser(employee2).build(),
-            TimeEntryBuilder.aTimeEntry().withEndBreak().withJob(job).atTime(13).forUser(employee2).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(12).forUser(employee2).build(),
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(13).forUser(employee2).build(),
             TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(17).forUser(employee2).build()
         );
 

@@ -74,10 +74,10 @@ public class PayrollServiceTest {
         Instant end = start.plus(1, ChronoUnit.DAYS);
 
         List<TimeEntry> entries = List.of(
-            createTimeEntry(TimeEntryType.CLOCK_IN, start.plus(9, ChronoUnit.HOURS)),
-            createTimeEntry(TimeEntryType.START_BREAK, start.plus(12, ChronoUnit.HOURS)),
-            createTimeEntry(TimeEntryType.END_BREAK, start.plus(13, ChronoUnit.HOURS)),
-            createTimeEntry(TimeEntryType.CLOCK_OUT, start.plus(18, ChronoUnit.HOURS))
+            createTimeEntry(TimeEntryType.IN, start.plus(9, ChronoUnit.HOURS)),
+            createTimeEntry(TimeEntryType.OUT, start.plus(12, ChronoUnit.HOURS)),
+            createTimeEntry(TimeEntryType.IN, start.plus(13, ChronoUnit.HOURS)),
+            createTimeEntry(TimeEntryType.OUT, start.plus(18, ChronoUnit.HOURS))
         );
 
         SalaryHistory salary = createSalaryHistory(new BigDecimal("25.00"), workDate.minusDays(1));
@@ -110,10 +110,10 @@ public class PayrollServiceTest {
         Instant end = day2.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC);
 
         List<TimeEntry> entries = List.of(
-            createTimeEntry(TimeEntryType.CLOCK_IN, start.plus(9, ChronoUnit.HOURS)),   // Day 1 - 09:00
-            createTimeEntry(TimeEntryType.CLOCK_OUT, start.plus(17, ChronoUnit.HOURS)), // Day 1 - 17:00
-            createTimeEntry(TimeEntryType.CLOCK_IN, start.plus(33, ChronoUnit.HOURS)), // Day 2 - 09:00
-            createTimeEntry(TimeEntryType.CLOCK_OUT, start.plus(41, ChronoUnit.HOURS))  // Day 2 - 17:00
+            createTimeEntry(TimeEntryType.IN, start.plus(9, ChronoUnit.HOURS)),   // Day 1 - 09:00
+            createTimeEntry(TimeEntryType.OUT, start.plus(17, ChronoUnit.HOURS)), // Day 1 - 17:00
+            createTimeEntry(TimeEntryType.IN, start.plus(33, ChronoUnit.HOURS)), // Day 2 - 09:00
+            createTimeEntry(TimeEntryType.OUT, start.plus(41, ChronoUnit.HOURS))  // Day 2 - 17:00
         );
 
         SalaryHistory oldSalary = createSalaryHistory(new BigDecimal("20.00"), day1.minusDays(10));
@@ -150,10 +150,10 @@ public class PayrollServiceTest {
         UUID payrollId = UUID.randomUUID();
 
         List<TimeEntry> entries = List.of(
-            createTimeEntry(TimeEntryType.CLOCK_IN, start.plus(9, ChronoUnit.HOURS), payrollId), // Day 1
-            createTimeEntry(TimeEntryType.CLOCK_OUT, start.plus(14, ChronoUnit.HOURS), payrollId), // Day 1 -> 5h
-            createTimeEntry(TimeEntryType.CLOCK_IN, start.plus(33, ChronoUnit.HOURS), null), // Day 2
-            createTimeEntry(TimeEntryType.CLOCK_OUT, start.plus(38, ChronoUnit.HOURS), null)  // Day 2 -> 5h
+            createTimeEntry(TimeEntryType.IN, start.plus(9, ChronoUnit.HOURS), payrollId), // Day 1
+            createTimeEntry(TimeEntryType.OUT, start.plus(14, ChronoUnit.HOURS), payrollId), // Day 1 -> 5h
+            createTimeEntry(TimeEntryType.IN, start.plus(33, ChronoUnit.HOURS), null), // Day 2
+            createTimeEntry(TimeEntryType.OUT, start.plus(38, ChronoUnit.HOURS), null)  // Day 2 -> 5h
         );
 
         SalaryHistory salary = createSalaryHistory(new BigDecimal("10.00"), day1.minusDays(1));
@@ -205,7 +205,7 @@ public class PayrollServiceTest {
         Instant end = start.plus(1, ChronoUnit.DAYS);
 
         List<TimeEntry> entries = List.of(
-            createTimeEntry(TimeEntryType.CLOCK_IN, start.plus(9, ChronoUnit.HOURS))
+            createTimeEntry(TimeEntryType.IN, start.plus(9, ChronoUnit.HOURS))
         );
 
         SalaryHistory salary = createSalaryHistory(new BigDecimal("25.00"), workDate.minusDays(1));
@@ -233,9 +233,9 @@ public class PayrollServiceTest {
         Instant end = start.plus(1, ChronoUnit.DAYS);
 
         List<TimeEntry> entries = List.of(
-            createTimeEntry(TimeEntryType.CLOCK_IN, start.plus(9, ChronoUnit.HOURS)),
-            createTimeEntry(TimeEntryType.START_BREAK, start.plus(12, ChronoUnit.HOURS)),
-            createTimeEntry(TimeEntryType.END_BREAK, start.plus(13, ChronoUnit.HOURS))
+            createTimeEntry(TimeEntryType.IN, start.plus(9, ChronoUnit.HOURS)),
+            createTimeEntry(TimeEntryType.OUT, start.plus(12, ChronoUnit.HOURS)),
+            createTimeEntry(TimeEntryType.IN, start.plus(13, ChronoUnit.HOURS))
         );
 
         SalaryHistory salary = createSalaryHistory(new BigDecimal("10.00"), workDate.minusDays(1));
@@ -271,13 +271,13 @@ public class PayrollServiceTest {
         Instant end = start.plus(1, ChronoUnit.DAYS);
 
         List<TimeEntry> entries1 = List.of(
-            createTimeEntry(employee1, TimeEntryType.CLOCK_IN, start.plus(8, ChronoUnit.HOURS)),
-            createTimeEntry(employee1, TimeEntryType.CLOCK_OUT, start.plus(16, ChronoUnit.HOURS))
+            createTimeEntry(employee1, TimeEntryType.IN, start.plus(8, ChronoUnit.HOURS)),
+            createTimeEntry(employee1, TimeEntryType.OUT, start.plus(16, ChronoUnit.HOURS))
         );
 
         List<TimeEntry> entries2 = List.of(
-            createTimeEntry(employee2, TimeEntryType.CLOCK_IN, start.plus(8, ChronoUnit.HOURS)),
-            createTimeEntry(employee2, TimeEntryType.CLOCK_OUT, start.plus(13, ChronoUnit.HOURS))
+            createTimeEntry(employee2, TimeEntryType.IN, start.plus(8, ChronoUnit.HOURS)),
+            createTimeEntry(employee2, TimeEntryType.OUT, start.plus(13, ChronoUnit.HOURS))
         );
 
         SalaryHistory salary1 = createSalaryHistory(employee1, new BigDecimal("20.00"), workDate.minusDays(1));

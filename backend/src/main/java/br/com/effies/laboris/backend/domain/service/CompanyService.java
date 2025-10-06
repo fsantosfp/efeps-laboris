@@ -69,7 +69,7 @@ public class CompanyService {
         manager.setRole(UserRole.MANAGER);
         manager.setCompany(company);
 
-        String randomPassword = "Efiies#09";//UUID.randomUUID().toString();
+        String randomPassword = UUID.randomUUID().toString();
         manager.setPasswordHash(passwordEncoder.encode(randomPassword));
 
         return userRepository.save(manager);

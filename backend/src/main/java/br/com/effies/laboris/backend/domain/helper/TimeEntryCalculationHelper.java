@@ -13,27 +13,14 @@ public class TimeEntryCalculationHelper {
     public static BigDecimal calculateHoursWorked(List<TimeEntry> entries){
         long totalSeconds = 0;
         Instant startWork = null;
-        Instant startBreak = null;
 
         for( TimeEntry entry : entries) {
+
             switch (entry.getEntryType()) {
-                case CLOCK_IN -> {
+                case IN -> {
                     startWork = entry.getEntryTimestamp();
                 }
-                case START_BREAK -> {
-                    if (startWork != null) {
-                        totalSeconds += Duration.between(startWork, entry.getEntryTimestamp()).getSeconds();
-                        startWork = null;
-                    }
-                    startBreak = entry.getEntryTimestamp();
-                }
-                case END_BREAK -> {
-                    if (startBreak != null) {
-                        startWork = entry.getEntryTimestamp();
-                        startBreak = null;
-                    }
-                }
-                case CLOCK_OUT -> {
+                case OUT -> {
                     if (startWork != null) {
                         totalSeconds += Duration.between(startWork, entry.getEntryTimestamp()).getSeconds();
                         startWork = null;

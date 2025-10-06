@@ -10,9 +10,9 @@ import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.presentation.dto.request.TimeEntryRequestDto;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +51,12 @@ public class TimeEntryService {
         }
 
         Optional<TimeEntry> lastTimeEntry = timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId());
+
+        if (lastTimeEntry.isPresent()) {
+            Instant lastTimestamp = lastTimeEntry.get().getEntryTimestamp();
+            long secondsSinceLastPunch = Duration.between( lastTimestamp, Instant.now()).getSeconds();
+            if( secondsSinceLastPunch < 60 ) throw new IllegalStateException("A batida de ponto não pode ser igual à última batida registrada.");
+        }
 
         if(request.isManual()){
             validateRulesForManualEntry(request, lastTimeEntry);
@@ -104,44 +110,13 @@ public class TimeEntryService {
         }
     }
 
-    private void validateStateTransition(TimeEntryType nextType, Optional<TimeEntry> lastTimeEntry){
+    private  void validateStateTransition(TimeEntryType nextType, Optional<TimeEntry> lastEntry){
 
-        if(lastTimeEntry.isEmpty()){
-            if(nextType != TimeEntryType.CLOCK_IN){
-                throw new IllegalStateException("A primeira batida de ponto do dia deve ser 'CLOCK_IN'.");
-            }
-            return;
-        }
+        if(lastEntry.isEmpty() && nextType != TimeEntryType.IN) throw new IllegalStateException("A primeira batida de ponto deve ser uma entrada (IN).");
 
-        TimeEntryType lastType = lastTimeEntry.get().getEntryType();
-
-        String exceptionMessage = null;
-
-        switch (nextType){
-            case CLOCK_IN :
-                if(lastType != TimeEntryType.CLOCK_OUT){
-                    exceptionMessage = "Não é possível fazer 'CLOCK_IN' sem antes ter feito 'CLOCK_OUT'";
-                }
-                break;
-            case START_BREAK:
-                if(lastType != TimeEntryType.CLOCK_IN && lastType != TimeEntryType.END_BREAK){
-                    exceptionMessage = "Só é possível iniciar um intervalo se você estiver trabalhando.";
-                }
-                break;
-            case END_BREAK:
-                if(lastType != TimeEntryType.START_BREAK ){
-                    exceptionMessage = "Não é possível terminar um intervalo sem antes tê-lo iniciado.";
-                }
-                break;
-            case CLOCK_OUT:
-                if(lastType == TimeEntryType.CLOCK_OUT || lastType == TimeEntryType.START_BREAK ){
-                    exceptionMessage = "Não é possível fazer 'CLOCK_OUT' neste momento.";
-                }
-                break;
-        }
-
-        if(exceptionMessage != null){
-            throw new IllegalStateException(exceptionMessage);
+        if(lastEntry.isPresent()){
+            TimeEntryType lastType = lastEntry.get().getEntryType();
+            if( lastType == nextType) throw new IllegalStateException("Ação inválida. A última batida já foi do tipo '" + lastType + "'.");
         }
     }
 }
