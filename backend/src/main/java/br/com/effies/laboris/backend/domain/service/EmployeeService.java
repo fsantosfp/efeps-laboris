@@ -48,7 +48,6 @@ public class EmployeeService {
         employee.setCompany(manager.getCompany());
 
         String randomPassword = UUID.randomUUID().toString();
-        System.out.println(randomPassword);
         employee.setPasswordHash(passwordEncoder.encode(randomPassword));
 
         User savedEmployee = userRepository.save(employee);
