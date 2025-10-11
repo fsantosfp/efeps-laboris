@@ -56,22 +56,6 @@ CREATE TABLE job_assignments (
     PRIMARY KEY (user_id, job_id) -- Garante que um usuário só pode ser designado uma vez para o mesmo trabalho
 );
 
--- Tabela para armazenar todas as batidas de ponto
-CREATE TABLE time_entries (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
-    entry_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    entry_type VARCHAR(255) NOT NULL,
-    latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL,
-    is_manual BOOLEAN NOT NULL DEFAULT FALSE,
-    justification TEXT, -- Justificativa para entradas manuais,
-    payroll_id UUID,
-    CONSTRAINT check_time_entry_type CHECK (entry_type IN ('CLOCK_IN', 'START_BREAK', 'END_BREAK', 'CLOCK_OUT')),
-    CONSTRAINT fk_time_entries_payroll FOREIGN KEY (payroll_id) REFERENCES payrolls(id)
-);
-
 -- Tabela para armazenar as folhas de pagamentos.
 CREATE TABLE payrolls (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -88,6 +72,22 @@ CREATE TABLE payroll_details (
     employee_id UUID NOT NULL REFERENCES users(id),
     total_hours NUMERIC(10, 2) NOT NULL,
     total_amount NUMERIC(10, 2) NOT NULL
+);
+
+-- Tabela para armazenar todas as batidas de ponto
+CREATE TABLE time_entries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+    entry_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    entry_type VARCHAR(255) NOT NULL,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    is_manual BOOLEAN NOT NULL DEFAULT FALSE,
+    justification TEXT, -- Justificativa para entradas manuais
+    payroll_id UUID,
+    CONSTRAINT check_time_entry_type CHECK (entry_type IN ('IN', 'OUT')),
+    CONSTRAINT fk_time_entries_payroll FOREIGN KEY (payroll_id) REFERENCES payrolls(id)
 );
 
 -- Criando um índice para otimizar a busca por salário em uma data específica, analisar primeiro o desempenho
