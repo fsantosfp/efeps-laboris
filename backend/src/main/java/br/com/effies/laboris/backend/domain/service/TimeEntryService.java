@@ -95,6 +95,10 @@ public class TimeEntryService {
         );
     }
 
+    public Optional<TimeEntry> findLastByEmployee(User employee){
+        return timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId());
+    }
+
     private void validateRulesForManualEntry(TimeEntryRequestDto request, Optional<TimeEntry> lastTimeEntry) {
 
         if(request.getReportedTimestamp() == null){
