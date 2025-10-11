@@ -65,4 +65,14 @@ public class TimeEntryController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/me/last")
+    public ResponseEntity<TimeEntryResponseDto> getMyLastTimeEntry(
+        @AuthenticationPrincipal User employee
+    ){
+        return timeEntryService.findLastByEmployee(employee)
+            .map(TimeEntryResponseDto::new)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
 }
