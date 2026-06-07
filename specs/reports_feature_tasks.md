@@ -60,19 +60,19 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## 💼 Slice 3: Atualizações no Detalhe do Job (Frontend)
 
-- [ ] **Tarefa 3.1: Ajuste de Layout e Nova Seção**
+- [x] **Tarefa 3.1: Ajuste de Layout e Nova Seção**
   - **Ações:**
     - Modificar [JobDetailPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/JobDetailPage.jsx) para remover o link/botão antigo de "Gerar Relatório de Custo".
     - Adicionar a seção visível inferior "Relatório de Presença e Horas Diárias" (Timesheet).
   - **Critério de Aceitação:** Interface do Job adaptada sem o botão de custos e com a nova seção.
 
-- [ ] **Tarefa 3.2: Integração e Renderização do Timesheet**
+- [x] **Tarefa 3.2: Integração e Renderização do Timesheet**
   - **Ações:**
     - Chamar a API `GET /api/v1/reports/jobs/{jobId}/timesheet` na montagem do componente.
     - Renderizar a listagem contendo colaboradores, dias e horas trabalhadas de forma intuitiva e premium.
   - **Critério de Aceitação:** Timesheet sendo exibido dinamicamente com informações do banco.
 
-- [ ] **Tarefa 3.3: Validação Final e Build**
+- [x] **Tarefa 3.3: Validação Final e Build**
   - **Ações:**
     - Executar `npm run build` na pasta frontend.
     - Validar o fluxo completo de emissão de folha, custos múltiplos e visualização do timesheet localmente.

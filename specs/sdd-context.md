@@ -9,17 +9,16 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 3.1: Ajuste de Layout e Nova Seção (Slice 3)
-* **Objetivo:** Modificar `JobDetailPage.jsx` para remover o botão antigo de "Gerar Relatório de Custo" e adicionar a nova seção "Relatório de Presença e Horas Diárias" (Timesheet).
+* **Título:** Concluído
+* **Objetivo:** Todas as tarefas de backend e frontend foram implementadas e validadas com sucesso.
 
 ---
 
 ## 📂 Escopo dos Arquivos
-* **Modificar:**
-  - [JobDetailPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/JobDetailPage.jsx)
+Nenhum.
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que a página de detalhes do job compile e renderize corretamente com a nova seção e sem o link de custo.
-2. **Conventional Commit:** Commitar no formato `feat(reports): add timesheet layout section in JobDetailPage` antes de prosseguir.
+1. **Compilação Limpa:** Certificar que o backend compile e teste com sucesso e que a build do frontend ocorra sem erros.
+2. **Conventional Commit:** Tudo foi comitado e empurrado na branch correspondente.
