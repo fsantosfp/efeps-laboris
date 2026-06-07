@@ -32,7 +32,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Adicionar o método `reverseGeocode` no [GeoService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/GeoService.java) usando a API do Google Maps para traduzir latitude/longitude em endereço de texto.
   - **Critério de Aceitação:** Método criado, integrando com o SDK do Google.
 
-- [ ] **Tarefa 2.2: Criar os DTOs de Deslocamento**
+- [x] **Tarefa 2.2: Criar os DTOs de Deslocamento**
   - **Ações:**
     - Criar as classes de DTO para receber coordenadas (`DisplacementRequestDto.java`) e para responder dados da viagem (`DisplacementResponseDto.java`).
   - **Critério de Aceitação:** Classes DTO criadas e estruturadas.
