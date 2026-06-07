@@ -19,15 +19,22 @@ const MainScreen = ({ onLogout: handleLogout }) => {
             async (position) => {
                 const {latitude, longitude} = position.coords;
                 setCurrentPosition(position.coords);
+                console.log(`[Developer Log] Dispositivo coordenadas: Lat: ${latitude}, Lon: ${longitude}`);
 
                 try{
 
                     const [assignmentsRes, lastEntryRes] = await Promise.all([
                         api.get('/my-assignments'),
-                        api.get('/time-entries/me/last')
+                        api.get('/time-entries/me/last').catch(err => {
+                            if (err.response && err.response.status === 404) {
+                                return { data: null };
+                            }
+                            throw err;
+                        })
                     ]);
 
                     setLastEntry(lastEntryRes.data);
+                    console.log(`[Developer Log] Trabalhos designados:`, assignmentsRes.data);
 
                     const foundJob = assignmentsRes.data.find( job => {
                         const latDiff = Math.abs(job.latitude - latitude)
@@ -38,15 +45,16 @@ const MainScreen = ({ onLogout: handleLogout }) => {
                     if(foundJob){
                         setCurrentJob(foundJob)
                     } else {
-                        setErrorMessage('Você não parece estar em um local de trabalho designado.');
+                        if (assignmentsRes.data.length > 0) {
+                            const firstJob = assignmentsRes.data[0];
+                            setErrorMessage(`Você não parece estar perto do local de trabalho designado.\n\nSua posição atual:\nLat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}\n\nCoordenadas do trabalho:\nLat: ${firstJob.latitude.toFixed(4)}, Lon: ${firstJob.longitude.toFixed(4)}\n\n(Aproxime-se a menos de 0.1 graus ou configure seu emulador com estas coordenadas).`);
+                        } else {
+                            setErrorMessage('Você não possui nenhum trabalho ativo designado.');
+                        }
                     }
                 }
                 catch (error) {
-                    if (error.response && error.response.status === 404) {
-                        setLastEntry(null);
-                    } else {
-                        setErrorMessage('Falha ao buscar seus dados de trabalho.');
-                    }
+                    setErrorMessage('Falha ao buscar seus dados de trabalho.');
                 }finally{
                     setLoading(false)
                 }
