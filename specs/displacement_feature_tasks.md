@@ -18,7 +18,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Criar a classe [Displacement.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/entity/Displacement.java) mapeando a tabela de banco de dados com seus relacionamentos.
   - **Critério de Aceitação:** Entidade JPA mapeada corretamente e sem erros de compilação.
 
-- [ ] **Tarefa 1.3: Criar o repositório `DisplacementRepository.java`**
+- [x] **Tarefa 1.3: Criar o repositório `DisplacementRepository.java`**
   - **Ações:**
     - Criar a interface [DisplacementRepository.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/repository/DisplacementRepository.java) com as consultas de deslocamento ativo e por período.
   - **Critério de Aceitação:** Repositório criado e compilável.
