@@ -13,11 +13,12 @@ const LoginScreen = ({ onLoginSucess }) => {
         try {
             
             const response = await api.post('/auth/login', {email, password});
-            const {token} = response.data;
+            const { token, passwordResetRequired } = response.data;
             await AsyncStorage.setItem('authToken', token);
+            await AsyncStorage.setItem('passwordResetRequired', String(passwordResetRequired));
 
             Alert.alert("Sucesso", "Login realizado com sucesso!");
-            onLoginSucess()
+            onLoginSucess(passwordResetRequired);
         } catch (error) {
             Alert.alert("Erro no Login", "E-mail ou senha inválidos.");
         }

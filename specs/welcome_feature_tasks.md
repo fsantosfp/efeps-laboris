@@ -104,13 +104,13 @@ Este documento contém o fatiamento e decomposição das tarefas para a implemen
 
 ## 📱 Slice 6: Aplicativo Mobile React Native (Mobile)
 
-- [ ] **Tarefa 6.1: Fluxo de Login no Mobile**
+- [x] **Tarefa 6.1: Fluxo de Login no Mobile**
   - **Ações:**
     - Adaptar `LoginScreen.js` para ler `passwordResetRequired` do payload HTTP.
     - Se `true`, redirecionar para a nova tela de redefinição.
   - **Critério de Aceitação:** O aplicativo identifica novos funcionários e direciona para a tela de alteração obrigatória.
 
-- [ ] **Tarefa 6.2: Criação da Tela ChangePasswordScreen.js**
+- [x] **Tarefa 6.2: Criação da Tela ChangePasswordScreen.js**
   - **Ações:**
     - Criar tela nativa de redefinição de senha.
     - Bloquear o botão de voltar físico do Android e gestos de navegação.
