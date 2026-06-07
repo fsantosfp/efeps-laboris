@@ -56,7 +56,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## 📈 Slice 3: Cálculo de Horas, Intervalos e Relatórios (Backend)
 
-- [ ] **Tarefa 3.1: Adicionar propriedade no DTO do Relatório**
+- [x] **Tarefa 3.1: Adicionar propriedade no DTO do Relatório**
   - **Ações:**
     - Adicionar o campo `displacement` (String) em `DailyHoursDto` dentro de [JobTimesheetResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JobTimesheetResponseDto.java).
   - **Critério de Aceitação:** DTO estendido compilável.
