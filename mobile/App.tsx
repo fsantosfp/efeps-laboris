@@ -5,10 +5,11 @@ import { Text, View, Button, ActivityIndicator } from "react-native";
 import LoginScreen from "./src/screens/LoginScreen";
 import MainScreen from "./src/screens/MainScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import TabNavigator from "./src/navigation/TabNavigator";
 
 const Stack = createNativeStackNavigator();
 
-const App = () => {
+const App = (): React.JSX.Element => {
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
@@ -36,7 +37,7 @@ const App = () => {
   }
 
   if( isLoggedIn === null ){
-    return <View style={{flex: 1, justifyContent: 'center'}}><ActivityIndicator /></View>;
+    return <View style={{flex: 1, justifyContent: 'center'}}><ActivityIndicator size="large" /></View>;
   }
 
   return (
@@ -44,7 +45,7 @@ const App = () => {
       <Stack.Navigator>
         {isLoggedIn ? (
           <Stack.Screen name="MainApp" options={{ headerShown: false }} >
-            { (props) => <MainScreen {...props} onLogout={ () => setIsLoggedIn(false) } /> }
+            { () => <TabNavigator onLogout={handleLogout} />}
           </Stack.Screen>
         ) : (
           <Stack.Screen name="Login">

@@ -21,24 +21,17 @@ const MainScreen = ({ onLogout: handleLogout }) => {
                 setCurrentPosition(position.coords);
 
                 try{
-                    console.log('getting assigments')
 
                     const [assignmentsRes, lastEntryRes] = await Promise.all([
                         api.get('/my-assignments'),
                         api.get('/time-entries/me/last')
                     ]);
 
-                    console.log(assignmentsRes, lastEntryRes);
-
                     setLastEntry(lastEntryRes.data);
 
-                    console.log(latitude, longitude)
                     const foundJob = assignmentsRes.data.find( job => {
-                        console.info(job)
                         const latDiff = Math.abs(job.latitude - latitude)
                         const lonDiff = Math.abs(job.longitude - longitude)
-                        console.info('calculado')
-                        console.log(latDiff, lonDiff)
                         return latDiff < 0.1 && lonDiff < 0.1;
                     })
 
