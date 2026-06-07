@@ -70,7 +70,7 @@ Este documento contém o fatiamento e decomposição das tarefas para a implemen
 
 ## ✏️ Slice 4: Endpoint de Redefinição de Senha (Backend)
 
-- [ ] **Tarefa 4.1: Endpoint PUT /api/v1/me/password**
+- [x] **Tarefa 4.1: Endpoint PUT /api/v1/me/password**
   - **Ações:**
     - Criar `ChangePasswordRequestDto.java` recebendo `newPassword` (mínimo de 8 caracteres).
     - Criar o controller `MeController.java` anotado com `@RestController` e `@RequestMapping("/api/v1/me")`.
