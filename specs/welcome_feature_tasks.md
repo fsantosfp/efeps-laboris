@@ -60,7 +60,7 @@ Este documento contém o fatiamento e decomposição das tarefas para a implemen
     - Modificar a resposta do login em `AuthController.java` / `AuthService.java` para retornar o valor boolean correto.
   - **Critério de Aceitação:** O payload JSON retornado pela chamada HTTP de login exibe `passwordResetRequired: true` para usuários que ainda não alteraram a senha inicial.
 
-- [ ] **Tarefa 3.3: Filtro de Segurança Interceptador (Security Gate)**
+- [x] **Tarefa 3.3: Filtro de Segurança Interceptador (Security Gate)**
   - **Ações:**
     - Atualizar o `SecurityFilter.java`.
     - Se o token conter o claim `passwordResetRequired = true` e o endpoint solicitado não for `/api/v1/me/password`, bloquear a requisição e retornar HTTP `403 Forbidden` com corpo detalhando a necessidade de alteração de senha.
