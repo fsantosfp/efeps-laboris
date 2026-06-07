@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.3: Lógica de Serviço no ReportService (Slice 1)
-* **Objetivo:** Implementar o método `calculateJobTimesheetReport(User manager, UUID jobId, Instant start, Instant end)` no `ReportService.java` para retornar o timesheet detalhado de um Job agrupando horas por colaborador e por dia.
+* **Título:** Tarefa 1.4: Endpoint no ReportController (Slice 1)
+* **Objetivo:** Criar a rota `GET /api/v1/reports/jobs/{jobId}/timesheet` no `ReportController.java` recebendo parâmetros de período opcionais.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Modificar:**
-  - [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java)
+  - [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que as lógicas de agrupamento do Stream compilem corretamente.
-2. **Conventional Commit:** Commitar no formato `feat(reports): implement calculateJobTimesheetReport in ReportService` antes de prosseguir.
+1. **Compilação Limpa:** Certificar que o endpoint do controlador compile corretamente e mapeie a rota e parâmetros esperados.
+2. **Conventional Commit:** Commitar no formato `feat(reports): add timesheet endpoint in ReportController` antes de prosseguir.

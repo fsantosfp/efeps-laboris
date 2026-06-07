@@ -16,7 +16,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Adicionar a declaração de método `findAllByJobIdOrderByEntryTimestampAsc` no [TimeEntryRepository.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/repository/TimeEntryRepository.java).
   - **Critério de Aceitação:** Repositório atualizado e compilável.
 
-- [ ] **Tarefa 1.3: Lógica de Serviço no ReportService**
+- [x] **Tarefa 1.3: Lógica de Serviço no ReportService**
   - **Ações:**
     - Criar o método `calculateJobTimesheetReport(User manager, UUID jobId, Instant start, Instant end)` no [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java).
     - Agrupar e somar as horas diárias trabalhadas por cada colaborador usando `TimeEntryCalculationHelper.calculateHoursWorked`.
