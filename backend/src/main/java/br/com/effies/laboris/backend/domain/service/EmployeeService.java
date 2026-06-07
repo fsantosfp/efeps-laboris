@@ -7,6 +7,7 @@ import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
 import br.com.effies.laboris.backend.domain.model.Employee;
 import br.com.effies.laboris.backend.domain.repository.SalaryHistoryRepository;
 import br.com.effies.laboris.backend.domain.repository.UserRepository;
+import br.com.effies.laboris.backend.domain.utils.PasswordGenerator;
 import br.com.effies.laboris.backend.presentation.dto.request.CreateEmployeeRequestDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -23,15 +24,18 @@ public class EmployeeService {
     private final SalaryHistoryRepository salaryRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public EmployeeService(
         SalaryHistoryRepository salaryRepository,
         UserRepository userRepository,
-        PasswordEncoder passwordEncoder
+        PasswordEncoder passwordEncoder,
+        EmailService emailService
     ) {
         this.salaryRepository = salaryRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -46,9 +50,10 @@ public class EmployeeService {
         employee.setEmail(request.getEmail());
         employee.setRole(UserRole.EMPLOYEE);
         employee.setCompany(manager.getCompany());
+        employee.setPasswordResetRequired(true);
 
-        String randomPassword = UUID.randomUUID().toString();
-        employee.setPasswordHash(passwordEncoder.encode(randomPassword));
+        String temporaryPassword = PasswordGenerator.generate();
+        employee.setPasswordHash(passwordEncoder.encode(temporaryPassword));
 
         User savedEmployee = userRepository.save(employee);
 
@@ -58,8 +63,7 @@ public class EmployeeService {
         initialSalary.setEffectiveDate(request.getEffectiveDate());
         salaryRepository.save(initialSalary);
 
-        // TODO: Disparar e-mail de boas-vindas para o funcionário
-        System.out.println("LOG DEV: E-mail de boas-vindas para o funcionário " + employee.getEmail());
+        emailService.sendWelcomeEmail(savedEmployee.getEmail(), savedEmployee.getName(), temporaryPassword, savedEmployee.getRole().name());
 
         return new Employee(savedEmployee, initialSalary);
     }
