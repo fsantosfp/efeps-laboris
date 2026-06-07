@@ -91,17 +91,17 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## 📱 Slice 5: Fluxo de Trânsito no Aplicativo Mobile (Frontend)
 
-- [ ] **Tarefa 5.1: Condicionar visibilidade dos botões de deslocamento**
+- [x] **Tarefa 5.1: Condicionar visibilidade dos botões de deslocamento**
   - **Ações:**
     - Modificar [MainScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/MainScreen.js) para carregar as atribuições e exibir botões de deslocamento somente se o usuário tiver designação para 2 ou mais jobs.
   - **Critério de Aceitação:** Botões exibidos apenas para colaboradores multi-job.
 
-- [ ] **Tarefa 5.2: Ação de Iniciar Deslocamento no Mobile**
+- [x] **Tarefa 5.2: Ação de Iniciar Deslocamento no Mobile**
   - **Ações:**
     - Implementar chamada à API `POST /api/v1/displacements/start` capturando a posição GPS atual.
   - **Critério de Aceitação:** Início do deslocamento gravado e estado do app atualizado.
 
-- [ ] **Tarefa 5.3: Ação de Finalizar Deslocamento e Bater Ponto no Mobile**
+- [x] **Tarefa 5.3: Ação de Finalizar Deslocamento e Bater Ponto no Mobile**
   - **Ações:**
     - Adicionar modal/seletor para o usuário escolher o job de destino.
     - Chamar `POST /api/v1/displacements/end` e registrar o ponto `IN` para o respectivo Job.
