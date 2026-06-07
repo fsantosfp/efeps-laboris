@@ -35,40 +35,49 @@ Este documento contém a decomposição das tarefas para a implementação da fe
 
 ## 🚪 Slice 2: Interface e Listagem (Frontend)
 
-- [ ] **Tarefa 2.1: Navegação e Registro de Rota**
+- [x] **Tarefa 2.1: Navegação e Registro de Rota**
   - **Ações:**
     - Adicionar o link de navegação "Equipe" no menu do [Layout.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/components/Layout.jsx).
     - Registrar a rota protegida `/employees` apontando para `EmployeesPage` no [App.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/App.jsx).
   - **Critério de Aceitação:** O menu exibe o link e a rota é acessível quando autenticado.
 
-- [ ] **Tarefa 2.2: Tabela Principal e Estilização**
+- [x] **Tarefa 2.2: Tabela Principal e Estilização**
   - **Ações:**
     - Criar o arquivo `EmployeesPage.jsx` e `EmployeesPage.css` em `frontend/src/pages/`.
     - Exibir a tabela contendo Nome, E-mail, Taxa Horária Atual e Data de Vigência de todos os funcionários ativos da empresa.
     - Adicionar um filtro de alternância (toggle) "Mostrar Inativos" que inclui/exclui registros com `status = INACTIVE` da listagem.
   - **Critério de Aceitação:** A tabela renderiza corretamente com visual premium, listando os funcionários ativos.
 
-- [ ] **Tarefa 2.3: Ação de Inativação**
+- [x] **Tarefa 2.3: Ação de Inativação**
   - **Ações:**
     - Adicionar o botão "Inativar" em cada linha de funcionário ativo.
     - Exibir um diálogo de confirmação moderno antes de disparar o `DELETE /api/v1/employees/{id}`.
     - Após o sucesso, recarregar a listagem.
   - **Critério de Aceitação:** Um funcionário pode ser inativado com sucesso.
 
+- [x] **Tarefa 2.4: Ação de Reativação**
+  - **Ações:**
+    - Adicionar a rota de reativação no backend `POST /api/v1/employees/{id}/activate`.
+    - Exibir o botão "Reativar" para funcionários com `status = INACTIVE`.
+    - Exibir diálogo de confirmação moderno para o gestor.
+    - Chamar o endpoint correspondente e recarregar a listagem ao confirmar.
+  - **Critério de Aceitação:** Um funcionário inativo pode ser reativado com sucesso.
+
 ---
 
 ## ✏️ Slice 3: Cadastro e Histórico Salarial (Frontend)
 
-- [ ] **Tarefa 3.1: Modal de Cadastro de Funcionário**
+- [x] **Tarefa 3.1: Modal de Cadastro de Funcionário**
   - **Ações:**
     - Criar um modal na página de listagem contendo formulário com os campos: Nome, E-mail, Taxa Horária Inicial e Data de Vigência Inicial.
     - Integrar com o endpoint `POST /api/v1/employees`.
     - Adicionar tratamento de erros e feedbacks visuais em caso de e-mail duplicado ou campos inválidos.
   - **Critério de Aceitação:** Gestores conseguem cadastrar novos funcionários direto do modal e a tabela atualiza após o sucesso.
 
-- [ ] **Tarefa 3.2: Modal de Histórico Salarial**
+- [x] **Tarefa 3.2: Modal de Histórico Salarial**
   - **Ações:**
     - Criar um modal contendo a timeline/tabela do histórico de salários do funcionário selecionado (carregando de `GET /api/v1/employees/{id}/salaries`).
     - Permitir a adição de uma nova vigência salarial (Taxa Horária e Data de Vigência) enviando os dados em um formulário integrado com `POST /api/v1/employees/{id}/salaries`.
     - Atualizar a timeline dinamicamente ao salvar a nova taxa.
   - **Critério de Aceitação:** O histórico é carregado corretamente e novas taxas são adicionadas com sucesso.
+
