@@ -48,6 +48,20 @@ public class TokenService {
         }
     }
 
+    public boolean isPasswordResetRequired(String token) {
+        try {
+            Boolean required = Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("passwordResetRequired", Boolean.class);
+            return required != null && required;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private Key getSignInKey(){
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);

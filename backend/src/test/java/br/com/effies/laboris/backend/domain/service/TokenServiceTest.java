@@ -91,6 +91,50 @@ class TokenServiceTest {
         assertThat(email).isEmpty();
     }
 
+    @Test
+    @DisplayName("Should return true when token has passwordResetRequired claim set to true")
+    void isPasswordResetRequired_WhenClaimIsTrue_ShouldReturnTrue() {
+        // Arrange
+        User user = new User();
+        user.setEmail("reset@company.com");
+        user.setRole(UserRole.EMPLOYEE);
+        user.setPasswordResetRequired(true);
+        String token = tokenService.generateToken(user);
+
+        // Act
+        boolean result = tokenService.isPasswordResetRequired(token);
+
+        // Assert
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("Should return false when token has passwordResetRequired claim set to false")
+    void isPasswordResetRequired_WhenClaimIsFalse_ShouldReturnFalse() {
+        // Arrange
+        User user = new User();
+        user.setEmail("no-reset@company.com");
+        user.setRole(UserRole.EMPLOYEE);
+        user.setPasswordResetRequired(false);
+        String token = tokenService.generateToken(user);
+
+        // Act
+        boolean result = tokenService.isPasswordResetRequired(token);
+
+        // Assert
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("Should return false when token is invalid")
+    void isPasswordResetRequired_WhenTokenIsInvalid_ShouldReturnFalse() {
+        // Act
+        boolean result = tokenService.isPasswordResetRequired("invalid-token-string");
+
+        // Assert
+        assertThat(result).isFalse();
+    }
+
     private Claims getClaimsFromToken(String token) {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         Key key = Keys.hmacShaKeyFor(keyBytes);
