@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.2: Adição do Método de Busca no Repositório (Slice 1)
-* **Objetivo:** Adicionar o método `findAllByJobIdOrderByEntryTimestampAsc` no `TimeEntryRepository.java` para buscar todos os pontos associados a um Job ordenados de forma cronológica.
+* **Título:** Tarefa 1.3: Lógica de Serviço no ReportService (Slice 1)
+* **Objetivo:** Implementar o método `calculateJobTimesheetReport(User manager, UUID jobId, Instant start, Instant end)` no `ReportService.java` para retornar o timesheet detalhado de um Job agrupando horas por colaborador e por dia.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Modificar:**
-  - [TimeEntryRepository.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/repository/TimeEntryRepository.java)
+  - [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que o repositório compile sem erros de JPA query mapping.
-2. **Conventional Commit:** Commitar no formato `feat(reports): add findAllByJobIdOrderByEntryTimestampAsc in TimeEntryRepository` antes de prosseguir.
+1. **Compilação Limpa:** Certificar que as lógicas de agrupamento do Stream compilem corretamente.
+2. **Conventional Commit:** Commitar no formato `feat(reports): implement calculateJobTimesheetReport in ReportService` antes de prosseguir.
