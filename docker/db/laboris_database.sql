@@ -16,6 +16,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'ACTIVE',
+    password_reset_required BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT check_user_role CHECK (role IN ('SAAS_OWNER', 'MANAGER', 'EMPLOYEE')),

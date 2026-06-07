@@ -28,8 +28,8 @@ public class AuthController {
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest){
 
         try{
-            String token = authService.login(loginRequest);
-            return ResponseEntity.ok( new LoginResponseDto(token));
+            LoginResponseDto response = authService.login(loginRequest);
+            return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).build();
         }

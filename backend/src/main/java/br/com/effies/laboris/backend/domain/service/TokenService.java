@@ -28,6 +28,7 @@ public class TokenService {
             .setIssuer("laboris-api")
             .setSubject(user.getUsername())
             .claim("role", user.getRole().name())
+            .claim("passwordResetRequired", user.isPasswordResetRequired())
             .setIssuedAt(Date.from(now))
             .setExpiration(Date.from(expiration))
             .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -44,6 +45,20 @@ public class TokenService {
                 .getSubject();
         } catch (Exception e){
             return "";
+        }
+    }
+
+    public boolean isPasswordResetRequired(String token) {
+        try {
+            Boolean required = Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("passwordResetRequired", Boolean.class);
+            return required != null && required;
+        } catch (Exception e) {
+            return false;
         }
     }
 

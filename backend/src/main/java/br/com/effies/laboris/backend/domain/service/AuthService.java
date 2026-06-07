@@ -3,6 +3,7 @@ package br.com.effies.laboris.backend.domain.service;
 
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.presentation.dto.request.LoginRequestDto;
+import br.com.effies.laboris.backend.presentation.dto.response.LoginResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +17,7 @@ public class AuthService {
     @Autowired
     private TokenService tokenService;
 
-    public String login(LoginRequestDto loginRequest){
+    public LoginResponseDto login(LoginRequestDto loginRequest){
         var usernamePassword = new UsernamePasswordAuthenticationToken(
             loginRequest.getEmail(),
             loginRequest.getPassword());
@@ -25,6 +26,7 @@ public class AuthService {
 
         User authenticatedUser = (User) auth.getPrincipal();
 
-        return tokenService.generateToken(authenticatedUser);
+        String token = tokenService.generateToken(authenticatedUser);
+        return new LoginResponseDto(token, authenticatedUser.isPasswordResetRequired());
     }
 }

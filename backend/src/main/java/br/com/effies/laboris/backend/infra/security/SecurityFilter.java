@@ -46,6 +46,21 @@ public class SecurityFilter extends OncePerRequestFilter {
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                if (tokenService.isPasswordResetRequired(token)) {
+                    String requestURI = request.getRequestURI();
+                    String method = request.getMethod();
+                    boolean isPublicRoute = requestURI.startsWith("/api/v1/auth/");
+                    boolean isChangePasswordRoute = (requestURI.equals("/api/v1/me/password") || requestURI.equals("/api/v1/me/password/"))
+                            && "PUT".equalsIgnoreCase(method);
+
+                    if (!isPublicRoute && !isChangePasswordRoute) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"error\": \"PASSWORD_RESET_REQUIRED\", \"message\": \"Password reset is required before accessing this resource.\"}");
+                        return;
+                    }
+                }
             }
         }
         filterChain.doFilter(request, response);

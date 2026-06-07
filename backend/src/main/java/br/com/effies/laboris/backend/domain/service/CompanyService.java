@@ -6,6 +6,7 @@ import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
 import br.com.effies.laboris.backend.domain.repository.CompanyRepository;
 import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import br.com.effies.laboris.backend.presentation.dto.request.CreateCompanyRequestDto;
+import br.com.effies.laboris.backend.domain.utils.PasswordGenerator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,11 +21,18 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
-    public CompanyService(CompanyRepository companyRepository, UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public CompanyService(
+        CompanyRepository companyRepository, 
+        UserRepository userRepository, 
+        PasswordEncoder passwordEncoder,
+        EmailService emailService
+    ){
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -38,11 +46,10 @@ public class CompanyService {
         newCompany.setName(request.getCompanyName());
         Company savedCompany = companyRepository.save(newCompany);
 
-        var manager = managerCreate(request, savedCompany);
+        String temporaryPassword = PasswordGenerator.generate();
+        var manager = managerCreate(request, savedCompany, temporaryPassword);
 
-        // TODO: Implementar a lógica de envio de e-mail aqui.
-        // O e-mail conteria um link para o gestor definir sua senha.
-        System.out.println("LOG DE DESENVOLVIMENTO: E-mail de boas-vindas deveria ser enviado para " + manager.getEmail());
+        emailService.sendWelcomeEmail(manager.getEmail(), manager.getName(), temporaryPassword, manager.getRole().name());
 
         return savedCompany;
 
@@ -62,15 +69,15 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    private User managerCreate(CreateCompanyRequestDto request, Company company){
+    private User managerCreate(CreateCompanyRequestDto request, Company company, String temporaryPassword){
         User manager = new User();
         manager.setName(request.getManagerName());
         manager.setEmail(request.getManagerEmail());
         manager.setRole(UserRole.MANAGER);
         manager.setCompany(company);
+        manager.setPasswordResetRequired(true);
 
-        String randomPassword = UUID.randomUUID().toString();
-        manager.setPasswordHash(passwordEncoder.encode(randomPassword));
+        manager.setPasswordHash(passwordEncoder.encode(temporaryPassword));
 
         return userRepository.save(manager);
     }

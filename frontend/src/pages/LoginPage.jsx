@@ -19,7 +19,7 @@ function LoginPage(){
                 password: password
             });
 
-            login(response.data.token);
+            login(response.data.token, response.data.passwordResetRequired);
 
         } catch (err) {
             console.error("Erro no login: ", err);
