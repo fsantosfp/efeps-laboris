@@ -30,4 +30,18 @@ public class GeoService {
         }
         return  null;
     }
+
+    public String reverseGeocode(double latitude, double longitude) {
+        try {
+            LatLng latLng = new LatLng(latitude, longitude);
+            GeocodingResult[] results = GeocodingApi.reverseGeocode(context, latLng).await();
+
+            if (results != null && results.length > 0) {
+                return results[0].formattedAddress;
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao fazer reverse geocode: " + e.getMessage());
+        }
+        return null;
+    }
 }

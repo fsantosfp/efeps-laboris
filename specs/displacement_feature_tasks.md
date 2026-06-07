@@ -27,7 +27,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## 🛠️ Slice 2: Serviço e Lógica de Deslocamento (Backend)
 
-- [ ] **Tarefa 2.1: Implementar reverse geocoding no GeoService**
+- [x] **Tarefa 2.1: Implementar reverse geocoding no GeoService**
   - **Ações:**
     - Adicionar o método `reverseGeocode` no [GeoService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/GeoService.java) usando a API do Google Maps para traduzir latitude/longitude em endereço de texto.
   - **Critério de Aceitação:** Método criado, integrando com o SDK do Google.
