@@ -100,3 +100,17 @@ CREATE TABLE time_entries (
 INSERT INTO users (name, email, password_hash, "role")
 VALUES ('Admin SaaS', 'admin@laboris.com', '$2a$10$p8s27fACTFqP4fz3iD0z0.c8zHyCxEEEN/BuLNGzKAUgtNXs0SqcS', 'SAAS_OWNER')
 ON CONFLICT (email) DO NOTHING;
+
+-- Tabela para armazenar deslocamentos (translados) entre trabalhos
+CREATE TABLE displacements (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    start_timestamp TIMESTAMPTZ NOT NULL,
+    end_timestamp TIMESTAMPTZ,
+    start_latitude DOUBLE PRECISION NOT NULL,
+    start_longitude DOUBLE PRECISION NOT NULL,
+    end_latitude DOUBLE PRECISION,
+    end_longitude DOUBLE PRECISION,
+    start_address TEXT,
+    destination_job_id UUID REFERENCES jobs(id) ON DELETE CASCADE
+);
