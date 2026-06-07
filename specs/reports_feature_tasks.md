@@ -11,7 +11,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Criar a classe [JobTimesheetResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JobTimesheetResponseDto.java) contendo a estrutura com dados do Job, lista de colaboradores e detalhamento de data/horas diárias.
   - **Critério de Aceitação:** Classe DTO criada e compilando normalmente.
 
-- [ ] **Tarefa 1.2: Adição do Método de Busca no Repositório**
+- [x] **Tarefa 1.2: Adição do Método de Busca no Repositório**
   - **Ações:**
     - Adicionar a declaração de método `findAllByJobIdOrderByEntryTimestampAsc` no [TimeEntryRepository.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/repository/TimeEntryRepository.java).
   - **Critério de Aceitação:** Repositório atualizado e compilável.
