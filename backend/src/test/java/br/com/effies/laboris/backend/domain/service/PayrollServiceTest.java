@@ -92,9 +92,9 @@ public class PayrollServiceTest {
         MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
-        assertThat(result.getOpenToReceive().getTotalHours()).isEqualTo(8.0);
+        assertThat(result.getOpenToReceive().getTotalHours()).isEqualByComparingTo("8.00");
         assertThat(result.getOpenToReceive().getTotalAmount()).isEqualByComparingTo("200.00");
-        assertThat(result.getAlreadyPaid().getTotalHours()).isEqualTo(0.0);
+        assertThat(result.getAlreadyPaid().getTotalHours()).isEqualByComparingTo("0");
         assertThat(result.getAlreadyPaid().getTotalAmount()).isEqualByComparingTo("0");
         assertThat(result.getDailyBreakdown()).hasSize(1);
         assertThat(result.getDailyBreakdown().getFirst().getStatus()).isEqualTo("OPEN");
@@ -132,7 +132,7 @@ public class PayrollServiceTest {
         // Assert
         assertThat(result.getDailyBreakdown()).hasSize(2);
         assertThat(result.getAlreadyPaid().getTotalAmount()).isEqualByComparingTo("0");
-        assertThat(result.getOpenToReceive().getTotalHours()).isEqualTo(16.0);
+        assertThat(result.getOpenToReceive().getTotalHours()).isEqualByComparingTo("16.00");
 
         // Dia 1 (8h * 20.00 = 160.00) + Dia 2 (8h * 30.00 = 240.00) = 400.00
         assertThat(result.getOpenToReceive().getTotalAmount()).isEqualByComparingTo("400.00");
@@ -167,9 +167,9 @@ public class PayrollServiceTest {
         MyPayrollResponseDto result = payrollService.calculateEmployeePayroll(employee, start, end);
 
         // Assert
-        assertThat(result.getAlreadyPaid().getTotalHours()).isEqualTo(5.0);
+        assertThat(result.getAlreadyPaid().getTotalHours()).isEqualByComparingTo("5.00");
         assertThat(result.getAlreadyPaid().getTotalAmount()).isEqualByComparingTo("50.00");
-        assertThat(result.getOpenToReceive().getTotalHours()).isEqualTo(5.0);
+        assertThat(result.getOpenToReceive().getTotalHours()).isEqualByComparingTo("5.00");
         assertThat(result.getOpenToReceive().getTotalAmount()).isEqualByComparingTo("50.00");
         assertThat(result.getDailyBreakdown()
             .stream().filter(d -> d.getStatus().equals("PAID")).count()).isEqualTo(1);
@@ -312,7 +312,7 @@ public class PayrollServiceTest {
     }
 
     private TimeEntry createTimeEntry(TimeEntryType type, Instant timestamp, UUID payrollId){
-        return createTimeEntry(type, timestamp, null, null);
+        return createTimeEntry(type, timestamp, payrollId, null);
     }
 
     private TimeEntry createTimeEntry(User user,TimeEntryType type, Instant timestamp){

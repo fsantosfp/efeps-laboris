@@ -45,6 +45,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
 
+    @Column(name = "password_reset_required", nullable = false)
+    private boolean passwordResetRequired = false;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private Instant createdAt;
