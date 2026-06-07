@@ -23,6 +23,9 @@ public class JobResponseDto {
     private BigDecimal budget;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String responsibleName;
+    private String responsiblePhone;
+    private String responsibleEmail;
     private Instant createdAt;
     private List<EmployeeSummaryDto> assignedTeam;
 
@@ -37,6 +40,9 @@ public class JobResponseDto {
         this.budget = job.getBudget();
         this.startDate = job.getStartDate();
         this.endDate = job.getEndDate();
+        this.responsibleName = job.getResponsibleName();
+        this.responsiblePhone = job.getResponsiblePhone();
+        this.responsibleEmail = job.getResponsibleEmail();
         this.createdAt = job.getCreatedAt();
     }
 

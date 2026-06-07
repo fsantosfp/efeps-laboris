@@ -35,8 +35,17 @@ public class Job {
     @Column(nullable = false)
     private BigDecimal budget;
 
-    @Column(name = "billing_rate")
+    @Column(name = "billing_rate", nullable = false)
     private BigDecimal billingRate;
+
+    @Column(name = "responsible_name", nullable = false)
+    private String responsibleName;
+
+    @Column(name = "responsible_phone", nullable = false)
+    private String responsiblePhone;
+
+    @Column(name = "responsible_email")
+    private String responsibleEmail;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

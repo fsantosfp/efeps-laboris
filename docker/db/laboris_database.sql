@@ -41,7 +41,10 @@ CREATE TABLE jobs (
     longitude DOUBLE PRECISION NOT NULL,
     client_name VARCHAR(255), -- Nome do contratante do serviço
     budget NUMERIC(10, 2) NOT NULL,
-    billing_rate NUMERIC(10, 2), -- Valor/hora de venda
+    billing_rate NUMERIC(10, 2) NOT NULL, -- Valor/hora de venda
+    responsible_name VARCHAR(255) NOT NULL,
+    responsible_phone VARCHAR(50) NOT NULL,
+    responsible_email VARCHAR(255),
     status VARCHAR(255) NOT NULL DEFAULT 'PENDING',
     start_date DATE,
     end_date DATE,

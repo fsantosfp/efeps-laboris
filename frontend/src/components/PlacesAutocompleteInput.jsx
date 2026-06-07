@@ -25,9 +25,11 @@ const PlacesAutocompleteInput = ({ onPlaceSelect, value }) => {
 
                     autocompleteElement.addEventListener('gmp-select', async ({placePrediction}) => {
                         const place = placePrediction.toPlace();
-                        await place.fetchFields({fields: ['formattedAddress']})
+                        await place.fetchFields({fields: ['formattedAddress', 'location']})
                         if(place && place.formattedAddress){
-                            onPlaceSelect(place.formattedAddress)
+                            const lat = place.location ? place.location.lat() : null;
+                            const lng = place.location ? place.location.lng() : null;
+                            onPlaceSelect(place.formattedAddress, lat, lng)
                         }
                     });
 

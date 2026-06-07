@@ -51,12 +51,12 @@ public class JobController {
     }
 
     @PatchMapping("/{jobId}")
-    public ResponseEntity<JobResponseDto> updateJobStatus(
+    public ResponseEntity<JobResponseDto> updateJob(
         @PathVariable UUID jobId,
         @Valid @RequestBody UpdateJobRequestDto request,
         @AuthenticationPrincipal User manager
         ){
-         Job updatedJob = jobService.updateStatus(jobId, request, manager);
+         Job updatedJob = jobService.update(jobId, request, manager);
          JobResponseDto response = new JobResponseDto(updatedJob);
 
          return ResponseEntity.ok(response);
