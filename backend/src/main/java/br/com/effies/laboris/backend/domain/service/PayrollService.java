@@ -1,5 +1,6 @@
 package br.com.effies.laboris.backend.domain.service;
 
+import br.com.effies.laboris.backend.domain.entity.Displacement;
 import br.com.effies.laboris.backend.domain.entity.Payroll;
 import br.com.effies.laboris.backend.domain.entity.PayrollDetail;
 import br.com.effies.laboris.backend.domain.entity.SalaryHistory;
@@ -8,6 +9,9 @@ import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
 import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
 import br.com.effies.laboris.backend.domain.helper.TimeEntryCalculationHelper;
+import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
+import java.time.Duration;
+import java.util.Collections;
 import br.com.effies.laboris.backend.domain.repository.PayrollDetailRepository;
 import br.com.effies.laboris.backend.domain.repository.PayrollRepository;
 import br.com.effies.laboris.backend.domain.repository.SalaryHistoryRepository;
@@ -40,19 +44,22 @@ public class PayrollService {
     private final UserRepository userRepository;
     private final PayrollRepository payrollRepository;
     private final PayrollDetailRepository payrollDetailRepository;
+    private final DisplacementRepository displacementRepository;
 
     public PayrollService(
         TimeEntryRepository timeEntryRepository,
         SalaryHistoryRepository salaryRepository,
         UserRepository userRepository,
         PayrollRepository payrollRepository,
-        PayrollDetailRepository payrollDetailRepository
+        PayrollDetailRepository payrollDetailRepository,
+        DisplacementRepository displacementRepository
     ){
         this.salaryRepository = salaryRepository;
         this.timeEntryRepository = timeEntryRepository;
         this.userRepository = userRepository;
         this.payrollRepository = payrollRepository;
         this.payrollDetailRepository = payrollDetailRepository;
+        this.displacementRepository = displacementRepository;
     }
 
     public MyPayrollResponseDto calculateEmployeePayroll(User employee, Instant start, Instant end){
@@ -140,9 +147,13 @@ public class PayrollService {
     private MyPayrollResponseDto calculatePayroll(User employee, Instant start, Instant end){
 
         List<TimeEntry> entries = timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(employee.getId(), start, end);
+        List<Displacement> displacements = displacementRepository.findAllByUserIdAndPeriod(employee.getId(), start, end);
 
         Map<LocalDate, List<TimeEntry>> entriesByDay = entries.stream().collect(Collectors.groupingBy(entry ->
             entry.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate()));
+
+        Map<LocalDate, List<Displacement>> displacementsByDay = displacements.stream().collect(Collectors.groupingBy(d ->
+            d.getStartTimestamp().atZone(ZoneOffset.UTC).toLocalDate()));
 
         List<MyPayrollResponseDto.DailyEntryDto> dailyBreakdown = new ArrayList<>();
 
@@ -156,6 +167,17 @@ public class PayrollService {
             List<TimeEntry> dayEntries = dayEntry.getValue();
 
             BigDecimal hoursWorkedOnDay = TimeEntryCalculationHelper.calculateHoursWorked(dayEntries);
+
+            List<Displacement> dayDisplacements = displacementsByDay.getOrDefault(workDate, Collections.emptyList());
+            BigDecimal displacementHours = BigDecimal.ZERO;
+            for (Displacement d : dayDisplacements) {
+                if (d.getEndTimestamp() != null) {
+                    long seconds = Duration.between(d.getStartTimestamp(), d.getEndTimestamp()).getSeconds();
+                    displacementHours = displacementHours.add(BigDecimal.valueOf(seconds / 3600.0));
+                }
+            }
+            displacementHours = displacementHours.setScale(2, RoundingMode.HALF_UP);
+            hoursWorkedOnDay = hoursWorkedOnDay.add(displacementHours);
 
             Optional<SalaryHistory> salary = salaryRepository
                 .findTopByUser_IdAndEffectiveDateLessThanEqualOrderByEffectiveDateDesc(employee.getId(), workDate);

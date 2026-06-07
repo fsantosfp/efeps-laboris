@@ -23,4 +23,7 @@ public interface DisplacementRepository extends JpaRepository<Displacement, UUID
 
     @Query("SELECT d FROM Displacement d WHERE d.user.id = :userId AND d.destinationJob.id = :jobId AND d.startTimestamp BETWEEN :start AND :end ORDER BY d.startTimestamp ASC")
     List<Displacement> findAllByUserIdAndDestinationJobIdAndPeriod(UUID userId, UUID jobId, Instant start, Instant end);
+
+    @Query("SELECT d FROM Displacement d WHERE d.user.id = :userId AND d.startTimestamp BETWEEN :start AND :end ORDER BY d.startTimestamp ASC")
+    List<Displacement> findAllByUserIdAndPeriod(UUID userId, Instant start, Instant end);
 }

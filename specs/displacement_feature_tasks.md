@@ -61,18 +61,18 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Adicionar o campo `displacement` (String) em `DailyHoursDto` dentro de [JobTimesheetResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JobTimesheetResponseDto.java).
   - **Critério de Aceitação:** DTO estendido compilável.
 
-- [ ] **Tarefa 3.2: Implementar lógica de cálculo de intervalos no mesmo job**
+- [x] **Tarefa 3.2: Implementar lógica de cálculo de intervalos no mesmo job**
   - **Ações:**
     - Modificar a lógica de serviço de relatórios para que o cálculo de intervalos só considere transições de `OUT` e `IN` consecutivos ocorridos no mesmo Trabalho (Job), ignorando transições de trabalhos diferentes.
   - **Critério de Aceitação:** Cálculo de intervalos corrigido de acordo com a regra.
 
-- [ ] **Tarefa 3.3: Apropriar horas de deslocamento ao job de destino**
+- [x] **Tarefa 3.3: Apropriar horas de deslocamento ao job de destino**
   - **Ações:**
     - Atualizar a apuração de horas no [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java) (custo e timesheet) e no [PayrollService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/PayrollService.java) (folha de pagamento) para somar os tempos de trânsito ao job de destino.
     - Mapear a propriedade `displacement` do DTO com o endereço de partida (`start_address`).
   - **Critério de Aceitação:** Custos, folha e timesheet refletindo a apropriação dos tempos de deslocamento.
 
-- [ ] **Tarefa 3.4: Testes Unitários de Deslocamento e Regras**
+- [x] **Tarefa 3.4: Testes Unitários de Deslocamento e Regras**
   - **Ações:**
     - Escrever a suíte de testes `DisplacementServiceTest.java` para cobrir regras de início, fim, geolocalização e bloqueios de ponto.
     - Rodar suíte completa do backend com `SPRING_PROFILES_ACTIVE=local mvn test`.

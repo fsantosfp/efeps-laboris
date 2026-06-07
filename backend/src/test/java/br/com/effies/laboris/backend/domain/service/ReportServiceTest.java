@@ -5,6 +5,7 @@ import br.com.effies.laboris.backend.domain.entity.Job;
 import br.com.effies.laboris.backend.domain.entity.TimeEntry;
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
+import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.domain.utils.TimeEntryBuilder;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +40,8 @@ class ReportServiceTest {
     private JobRepository jobRepository;
     @Mock
     private TimeEntryRepository timeEntryRepository;
+    @Mock
+    private DisplacementRepository displacementRepository;
     @InjectMocks
     private ReportService reportService;
 
@@ -171,6 +175,8 @@ class ReportServiceTest {
 
         when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
         when(timeEntryRepository.findAllByJobIdAndPeriod(job.getId(), start, end)).thenReturn(entries);
+        when(timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(any(UUID.class), any(Instant.class), any(Instant.class))).thenReturn(Collections.emptyList());
+        when(displacementRepository.findAllByUserIdAndDestinationJobIdAndPeriod(any(UUID.class), any(UUID.class), any(Instant.class), any(Instant.class))).thenReturn(Collections.emptyList());
 
         // Act
         JobTimesheetResponseDto result = reportService.calculateJobTimesheetReport(manager, job.getId(), start, end);
@@ -208,6 +214,8 @@ class ReportServiceTest {
 
         when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
         when(timeEntryRepository.findAllByJobIdOrderByEntryTimestampAsc(job.getId())).thenReturn(entries);
+        when(timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(any(UUID.class), any(Instant.class), any(Instant.class))).thenReturn(Collections.emptyList());
+        when(displacementRepository.findAllByUserIdAndDestinationJobIdAndPeriod(any(UUID.class), any(UUID.class), any(Instant.class), any(Instant.class))).thenReturn(Collections.emptyList());
 
         // Act
         JobTimesheetResponseDto result = reportService.calculateJobTimesheetReport(manager, job.getId(), null, null);
