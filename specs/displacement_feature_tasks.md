@@ -13,7 +13,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Executar o script SQL no container PostgreSQL ativo para aplicar as modificações.
   - **Critério de Aceitação:** Tabela criada no banco de dados e scripts atualizados.
 
-- [ ] **Tarefa 1.2: Criar a entidade JPA `Displacement.java`**
+- [x] **Tarefa 1.2: Criar a entidade JPA `Displacement.java`**
   - **Ações:**
     - Criar a classe [Displacement.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/entity/Displacement.java) mapeando a tabela de banco de dados com seus relacionamentos.
   - **Critério de Aceitação:** Entidade JPA mapeada corretamente e sem erros de compilação.
