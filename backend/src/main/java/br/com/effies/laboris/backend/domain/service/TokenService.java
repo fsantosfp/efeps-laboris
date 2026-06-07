@@ -28,6 +28,7 @@ public class TokenService {
             .setIssuer("laboris-api")
             .setSubject(user.getUsername())
             .claim("role", user.getRole().name())
+            .claim("passwordResetRequired", user.isPasswordResetRequired())
             .setIssuedAt(Date.from(now))
             .setExpiration(Date.from(expiration))
             .signWith(getSignInKey(), SignatureAlgorithm.HS256)
