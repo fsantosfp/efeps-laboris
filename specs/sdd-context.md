@@ -1,23 +1,24 @@
 # SDD - Contexto Operacional da Tarefa Atual
 
 ## 🎯 Tarefa Atual
-* **Título:** Slice 6: Aplicativo Mobile React Native (Mobile)
+* **Título:** Tarefa 1.1: Criação dos DTOs de Histórico Salarial e Tarefa 1.2: Métodos de Serviço no EmployeeService
 * **Objetivo:** 
-  1. Adaptar o fluxo de login no aplicativo mobile (`LoginScreen.js`) para capturar a propriedade `passwordResetRequired`. Se for verdadeira, navegar o usuário para a tela de redefinição de senha.
-  2. Criar a tela `ChangePasswordScreen.js` para digitação e confirmação da nova senha, enviando-a para `PUT /api/v1/me/password` e retornando ao login.
+  1. Criar os DTOs `CreateSalaryHistoryRequestDto.java` e `SalaryHistoryResponseDto.java`.
+  2. Implementar os métodos `findSalariesByEmployee` e `addSalaryHistory` em `EmployeeService.java`.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Modificar:**
-  * [LoginScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/LoginScreen.js)
+  * [EmployeeService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/EmployeeService.java)
 * **Criar:**
-  * [ChangePasswordScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/ChangePasswordScreen.js) [NEW]
+  * [CreateSalaryHistoryRequestDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/request/CreateSalaryHistoryRequestDto.java)
+  * [SalaryHistoryResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/SalaryHistoryResponseDto.java)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
 
-1. **Validação Visual:** Verificar se o fluxo de login redireciona corretamente no mobile e se a tela de redefinição de senha impede navegações de volta (bloqueando botão físico de voltar no Android e gestos de swipe no iOS).
+1. **Segurança de Dados:** Os métodos do serviço devem validar se a empresa do funcionário a ser alterado coincide com a empresa do gestor (`manager.getCompany().getId()`), impedindo acesso cruzado.
 2. **Quality Gate:**
-   - Obter aprovação humana após apresentação da implementação.
+   - Compilação limpa do projeto.
