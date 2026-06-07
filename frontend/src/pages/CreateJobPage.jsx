@@ -84,11 +84,6 @@ function CreateJobPage(){
                 <div style={{marginBottom:'10px'}}>
                     <label> Endereço:*</label><br/>
                     <PlacesAutocompleteInput onPlaceSelect={handleAddressSelect} />
-                    {formData.latitude && formData.longitude && (
-                        <span style={{ fontSize: '12px', color: 'green' }}>
-                            Coordenadas obtidas: {formData.latitude}, {formData.longitude}
-                        </span>
-                    )}
                 </div>
                 <div style={{marginBottom:'10px'}}>
                     <label>Nome do Contratante:*</label><br/>
