@@ -197,8 +197,6 @@ function JobDetailPage(){
                     ) : (
                         <div style={{ background: '#fdfdfd', padding: '20px', borderRadius: '8px', border: '1px solid #eee', marginBottom: '20px' }}>
                             <p><strong>Endereço:</strong> { job.address }</p>
-                            <p><strong>Latitude:</strong> { job.latitude }</p>
-                            <p><strong>Longitude:</strong> { job.longitude }</p>
                             <p><strong>Contratante:</strong> { job.clientName }</p>
                             <p><strong>Status:</strong> { 
                                 job.status === 'PENDING' ? 'A fazer' : 
