@@ -37,7 +37,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Criar as classes de DTO para receber coordenadas (`DisplacementRequestDto.java`) e para responder dados da viagem (`DisplacementResponseDto.java`).
   - **Critério de Aceitação:** Classes DTO criadas e estruturadas.
 
-- [ ] **Tarefa 2.3: Criar o serviço `DisplacementService`**
+- [x] **Tarefa 2.3: Criar o serviço `DisplacementService`**
   - **Ações:**
     - Implementar a classe [DisplacementService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/DisplacementService.java) contendo os métodos `startDisplacement` (validando assignments >= 2, última batida OUT, sem viagem ativa, geocode do início) e `endDisplacement` (validando geolocalização perto do destino final).
   - **Critério de Aceitação:** Classe compilando normalmente com as validações de regras de negócio.
