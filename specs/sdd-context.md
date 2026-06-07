@@ -9,16 +9,19 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Concluído
-* **Objetivo:** Todas as tarefas de backend e frontend foram implementadas e validadas com sucesso.
+* **Título:** Tarefa 1.1: Criar a tabela displacements (Slice 1)
+* **Objetivo:** Criar o script SQL de migração `displacement_migration.sql` e atualizar o script `laboris_database.sql` para suportar a tabela `displacements`. Executar o script SQL no container de banco de dados ativo.
 
 ---
 
 ## 📂 Escopo dos Arquivos
-Nenhum.
+* **Criar:**
+  - [displacement_migration.sql](file:///Users/fsantos/Documents/workspace/effies-laboris/docker/db/displacement_migration.sql)
+* **Modificar:**
+  - [laboris_database.sql](file:///Users/fsantos/Documents/workspace/effies-laboris/docker/db/laboris_database.sql)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que o backend compile e teste com sucesso e que a build do frontend ocorra sem erros.
-2. **Conventional Commit:** Tudo foi comitado e empurrado na branch correspondente.
+1. **Compilação Limpa:** Certificar que os scripts SQL estejam sintaticamente corretos para PostgreSQL.
+2. **Conventional Commit:** Commitar no formato `feat(db): create displacements table migration and schema` antes de prosseguir.
