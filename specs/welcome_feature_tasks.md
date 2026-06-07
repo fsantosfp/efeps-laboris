@@ -81,13 +81,13 @@ Este documento contém o fatiamento e decomposição das tarefas para a implemen
 
 ## 🌐 Slice 5: Painel Web React (Frontend)
 
-- [ ] **Tarefa 5.1: Redirecionamento no AuthContext**
+- [x] **Tarefa 5.1: Redirecionamento no AuthContext**
   - **Ações:**
     - Atualizar a função `login` no [AuthContext.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/context/AuthContext.jsx).
     - Capturar o campo `passwordResetRequired` da resposta e, se `true`, navegar o usuário para `/change-password` ao invés de `/dashboard`.
   - **Critério de Aceitação:** Usuários comuns vão para `/dashboard`, novos usuários com senha temporária vão para `/change-password`.
 
-- [ ] **Tarefa 5.2: Criação da Página ChangePasswordPage.jsx**
+- [x] **Tarefa 5.2: Criação da Página ChangePasswordPage.jsx**
   - **Ações:**
     - Criar a página de redefinição com interface premium e amigável.
     - Exibir campos para nova senha e confirmação com validações.
@@ -95,7 +95,7 @@ Este documento contém o fatiamento e decomposição das tarefas para a implemen
     - Em caso de sucesso, limpar a sessão (logout) e mandar de volta ao login com mensagem de sucesso.
   - **Critério de Aceitação:** O fluxo de troca funciona visualmente e impede a saída da página sem a conclusão.
 
-- [ ] **Tarefa 5.3: Configuração de Rotas no App.jsx**
+- [x] **Tarefa 5.3: Configuração de Rotas no App.jsx**
   - **Ações:**
     - Adicionar a rota `/change-password` ligada ao `ChangePasswordPage.jsx` dentro das rotas do [App.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/App.jsx).
   - **Critério de Aceitação:** A rota está registrada e protegida.
