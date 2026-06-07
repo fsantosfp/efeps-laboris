@@ -82,7 +82,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## 🖥️ Slice 4: Integração de Interface Web (Frontend)
 
-- [ ] **Tarefa 4.1: Adicionar coluna de Deslocamento no JobDetailPage**
+- [x] **Tarefa 4.1: Adicionar coluna de Deslocamento no JobDetailPage**
   - **Ações:**
     - Modificar o componente [JobDetailPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/JobDetailPage.jsx) para exibir a nova coluna "Deslocamento" na tabela do Timesheet, renderizando o endereço de partida (`row.displacement`) ou `-`.
   - **Critério de Aceitação:** Tabela atualizada exibindo o endereço ou `-` sem quebrar o layout.
