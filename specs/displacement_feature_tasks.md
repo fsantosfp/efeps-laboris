@@ -47,7 +47,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Criar a classe [DisplacementController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/DisplacementController.java) expondo endpoints `/start`, `/end` e `/active`.
   - **Critério de Aceitação:** Endpoints expostos e acessíveis via HTTP.
 
-- [ ] **Tarefa 2.5: Adicionar validação de deslocamento no TimeEntryService**
+- [x] **Tarefa 2.5: Adicionar validação de deslocamento no TimeEntryService**
   - **Ações:**
     - Modificar [TimeEntryService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/TimeEntryService.java) no método `create` para impedir o clock-in (`IN`) se houver um deslocamento ativo (`endTimestamp` nulo).
   - **Critério de Aceitação:** Bloqueio ativado e testes de ponto existentes passando.
