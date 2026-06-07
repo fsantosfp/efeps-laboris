@@ -1,23 +1,26 @@
 # SDD - Contexto Operacional da Tarefa Atual
 
 ## 🎯 Tarefa Atual
-* **Título:** Slice 6: Aplicativo Mobile React Native (Mobile)
-* **Objetivo:** 
-  1. Adaptar o fluxo de login no aplicativo mobile (`LoginScreen.js`) para capturar a propriedade `passwordResetRequired`. Se for verdadeira, navegar o usuário para a tela de redefinição de senha.
-  2. Criar a tela `ChangePasswordScreen.js` para digitação e confirmação da nova senha, enviando-a para `PUT /api/v1/me/password` e retornando ao login.
+* **Título:** Tarefa 2.1: Navegação e Registro de Rota, Tarefa 2.2: Tabela Principal e Estilização, Tarefa 2.3: Ação de Inativação (Slice 2)
+* **Objetivo:**
+  1. Adicionar o link de navegação "Equipe" no menu do `Layout.jsx` e registrar a rota `/employees` protegida com `ProtectedRoute` no `App.jsx`.
+  2. Criar `EmployeesPage.jsx` and `EmployeesPage.css` com listagem responsiva de funcionários, toggle para exibir inativos e ação de confirmação de inativação (DELETE).
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Modificar:**
-  * [LoginScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/LoginScreen.js)
+  * [Layout.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/components/Layout.jsx)
+  * [App.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/App.jsx)
 * **Criar:**
-  * [ChangePasswordScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/ChangePasswordScreen.js) [NEW]
+  * [EmployeesPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/EmployeesPage.jsx) [NEW]
+  * [EmployeesPage.css](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/EmployeesPage.css) [NEW]
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
 
-1. **Validação Visual:** Verificar se o fluxo de login redireciona corretamente no mobile e se a tela de redefinição de senha impede navegações de volta (bloqueando botão físico de voltar no Android e gestos de swipe no iOS).
+1. **Design Consistente:** Seguir as diretrizes de visual premium (HSL tailored colors, glassmorphism, responsive table structure, hover states, loaders).
 2. **Quality Gate:**
-   - Obter aprovação humana após apresentação da implementação.
+   - Compilação limpa via Vite.
+   - Confirmação de exclusão/inativação segura.

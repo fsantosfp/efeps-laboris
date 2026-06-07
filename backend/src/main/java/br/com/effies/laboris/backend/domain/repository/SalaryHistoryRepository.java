@@ -11,4 +11,6 @@ public interface SalaryHistoryRepository extends JpaRepository<SalaryHistory, UU
     Optional<SalaryHistory> findTopByUser_IdOrderByEffectiveDateDesc(UUID userId);
 
     Optional<SalaryHistory> findTopByUser_IdAndEffectiveDateLessThanEqualOrderByEffectiveDateDesc(UUID userId, LocalDate date);
+
+    java.util.List<SalaryHistory> findAllByUser_IdOrderByEffectiveDateDesc(UUID userId);
 }

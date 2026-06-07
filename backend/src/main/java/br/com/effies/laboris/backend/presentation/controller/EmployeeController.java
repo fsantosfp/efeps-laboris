@@ -60,4 +60,39 @@ public class EmployeeController {
         employeeService.deactivate(employeeId, manager);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{employeeId}/activate")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<Void> activateEmployee(
+        @PathVariable UUID employeeId,
+        @AuthenticationPrincipal User manager
+    ){
+        employeeService.activate(employeeId, manager);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{employeeId}/salaries")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<List<br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto>> getEmployeeSalaries(
+            @PathVariable UUID employeeId,
+            @AuthenticationPrincipal User manager
+    ) {
+        List<br.com.effies.laboris.backend.domain.entity.SalaryHistory> salaries = employeeService.findSalariesByEmployee(employeeId, manager);
+        List<br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto> response = salaries.stream()
+                .map(br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto::new)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{employeeId}/salaries")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto> addEmployeeSalary(
+            @PathVariable UUID employeeId,
+            @Valid @RequestBody br.com.effies.laboris.backend.presentation.dto.request.CreateSalaryHistoryRequestDto request,
+            @AuthenticationPrincipal User manager
+    ) {
+        br.com.effies.laboris.backend.domain.entity.SalaryHistory salaryHistory = employeeService.addSalaryHistory(employeeId, request, manager);
+        br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto response = new br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto(salaryHistory);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }

@@ -19,6 +19,7 @@ const Layout = () => {
                 <h1>Laboris</h1>
                 <nav>
                     <NavLink to="/dashboard" style={navLinkStyle}>Dashboard</NavLink>
+                    <NavLink to="/employees" style={navLinkStyle}>Equipe</NavLink>
                     <NavLink to="/reports" style={navLinkStyle}>Relatórios</NavLink>
                 </nav>
                 <button onClick={logout}>Sair</button>

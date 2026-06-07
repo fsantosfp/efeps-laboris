@@ -72,7 +72,7 @@ public class EmployeeService {
 
         UUID companyId = manager.getCompany().getId();
 
-        List<User> employees = userRepository.findByCompanyIdAndRoleAndStatus(companyId, UserRole.EMPLOYEE, UserStatus.ACTIVE);
+        List<User> employees = userRepository.findByCompanyIdAndRole(companyId, UserRole.EMPLOYEE);
 
         return employees.stream()
             .map(employee -> {
@@ -98,4 +98,53 @@ public class EmployeeService {
         userRepository.save(employee);
     }
 
+    @Transactional
+    public void activate(UUID employeeId, User manager){
+
+        User employee = userRepository.findById(employeeId)
+            .orElseThrow(() -> new EntityNotFoundException("Funcionario não encontrado"));
+
+        if(!employee.getCompany().getId().equals(manager.getCompany().getId())){
+            throw new SecurityException("Acesso negado. Você não pode modificar funcionários de outra empresa.");
+        }
+
+        employee.setStatus(UserStatus.ACTIVE);
+        userRepository.save(employee);
+    }
+
+    public List<SalaryHistory> findSalariesByEmployee(UUID employeeId, User manager) {
+        User employee = userRepository.findById(employeeId)
+            .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+
+        if (!employee.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. Você não pode visualizar salários de funcionários de outra empresa.");
+        }
+
+        if (employee.getRole() != UserRole.EMPLOYEE) {
+            throw new IllegalArgumentException("O usuário especificado não é um funcionário.");
+        }
+
+        return salaryRepository.findAllByUser_IdOrderByEffectiveDateDesc(employeeId);
+    }
+
+    @Transactional
+    public SalaryHistory addSalaryHistory(UUID employeeId, br.com.effies.laboris.backend.presentation.dto.request.CreateSalaryHistoryRequestDto request, User manager) {
+        User employee = userRepository.findById(employeeId)
+            .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+
+        if (!employee.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. Você não pode modificar salários de funcionários de outra empresa.");
+        }
+
+        if (employee.getRole() != UserRole.EMPLOYEE) {
+            throw new IllegalArgumentException("O usuário especificado não é um funcionário.");
+        }
+
+        SalaryHistory salaryHistory = new SalaryHistory();
+        salaryHistory.setUser(employee);
+        salaryHistory.setHourlyRate(request.getHourlyRate());
+        salaryHistory.setEffectiveDate(request.getEffectiveDate());
+
+        return salaryRepository.save(salaryHistory);
+    }
 }

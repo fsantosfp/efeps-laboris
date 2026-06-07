@@ -17,6 +17,7 @@ public class EmployeeResponseDto {
     private String name;
     private String email;
     private String role;
+    private String status;
     private BigDecimal hourlyRate;
     private LocalDate effectiveDate;
     private Instant createdAt;
@@ -30,8 +31,9 @@ public class EmployeeResponseDto {
         this.name = user.getName();
         this.email = user.getEmail();
         this.role = user.getRole().name();
-        this.hourlyRate = salary.getHourlyRate();
-        this.effectiveDate = salary.getEffectiveDate();
+        this.status = user.getStatus().name();
+        this.hourlyRate = salary != null ? salary.getHourlyRate() : null;
+        this.effectiveDate = salary != null ? salary.getEffectiveDate() : null;
         this.createdAt = user.getCreatedAt();
 
     }

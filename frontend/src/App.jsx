@@ -9,6 +9,7 @@ import CreateJobPage from "./pages/CreateJobPage";
 import PayrollReportPage from "./pages/PayrollReportPage";
 import JobCostReportPage from "./pages/JobCostReportPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import EmployeesPage from "./pages/EmployeesPage";
 
 function App(){
   return (
@@ -18,6 +19,7 @@ function App(){
       <Route path="/" element={<ProtectedRoute><Layout/></ProtectedRoute>}>
         <Route index element={ <Navigate to="/dashboard" /> } />
         <Route path="/dashboard" element={ <DashboardPage/> } />
+        <Route path="/employees" element={ <EmployeesPage/> } />
         <Route path="/jobs/new" element={ <CreateJobPage/> } />
         <Route path="/jobs/:jobId" element={ <JobDetailPage/> } />
         <Route path="reports" element={ <PayrollReportPage /> } />
