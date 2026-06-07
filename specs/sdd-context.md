@@ -9,21 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 2.1: Nova Página de Relatórios e Rota (Slice 2)
-* **Objetivo:** Criar a página `ReportsPage.jsx`, configurar a rota `/reports` no `App.jsx` (removendo a página `PayrollReportPage.jsx` antiga e obsoleta) e desenhar um layout de Abas (Tabs) moderno para alternar entre "Folha de Pagamento" e "Custos de Serviços".
+* **Título:** Tarefa 3.1: Ajuste de Layout e Nova Seção (Slice 3)
+* **Objetivo:** Modificar `JobDetailPage.jsx` para remover o botão antigo de "Gerar Relatório de Custo" e adicionar a nova seção "Relatório de Presença e Horas Diárias" (Timesheet).
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Modificar:**
-  - [App.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/App.jsx)
-* **Criar:**
-  - [ReportsPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.jsx)
-* **Deletar:**
-  - [PayrollReportPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/PayrollReportPage.jsx)
+  - [JobDetailPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/JobDetailPage.jsx)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Design Moderno:** Utilizar o sistema de design com abas modernas, estilização dark mode e glassmorphism premium.
-2. **Conventional Commit:** Commitar no formato `feat(reports): add ReportsPage component and configure route in App` antes de prosseguir.
+1. **Compilação Limpa:** Certificar que a página de detalhes do job compile e renderize corretamente com a nova seção e sem o link de custo.
+2. **Conventional Commit:** Commitar no formato `feat(reports): add timesheet layout section in JobDetailPage` antes de prosseguir.

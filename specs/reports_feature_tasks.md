@@ -37,20 +37,20 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## 📂 Slice 2: Interface Unificada de Relatórios (Frontend)
 
-- [ ] **Tarefa 2.1: Nova Página de Relatórios e Rota**
+- [x] **Tarefa 2.1: Nova Página de Relatórios e Rota**
   - **Ações:**
     - Criar [ReportsPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.jsx).
     - Atualizar as rotas do [App.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/App.jsx) fazendo `/reports` renderizar `ReportsPage` (e remover a página `PayrollReportPage.jsx` obsoleta e sua importação).
     - Montar a interface moderna de abas (Tabs) para alternar entre "Folha de Pagamento" e "Custos de Serviços".
   - **Critério de Aceitação:** Acesso à página com abas estruturadas funcionando no menu.
 
-- [ ] **Tarefa 2.2: Seletor Múltiplo de Jobs na Aba de Custos**
+- [x] **Tarefa 2.2: Seletor Múltiplo de Jobs na Aba de Custos**
   - **Ações:**
     - Na aba "Custos de Serviços", carregar todos os Jobs disponíveis da empresa usando `GET /api/v1/jobs`.
     - Exibir uma lista de seleção múltipla (checkboxes ou cards selecionáveis) para o gestor escolher quais Jobs incluir no relatório.
   - **Critério de Aceitação:** Lista de Jobs renderizada e seleções ativas em estado.
 
-- [ ] **Tarefa 2.3: Geração Paralela e Exibição Individual**
+- [x] **Tarefa 2.3: Geração Paralela e Exibição Individual**
   - **Ações:**
     - Ao submeter, executar requisições HTTP em paralelo para obter os dados de custo de cada Job selecionado.
     - Exibir os relatórios individualmente e empilhados na tela (sem somar horas de Jobs distintos).
