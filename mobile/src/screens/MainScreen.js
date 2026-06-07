@@ -83,46 +83,63 @@ const MainScreen = ({ onLogout: handleLogout }) => {
     }, [fetchData]);
 
     const handlePunch = async (entryType) => {
-        if(!currentJob || !currentPosition) return;
+        if(!currentJob) return;
         
         setLoading(true);
-        try {
-            const response = await api.post('/time-entries', {
-                jobId: currentJob.jobId,
-                entryType: entryType,
-                latitude: currentPosition.latitude,
-                longitude: currentPosition.longitude,
-                isManual: false
-            });
+        Geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                setCurrentPosition(position.coords);
+                try {
+                    const response = await api.post('/time-entries', {
+                        jobId: currentJob.jobId,
+                        entryType: entryType,
+                        latitude,
+                        longitude,
+                        isManual: false
+                    });
 
-            setLastEntry(response.data);
-            Alert.alert("Sucesso!", `Ponto '${entryType}' registrado.`);
-        } catch(error){
-            Alert.alert("Erro ao Bater o Ponto", error.response?.data?.message || "Ocorreu um erro.");
-        }finally{
-            setLoading(false);
-        }
+                    setLastEntry(response.data);
+                    Alert.alert("Sucesso!", `Ponto '${entryType}' registrado.`);
+                } catch(error){
+                    Alert.alert("Erro ao Bater o Ponto", error.response?.data?.message || "Ocorreu um erro.");
+                }finally{
+                    setLoading(false);
+                }
+            },
+            (error) => {
+                Alert.alert("Erro", "Não foi possível obter sua localização atual para registrar o ponto.");
+                setLoading(false);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
     };
 
     const handleStartDisplacement = async () => {
-        if (!currentPosition) {
-            Alert.alert("Erro", "Não foi possível obter sua localização.");
-            return;
-        }
-
         setLoading(true);
-        try {
-            const response = await api.post('/displacements/start', {
-                latitude: currentPosition.latitude,
-                longitude: currentPosition.longitude
-            });
-            setActiveDisplacement(response.data);
-            Alert.alert("Deslocamento Iniciado", "Sua viagem começou. Quando chegar ao destino, escolha o trabalho de destino e finalize o deslocamento.");
-        } catch (error) {
-            Alert.alert("Erro ao Iniciar Deslocamento", error.response?.data?.message || "Ocorreu um erro.");
-        } finally {
-            setLoading(false);
-        }
+        Geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                setCurrentPosition(position.coords);
+                try {
+                    const response = await api.post('/displacements/start', {
+                        latitude,
+                        longitude
+                    });
+                    setActiveDisplacement(response.data);
+                    Alert.alert("Deslocamento Iniciado", "Sua viagem começou. Quando chegar ao destino, escolha o trabalho de destino e finalize o deslocamento.");
+                } catch (error) {
+                    Alert.alert("Erro ao Iniciar Deslocamento", error.response?.data?.message || "Ocorreu um erro.");
+                } finally {
+                    setLoading(false);
+                }
+            },
+            (error) => {
+                Alert.alert("Erro", "Não foi possível obter sua localização atual para iniciar o deslocamento.");
+                setLoading(false);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
     };
 
     const handleEndDisplacementAndClockIn = async () => {
@@ -130,42 +147,49 @@ const MainScreen = ({ onLogout: handleLogout }) => {
             Alert.alert("Aviso", "Selecione o trabalho de destino.");
             return;
         }
-        if (!currentPosition) {
-            Alert.alert("Erro", "Não foi possível obter sua localização.");
-            return;
-        }
 
         setLoading(true);
-        try {
-            await api.post('/displacements/end', {
-                latitude: currentPosition.latitude,
-                longitude: currentPosition.longitude,
-                destinationJobId: selectedDestinationJobId
-            });
+        Geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                setCurrentPosition(position.coords);
+                try {
+                    await api.post('/displacements/end', {
+                        latitude,
+                        longitude,
+                        destinationJobId: selectedDestinationJobId
+                    });
 
-            const response = await api.post('/time-entries', {
-                jobId: selectedDestinationJobId,
-                entryType: 'IN',
-                latitude: currentPosition.latitude,
-                longitude: currentPosition.longitude,
-                isManual: false
-            });
+                    const response = await api.post('/time-entries', {
+                        jobId: selectedDestinationJobId,
+                        entryType: 'IN',
+                        latitude,
+                        longitude,
+                        isManual: false
+                    });
 
-            setActiveDisplacement(null);
-            setSelectedDestinationJobId('');
-            setLastEntry(response.data);
-            
-            const newJob = assignments.find(j => j.jobId === selectedDestinationJobId);
-            if (newJob) {
-                setCurrentJob(newJob);
-            }
+                    setActiveDisplacement(null);
+                    setSelectedDestinationJobId('');
+                    setLastEntry(response.data);
+                    
+                    const newJob = assignments.find(j => j.jobId === selectedDestinationJobId);
+                    if (newJob) {
+                        setCurrentJob(newJob);
+                    }
 
-            Alert.alert("Deslocamento Finalizado", "Deslocamento concluído e Entrada (IN) registrada com sucesso.");
-        } catch (error) {
-            Alert.alert("Erro ao Finalizar Deslocamento", error.response?.data?.message || "Ocorreu um erro.");
-        } finally {
-            setLoading(false);
-        }
+                    Alert.alert("Deslocamento Finalizado", "Deslocamento concluído e Entrada (IN) registrada com sucesso.");
+                } catch (error) {
+                    Alert.alert("Erro ao Finalizar Deslocamento", error.response?.data?.message || "Ocorreu um erro.");
+                } finally {
+                    setLoading(false);
+                }
+            },
+            (error) => {
+                Alert.alert("Erro", "Não foi possível obter sua localização atual para finalizar o deslocamento.");
+                setLoading(false);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
     };
 
     const renderActionButtons = () => {
