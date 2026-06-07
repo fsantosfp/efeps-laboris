@@ -240,4 +240,58 @@ class EmployeeServiceTest {
 
         verify(salaryRepository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("Should successfully activate a deactivated employee belonging to the same company")
+    void activate_WithSameCompany_ShouldSetStatusToActive() {
+        // Arrange
+        UUID companyId = UUID.randomUUID();
+        Company company = new Company();
+        company.setId(companyId);
+
+        User manager = new User();
+        manager.setCompany(company);
+
+        UUID employeeId = UUID.randomUUID();
+        User employee = new User();
+        employee.setId(employeeId);
+        employee.setCompany(company);
+        employee.setStatus(br.com.effies.laboris.backend.domain.entity.enums.UserStatus.INACTIVE);
+
+        when(userRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        employeeService.activate(employeeId, manager);
+
+        // Assert
+        assertThat(employee.getStatus()).isEqualTo(br.com.effies.laboris.backend.domain.entity.enums.UserStatus.ACTIVE);
+        verify(userRepository, times(1)).save(employee);
+    }
+
+    @Test
+    @DisplayName("Should throw SecurityException when activating an employee from another company")
+    void activate_WithDifferentCompany_ShouldThrowSecurityException() {
+        // Arrange
+        Company company1 = new Company();
+        company1.setId(UUID.randomUUID());
+        User manager = new User();
+        manager.setCompany(company1);
+
+        Company company2 = new Company();
+        company2.setId(UUID.randomUUID());
+        UUID employeeId = UUID.randomUUID();
+        User employee = new User();
+        employee.setId(employeeId);
+        employee.setCompany(company2);
+
+        when(userRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+
+        // Act & Assert
+        assertThatThrownBy(() -> employeeService.activate(employeeId, manager))
+            .isInstanceOf(SecurityException.class)
+            .hasMessageContaining("Acesso negado");
+
+        verify(userRepository, never()).save(any());
+    }
 }

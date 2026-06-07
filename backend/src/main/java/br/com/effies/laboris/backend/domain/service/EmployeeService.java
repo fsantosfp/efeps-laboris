@@ -72,7 +72,7 @@ public class EmployeeService {
 
         UUID companyId = manager.getCompany().getId();
 
-        List<User> employees = userRepository.findByCompanyIdAndRoleAndStatus(companyId, UserRole.EMPLOYEE, UserStatus.ACTIVE);
+        List<User> employees = userRepository.findByCompanyIdAndRole(companyId, UserRole.EMPLOYEE);
 
         return employees.stream()
             .map(employee -> {
@@ -95,6 +95,20 @@ public class EmployeeService {
         }
 
         employee.setStatus(UserStatus.INACTIVE);
+        userRepository.save(employee);
+    }
+
+    @Transactional
+    public void activate(UUID employeeId, User manager){
+
+        User employee = userRepository.findById(employeeId)
+            .orElseThrow(() -> new EntityNotFoundException("Funcionario não encontrado"));
+
+        if(!employee.getCompany().getId().equals(manager.getCompany().getId())){
+            throw new SecurityException("Acesso negado. Você não pode modificar funcionários de outra empresa.");
+        }
+
+        employee.setStatus(UserStatus.ACTIVE);
         userRepository.save(employee);
     }
 

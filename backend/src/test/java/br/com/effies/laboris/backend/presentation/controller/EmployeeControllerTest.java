@@ -149,4 +149,19 @@ class EmployeeControllerTest {
 
         verifyNoInteractions(employeeService);
     }
+
+    @Test
+    @DisplayName("Should return 204 No Content when POST /api/v1/employees/{id}/activate is called")
+    void activateEmployee_ShouldReturnNoContent() throws Exception {
+        // Arrange
+        UUID employeeId = UUID.randomUUID();
+
+        doNothing().when(employeeService).activate(eq(employeeId), any(User.class));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/employees/" + employeeId + "/activate"))
+                .andExpect(status().isNoContent());
+
+        verify(employeeService, times(1)).activate(eq(employeeId), any(User.class));
+    }
 }

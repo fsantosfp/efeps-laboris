@@ -61,6 +61,16 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{employeeId}/activate")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<Void> activateEmployee(
+        @PathVariable UUID employeeId,
+        @AuthenticationPrincipal User manager
+    ){
+        employeeService.activate(employeeId, manager);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{employeeId}/salaries")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<List<br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto>> getEmployeeSalaries(
