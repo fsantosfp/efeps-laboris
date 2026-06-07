@@ -301,39 +301,63 @@ function JobDetailPage(){
                         
                         {loadingTimesheet ? (
                             <p>Carregando dados do relatório...</p>
-                        ) : timesheetData && timesheetData.employeeTimesheets && timesheetData.employeeTimesheets.length > 0 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                {timesheetData.employeeTimesheets.map(empSheet => (
-                                    <div key={empSheet.employeeId} style={{ background: '#fff', border: '1px solid #eaeaea', borderRadius: '6px', padding: '15px' }}>
-                                        <h4 style={{ margin: '0 0 10px 0', color: '#2c3e50', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
-                                            {empSheet.employeeName}
-                                        </h4>
-                                        {empSheet.dailyHours && empSheet.dailyHours.length > 0 ? (
-                                            <table border="1" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                                <thead>
-                                                    <tr style={{ background: '#f9f9f9', color: '#555' }}>
-                                                        <th style={{ padding: '6px 10px', textAlign: 'left' }}>Data</th>
-                                                        <th style={{ padding: '6px 10px', textAlign: 'right' }}>Horas Trabalhadas</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {empSheet.dailyHours.map((dh, idx) => (
-                                                        <tr key={idx}>
-                                                            <td style={{ padding: '6px 10px' }}>{dh.date}</td>
-                                                            <td style={{ padding: '6px 10px', textAlign: 'right' }}>{formatDecimalHours(dh.hoursWorked)} h</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        ) : (
-                                            <p style={{ margin: 0, fontSize: '12px', color: '#7f8c8d' }}>Sem horas registradas neste período.</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p style={{ margin: 0, color: '#7f8c8d' }}>Não há registros de ponto para este trabalho.</p>
-                        )}
+                        ) : (() => {
+                            const flatRows = [];
+                            if (timesheetData && timesheetData.employeeTimesheets) {
+                                timesheetData.employeeTimesheets.forEach(empSheet => {
+                                    if (empSheet.dailyHours) {
+                                        empSheet.dailyHours.forEach(day => {
+                                            flatRows.push({
+                                                date: day.date,
+                                                employeeName: empSheet.employeeName,
+                                                employeeId: empSheet.employeeId,
+                                                start: day.start ? day.start.substring(0, 5) : '-',
+                                                end: day.end ? day.end.substring(0, 5) : '-',
+                                                hoursWorked: day.hoursWorked
+                                            });
+                                        });
+                                    }
+                                });
+                            }
+
+                            if (flatRows.length === 0) {
+                                return <p style={{ margin: 0, color: '#7f8c8d' }}>Não há registros de ponto para este trabalho no período selecionado.</p>;
+                            }
+
+                            // Sort by date descending, then by employeeName ascending
+                            flatRows.sort((a, b) => {
+                                const dateCompare = b.date.localeCompare(a.date);
+                                if (dateCompare !== 0) return dateCompare;
+                                return a.employeeName.localeCompare(b.employeeName);
+                            });
+
+                            return (
+                                <div style={{ overflowX: 'auto' }}>
+                                    <table border="1" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                                        <thead>
+                                            <tr style={{ background: '#f9f9f9', color: '#555' }}>
+                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Data</th>
+                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Funcionário</th>
+                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Hora de Entrada</th>
+                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Hora de Saída</th>
+                                                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Total de Horas Trabalhado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {flatRows.map((row, idx) => (
+                                                <tr key={idx}>
+                                                    <td style={{ padding: '8px 10px' }}>{row.date}</td>
+                                                    <td style={{ padding: '8px 10px' }}>{row.employeeName}</td>
+                                                    <td style={{ padding: '8px 10px' }}>{row.start}</td>
+                                                    <td style={{ padding: '8px 10px' }}>{row.end}</td>
+                                                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>{formatDecimalHours(row.hoursWorked)} h</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     <hr style={{ margin: '20px 0' }} />
