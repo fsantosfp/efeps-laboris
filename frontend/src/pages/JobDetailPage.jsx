@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom'; 
 import api from '../services/api';
 import ManageTeamModal from '../components/ManageTeamModal';
+import { formatDecimalHours } from "../utils/formatters";
 
 function JobDetailPage(){
 
@@ -26,6 +27,13 @@ function JobDetailPage(){
         responsibleEmail: ''
     });
 
+    // Estados para o Timesheet (Relatório de Presença)
+    const [timesheetData, setTimesheetData] = useState(null);
+    const [loadingTimesheet, setLoadingTimesheet] = useState(false);
+    const [timesheetError, setTimesheetError] = useState('');
+    const [timesheetStart, setTimesheetStart] = useState('');
+    const [timesheetEnd, setTimesheetEnd] = useState('');
+
     // Estados para exclusão segura
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [confirmAddressInput, setConfirmAddressInput] = useState('');
@@ -45,9 +53,35 @@ function JobDetailPage(){
          
     }, [jobId]);
 
+    const fetchTimesheet = useCallback(async (start = '', end = '') => {
+        setLoadingTimesheet(true);
+        setTimesheetError('');
+        try {
+            let url = `/reports/jobs/${jobId}/timesheet`;
+            const params = [];
+            if (start) {
+                params.push(`start=${new Date(start).toISOString()}`);
+            }
+            if (end) {
+                params.push(`end=${new Date(end + 'T23:59:59.999Z').toISOString()}`);
+            }
+            if (params.length > 0) {
+                url += `?${params.join('&')}`;
+            }
+            const response = await api.get(url);
+            setTimesheetData(response.data);
+        } catch (err) {
+            console.error("Erro ao buscar timesheet do trabalho:", err);
+            setTimesheetError('Não foi possível carregar o relatório de presença.');
+        } finally {
+            setLoadingTimesheet(false);
+        }
+    }, [jobId]);
+
     useEffect(() => {
         fetchJobDetails();
-    },[fetchJobDetails]);
+        fetchTimesheet();
+    }, [fetchJobDetails, fetchTimesheet]);
 
     const handleStartEdit = () => {
         if (!job) return;
@@ -127,12 +161,6 @@ function JobDetailPage(){
                 {job && !isEditing && (
                     <button onClick={handleStartEdit}>Editar Dados do Trabalho</button>
                 )}
-            </div>
-
-            <div style={{ marginBottom:'20px'}}>
-                <Link to={`/reports/jobs/${jobId}`}>
-                    <button>Gerar Relatório de Custo</button>
-                </Link>
             </div>
 
             { job && (
@@ -225,6 +253,88 @@ function JobDetailPage(){
                     ):( 
                         <p>Nenhum funcionário designado para este trabalho ainda.</p> 
                     )}
+
+                    <hr style={{ margin: '20px 0' }} />
+
+                    <h3>Relatório de Presença e Horas Diárias</h3>
+                    <div style={{ background: '#fcfcfc', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
+                        <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
+                            <div>
+                                <label style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '5px', color: '#555' }}>Data de Início:</label>
+                                <input 
+                                    type="date" 
+                                    value={timesheetStart} 
+                                    onChange={(e) => setTimesheetStart(e.target.value)} 
+                                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '5px', color: '#555' }}>Data de Término:</label>
+                                <input 
+                                    type="date" 
+                                    value={timesheetEnd} 
+                                    onChange={(e) => setTimesheetEnd(e.target.value)} 
+                                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                            <button 
+                                onClick={() => fetchTimesheet(timesheetStart, timesheetEnd)}
+                                disabled={loadingTimesheet}
+                                style={{ padding: '8px 16px', background: '#3498db', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                            >
+                                Filtrar
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    setTimesheetStart('');
+                                    setTimesheetEnd('');
+                                    fetchTimesheet('', '');
+                                }}
+                                disabled={loadingTimesheet}
+                                style={{ padding: '8px 16px', background: '#95a5a6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                            >
+                                Limpar
+                            </button>
+                        </div>
+
+                        {timesheetError && <p style={{ color: 'red' }}>{timesheetError}</p>}
+                        
+                        {loadingTimesheet ? (
+                            <p>Carregando dados do relatório...</p>
+                        ) : timesheetData && timesheetData.employeeTimesheets && timesheetData.employeeTimesheets.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                {timesheetData.employeeTimesheets.map(empSheet => (
+                                    <div key={empSheet.employeeId} style={{ background: '#fff', border: '1px solid #eaeaea', borderRadius: '6px', padding: '15px' }}>
+                                        <h4 style={{ margin: '0 0 10px 0', color: '#2c3e50', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
+                                            {empSheet.employeeName}
+                                        </h4>
+                                        {empSheet.dailyHours && empSheet.dailyHours.length > 0 ? (
+                                            <table border="1" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                                                <thead>
+                                                    <tr style={{ background: '#f9f9f9', color: '#555' }}>
+                                                        <th style={{ padding: '6px 10px', textAlign: 'left' }}>Data</th>
+                                                        <th style={{ padding: '6px 10px', textAlign: 'right' }}>Horas Trabalhadas</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {empSheet.dailyHours.map((dh, idx) => (
+                                                        <tr key={idx}>
+                                                            <td style={{ padding: '6px 10px' }}>{dh.date}</td>
+                                                            <td style={{ padding: '6px 10px', textAlign: 'right' }}>{formatDecimalHours(dh.hoursWorked)} h</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        ) : (
+                                            <p style={{ margin: 0, fontSize: '12px', color: '#7f8c8d' }}>Sem horas registradas neste período.</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p style={{ margin: 0, color: '#7f8c8d' }}>Não há registros de ponto para este trabalho.</p>
+                        )}
+                    </div>
 
                     <hr style={{ margin: '20px 0' }} />
                     {job.status === 'PENDING' && !isEditing && (
