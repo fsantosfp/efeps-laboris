@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +28,8 @@ public class JobTimesheetResponseDto {
     @Builder
     public static class DailyHoursDto {
         private LocalDate date;
+        private LocalTime start;
+        private LocalTime end;
         private BigDecimal hoursWorked;
     }
 }

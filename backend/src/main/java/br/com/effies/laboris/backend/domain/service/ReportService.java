@@ -195,9 +195,33 @@ public class ReportService {
                 LocalDate date = dayEntry.getKey();
                 List<TimeEntry> dayEntries = dayEntry.getValue();
 
+                Optional<TimeEntry> firstIn = dayEntries.stream()
+                    .filter(entry -> entry.getEntryType() == TimeEntryType.IN)
+                    .min(Comparator.comparing(TimeEntry::getEntryTimestamp));
+
+                Optional<TimeEntry> lastOut = dayEntries.stream()
+                    .filter(entry -> entry.getEntryType() == TimeEntryType.OUT)
+                    .max(Comparator.comparing(TimeEntry::getEntryTimestamp));
+
+                LocalTime startLocalTime = null;
+                LocalTime endLocalTime = null;
+
+                if (firstIn.isPresent() && lastOut.isPresent()) {
+                    TimeEntry in = firstIn.get();
+                    TimeEntry out = lastOut.get();
+                    if (out.getEntryTimestamp().isAfter(in.getEntryTimestamp())) {
+                        startLocalTime = in.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                            .truncatedTo(ChronoUnit.MINUTES);
+                        endLocalTime = out.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                            .truncatedTo(ChronoUnit.MINUTES);
+                    }
+                }
+
                 BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dayEntries);
                 dailyHours.add(JobTimesheetResponseDto.DailyHoursDto.builder()
                     .date(date)
+                    .start(startLocalTime)
+                    .end(endLocalTime)
                     .hoursWorked(hoursWorked)
                     .build());
             }

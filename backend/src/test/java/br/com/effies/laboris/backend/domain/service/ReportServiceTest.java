@@ -184,11 +184,15 @@ class ReportServiceTest {
         assertThat(aliceReport.getEmployeeName()).isEqualTo("Alice");
         assertThat(aliceReport.getDailyHours()).hasSize(1);
         assertThat(aliceReport.getDailyHours().get(0).getHoursWorked()).isEqualByComparingTo("4.00");
+        assertThat(aliceReport.getDailyHours().get(0).getStart()).isEqualTo(java.time.LocalTime.of(8, 0));
+        assertThat(aliceReport.getDailyHours().get(0).getEnd()).isEqualTo(java.time.LocalTime.of(12, 0));
 
         var bobReport = result.getEmployeeTimesheets().get(1);
         assertThat(bobReport.getEmployeeName()).isEqualTo("Bob");
         assertThat(bobReport.getDailyHours()).hasSize(1);
         assertThat(bobReport.getDailyHours().get(0).getHoursWorked()).isEqualByComparingTo("6.00");
+        assertThat(bobReport.getDailyHours().get(0).getStart()).isEqualTo(java.time.LocalTime.of(9, 0));
+        assertThat(bobReport.getDailyHours().get(0).getEnd()).isEqualTo(java.time.LocalTime.of(15, 0));
     }
 
     @Test
