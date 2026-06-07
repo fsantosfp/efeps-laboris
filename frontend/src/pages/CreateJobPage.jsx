@@ -11,8 +11,11 @@ function CreateJobPage(){
         startDate: '',
         endDate: '',
         budget: '',
-        latitude: '-0000001111',
-        longitude: '-000002222'
+        latitude: '',
+        longitude: '',
+        responsibleName: '',
+        responsiblePhone: '',
+        responsibleEmail: ''
     });
 
     const [error, setError] = useState('');
@@ -32,11 +35,20 @@ function CreateJobPage(){
         setError('');
         setIsSubmitting(true);
 
+        if (!formData.latitude || !formData.longitude) {
+            setError('Por favor, selecione um endereço válido no campo para obter as coordenadas de geolocalização.');
+            setIsSubmitting(false);
+            return;
+        }
+
         try{
             const dataToSend = {
                 ...formData,
-                billinRate: parseFloat(formData.billingRate),
-                budget: formData.budget ? parseFloat(formData.budget) : null
+                billingRate: parseFloat(formData.billingRate),
+                budget: parseFloat(formData.budget),
+                latitude: parseFloat(formData.latitude),
+                longitude: parseFloat(formData.longitude),
+                responsibleEmail: formData.responsibleEmail || null
             }
 
             console.log(dataToSend);
@@ -55,10 +67,12 @@ function CreateJobPage(){
         }
     }
 
-    const handleAddressSelect = (address) => {
+    const handleAddressSelect = (address, lat, lng) => {
         setFormData(prevState => ({
             ...prevState,
-            address: address
+            address: address,
+            latitude: lat !== null && lat !== undefined ? lat.toString() : '',
+            longitude: lng !== null && lng !== undefined ? lng.toString() : ''
         }));
     }
 
@@ -70,6 +84,11 @@ function CreateJobPage(){
                 <div style={{marginBottom:'10px'}}>
                     <label> Endereço:*</label><br/>
                     <PlacesAutocompleteInput onPlaceSelect={handleAddressSelect} />
+                    {formData.latitude && formData.longitude && (
+                        <span style={{ fontSize: '12px', color: 'green' }}>
+                            Coordenadas obtidas: {formData.latitude}, {formData.longitude}
+                        </span>
+                    )}
                 </div>
                 <div style={{marginBottom:'10px'}}>
                     <label>Nome do Contratante:*</label><br/>
@@ -90,6 +109,21 @@ function CreateJobPage(){
                 <div style={{marginBottom:'10px'}}>
                     <label>Data de Termino (Opcional):</label><br/>
                     <input type="date" name="endDate" value={formData.endDate} onChange={handleChange} />
+                </div>
+
+                <hr style={{ margin: '20px 0', border: '0', borderTop: '1px solid #ccc' }} />
+                <h3>Dados do Responsável</h3>
+                <div style={{marginBottom:'10px'}}>
+                    <label>Nome do Responsável:*</label><br/>
+                    <input type="text" name="responsibleName" value={formData.responsibleName} onChange={handleChange} required style={{width:'300px'}}/>
+                </div>
+                <div style={{marginBottom:'10px'}}>
+                    <label>Telefone do Responsável:*</label><br/>
+                    <input type="text" name="responsiblePhone" value={formData.responsiblePhone} onChange={handleChange} required style={{width:'300px'}}/>
+                </div>
+                <div style={{marginBottom:'10px'}}>
+                    <label>E-mail do Responsável (Opcional):</label><br/>
+                    <input type="email" name="responsibleEmail" value={formData.responsibleEmail} onChange={handleChange} style={{width:'300px'}}/>
                 </div>
 
                 {error && <p style={{ color: 'red' }}>{error}</p>}

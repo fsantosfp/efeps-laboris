@@ -42,17 +42,18 @@ public class JobService {
 
         // TODO: Adicionar a regra de negócio para não permitir criar jobs no mesmo endereço se um já estiver ativo.
 
-        LatLng coordinates = geoService.geocodeAddress(request.getAddress());
-
         Job newJob = new Job();
         newJob.setAddress(request.getAddress());
-        newJob.setLatitude(coordinates.lat);
-        newJob.setLongitude(coordinates.lng);
+        newJob.setLatitude(request.getLatitude());
+        newJob.setLongitude(request.getLongitude());
         newJob.setClientName(request.getClientName());
         newJob.setBudget(request.getBudget());
         newJob.setBillingRate(request.getBillingRate());
         newJob.setStartDate(request.getStartDate());
         newJob.setEndDate(request.getEndDate());
+        newJob.setResponsibleName(request.getResponsibleName());
+        newJob.setResponsiblePhone(request.getResponsiblePhone());
+        newJob.setResponsibleEmail(request.getResponsibleEmail());
 
         newJob.setCompany(manager.getCompany());
 
@@ -99,18 +100,22 @@ public class JobService {
     }
 
     @Transactional
-    public Job updateStatus(UUID jobId, UpdateJobRequestDto request, User manager){
+    public Job update(UUID jobId, UpdateJobRequestDto request, User manager){
 
         Job job = findJobById(jobId);
 
         job.ensureNotExcluded();
         job.ensureBelongsTo(manager);
 
-        // TODO: Adicionar regras de transição de status. Ex: não pode ir de COMPLETED para PENDING.
-        // Por agora, permitimos qualquer mudança.
-
         job.setStatus(request.getStatus());
         job.setBillingRate(request.getBillingRate());
+        job.setBudget(request.getBudget());
+        job.setStartDate(request.getStartDate());
+        job.setEndDate(request.getEndDate());
+        job.setResponsibleName(request.getResponsibleName());
+        job.setResponsiblePhone(request.getResponsiblePhone());
+        job.setResponsibleEmail(request.getResponsibleEmail());
+
         return jobRepository.save(job);
 
     }
