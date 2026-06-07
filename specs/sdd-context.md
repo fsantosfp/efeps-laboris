@@ -9,17 +9,21 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.5: Testes Unitários do Novo Relatório (Slice 1)
-* **Objetivo:** Escrever testes em `ReportServiceTest.java` para validar os cálculos de horas por funcionário e permissões de segurança. Executar `SPRING_PROFILES_ACTIVE=local mvn test` para certificar-se do sucesso de todos os testes do backend.
+* **Título:** Tarefa 2.1: Nova Página de Relatórios e Rota (Slice 2)
+* **Objetivo:** Criar a página `ReportsPage.jsx`, configurar a rota `/reports` no `App.jsx` (removendo a página `PayrollReportPage.jsx` antiga e obsoleta) e desenhar um layout de Abas (Tabs) moderno para alternar entre "Folha de Pagamento" e "Custos de Serviços".
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Modificar:**
-  - [ReportServiceTest.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/test/java/br/com/effies/laboris/backend/domain/service/ReportServiceTest.java)
+  - [App.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/App.jsx)
+* **Criar:**
+  - [ReportsPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.jsx)
+* **Deletar:**
+  - [PayrollReportPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/PayrollReportPage.jsx)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que os testes unitários compilem e executem com sucesso.
-2. **Conventional Commit:** Commitar no formato `test(reports): add unit tests for calculateJobTimesheetReport` antes de prosseguir.
+1. **Design Moderno:** Utilizar o sistema de design com abas modernas, estilização dark mode e glassmorphism premium.
+2. **Conventional Commit:** Commitar no formato `feat(reports): add ReportsPage component and configure route in App` antes de prosseguir.

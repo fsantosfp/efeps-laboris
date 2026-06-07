@@ -27,7 +27,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Criar a rota `GET /api/v1/reports/jobs/{jobId}/timesheet` no [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java) recebendo parâmetros de período opcionais.
   - **Critério de Aceitação:** Endpoint mapeado e acessível.
 
-- [ ] **Tarefa 1.5: Testes Unitários do Novo Relatório**
+- [x] **Tarefa 1.5: Testes Unitários do Novo Relatório**
   - **Ações:**
     - Escrever testes em `ReportServiceTest.java` para validar os cálculos de horas por funcionário e permissões de segurança.
     - Executar `SPRING_PROFILES_ACTIVE=local mvn test` para certificar-se do sucesso de todos os testes do backend.
