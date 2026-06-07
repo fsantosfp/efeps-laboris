@@ -21,6 +21,8 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, UUID> {
     @Query("SELECT te FROM TimeEntry te WHERE te.job.id = :jobId AND te.entryTimestamp BETWEEN :start AND :end ORDER BY te.entryTimestamp ASC")
     List<TimeEntry> findAllByJobIdAndPeriod(UUID jobId, Instant start, Instant end);
 
+    List<TimeEntry> findAllByJobIdOrderByEntryTimestampAsc(UUID jobId);
+
     @Query("SELECT te FROM TimeEntry te WHERE te.employee.id IN :employeeIds AND te.payrollId IS NULL AND te.entryTimestamp BETWEEN :start AND :end")
     List<TimeEntry> findOpenEntriesForEmployeesInPeriod(List<UUID> employeeIds, Instant start, Instant end);
 

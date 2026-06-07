@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.1: Criação do DTO de Resposta do Timesheet (Slice 1)
-* **Objetivo:** Criar a classe DTO `JobTimesheetResponseDto.java` no backend para encapsular e retornar as horas de trabalho do Timesheet.
+* **Título:** Tarefa 1.2: Adição do Método de Busca no Repositório (Slice 1)
+* **Objetivo:** Adicionar o método `findAllByJobIdOrderByEntryTimestampAsc` no `TimeEntryRepository.java` para buscar todos os pontos associados a um Job ordenados de forma cronológica.
 
 ---
 
 ## 📂 Escopo dos Arquivos
-* **Criar:**
-  - [JobTimesheetResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JobTimesheetResponseDto.java) [NEW]
+* **Modificar:**
+  - [TimeEntryRepository.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/repository/TimeEntryRepository.java)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Garantir que o projeto compile com o novo DTO.
-2. **Conventional Commit:** Commitar no formato `feat(reports): create JobTimesheetResponseDto` antes de iniciar a próxima tarefa.
+1. **Compilação Limpa:** Certificar que o repositório compile sem erros de JPA query mapping.
+2. **Conventional Commit:** Commitar no formato `feat(reports): add findAllByJobIdOrderByEntryTimestampAsc in TimeEntryRepository` antes de prosseguir.
