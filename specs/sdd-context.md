@@ -9,19 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.1: Criar a tabela displacements (Slice 1)
-* **Objetivo:** Criar o script SQL de migração `displacement_migration.sql` e atualizar o script `laboris_database.sql` para suportar a tabela `displacements`. Executar o script SQL no container de banco de dados ativo.
+* **Título:** Tarefa 1.2: Criar a classe de entidade Displacement.java (Slice 1)
+* **Objetivo:** Criar a classe [Displacement.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/entity/Displacement.java) mapeando a tabela de banco de dados com seus relacionamentos.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Criar:**
-  - [displacement_migration.sql](file:///Users/fsantos/Documents/workspace/effies-laboris/docker/db/displacement_migration.sql)
-* **Modificar:**
-  - [laboris_database.sql](file:///Users/fsantos/Documents/workspace/effies-laboris/docker/db/laboris_database.sql)
+  - [Displacement.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/entity/Displacement.java)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que os scripts SQL estejam sintaticamente corretos para PostgreSQL.
-2. **Conventional Commit:** Commitar no formato `feat(db): create displacements table migration and schema` antes de prosseguir.
+1. **Compilação Limpa:** Certificar que a classe de entidade compile corretamente com JPA.
+2. **Conventional Commit:** Commitar no formato `feat(backend): create Displacement JPA entity` antes de prosseguir.

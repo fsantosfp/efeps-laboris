@@ -6,7 +6,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## 💾 Slice 1: Estrutura de Banco de Dados e Entidades (Backend)
 
-- [ ] **Tarefa 1.1: Criar a tabela `displacements`**
+- [x] **Tarefa 1.1: Criar a tabela `displacements`**
   - **Ações:**
     - Criar o script SQL de migração [displacement_migration.sql](file:///Users/fsantos/Documents/workspace/effies-laboris/docker/db/displacement_migration.sql) com a criação da tabela.
     - Atualizar o script original [laboris_database.sql](file:///Users/fsantos/Documents/workspace/effies-laboris/docker/db/laboris_database.sql).
