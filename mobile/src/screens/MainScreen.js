@@ -2,71 +2,100 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import api from '../services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainScreen = ({ onLogout: handleLogout }) => {
     const [loading, setLoading] = useState(true);
     const [currentJob, setCurrentJob] = useState(null);
-    const [statusMessage, setStatusMessage] = useState('Buscando sua localização...');
-    const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [lastEntry, setLastEntry] = useState(null);
+    const [currentPosition, setCurrentPosition] = useState(null);
 
-    const findCurrentJob = useCallback(() => {
+    const fetchData = useCallback(() => {
         setLoading(true);
-        setStatusMessage('');
+        setErrorMessage('');
         setCurrentJob(null);
 
         Geolocation.getCurrentPosition(
-
             async (position) => {
-                setStatusMessage('Localização encontrada! Buscando trabalhos...');
-                const { latitude, longitude } = position.coords;
+                const {latitude, longitude} = position.coords;
+                setCurrentPosition(position.coords);
 
-                console.log(position.coords)
-                
                 try{
-                    const response =  await api.get('/my-assignments');
-                    const assignedJobs = response.data;
 
-                    const foundJob = assignedJobs.find( job => {
-                        const latDiff = Math.abs(job.latitude - latitude);
-                        const lonDiff = Math.abs(job.longitude - longitude);
-                        return latDiff < 0.1 && lonDiff < 0.1
+                    const [assignmentsRes, lastEntryRes] = await Promise.all([
+                        api.get('/my-assignments'),
+                        api.get('/time-entries/me/last')
+                    ]);
+
+                    setLastEntry(lastEntryRes.data);
+
+                    const foundJob = assignmentsRes.data.find( job => {
+                        const latDiff = Math.abs(job.latitude - latitude)
+                        const lonDiff = Math.abs(job.longitude - longitude)
+                        return latDiff < 0.1 && lonDiff < 0.1;
                     })
 
-                    if (foundJob){
-                        setCurrentJob(foundJob);
-                        setStatusMessage('');
-                        setError(false)
+                    if(foundJob){
+                        setCurrentJob(foundJob)
                     } else {
-                        setStatusMessage('Você não parece estar em um local de trabalho designado.');
-                        setError(true)
+                        setErrorMessage('Você não parece estar em um local de trabalho designado.');
                     }
-
-                } catch(error) {
-                    setStatusMessage('Falha ao buscar seus trabalhos.')
-                    setError(true)
-                } finally {
+                }
+                catch (error) {
+                    if (error.response && error.response.status === 404) {
+                        setLastEntry(null);
+                    } else {
+                        setErrorMessage('Falha ao buscar seus dados de trabalho.');
+                    }
+                }finally{
                     setLoading(false)
                 }
-            }, (error) => {
-                console.error("Erro de geolocalização:", error);
-                setStatusMessage('Não foi possível obter sua localização. Verifique as permissões.')
-                setLoading(false)
-                setError(true)
+            },
+
+            (error) => {
+                setErrorMessage('Não foi possível obter sua localização.');
+                setLoading(false);
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
     }, []);
 
     useEffect(() => {
-        findCurrentJob();
-    }, [findCurrentJob]);
+        fetchData();
+    }, [fetchData]);
 
-    const handleClockIn = async () => {
-        if(!currentJob) return;
+    const handlePunch = async (entryType) => {
 
-        Alert.alert("Ponto Registrado", `Entrada registrada para o trabalho: ${currentJob.address}`)
+        if(!currentJob || !currentPosition) return;
+        
+        setLoading(true);
+        try {
+            const response = await api.post('/time-entries', {
+                jobId: currentJob.jobId,
+                entryType: entryType,
+                latitude: currentPosition.latitude,
+                longitude: currentPosition.longitude,
+                isManual: false
+            });
+
+            setLastEntry(response.data);
+            Alert.alert("Sucesso!", `Ponto '${entryType}' registrado.`);
+        } catch(error){
+            Alert.alert("Erro ao Bater o Ponto", error.response?.data?.message || "Ocorreu um erro.");
+        }finally{
+            setLoading(false);
+        }
     }
+
+    const renderActionButtons = () => {
+            if(!currentJob) return null;
+
+            if (!lastEntry || lastEntry.entryType === 'OUT') {
+                return <Button title="Registrar Entrada (IN)" onPress={() => handlePunch('IN')} />;
+            } else { 
+                return <Button title="Registrar Saída (OUT)" onPress={() => handlePunch('OUT')} />;
+            }
+        }
 
     const styles = StyleSheet.create({
         container: { flex:1, justifyContent:'center', alignItems: 'center', padding: 20 },
@@ -85,43 +114,30 @@ const MainScreen = ({ onLogout: handleLogout }) => {
         <View style={ styles.container }>
             <Text style={ styles.title }>Meu Ponto</Text>
 
-            { loading && <ActivityIndicator size="large" /> }
+            { loading && <ActivityIndicator size="large" color="#0000ff" /> }
 
             { !loading && currentJob && (
                 <View style={ styles.jobContainer } >
                     <Text style={ styles.jobLabel } > Trabalho Atual:</Text>
                     <Text style={ styles.jobAddress} > { currentJob.address }</Text>
-                    <Button title="Registrar Entrada (CLOCK_IN)" onPress={handleClockIn} />
+                    <View style={{ marginTop:20 }}>
+                        {renderActionButtons()}
+                    </View>
                 </View>
             ) }
 
-            { !loading && error && (
+            { !loading && errorMessage && (
                 <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{statusMessage}</Text>
-                    <Button title="Tentar Novamente" onPress={findCurrentJob} />
+                    <Text style={styles.errorText}>{errorMessage}</Text>
+                    <Button title="Tentar Novamente" onPress={fetchData} />
                 </View>
             )}
 
-
-
-            {/* { loading ? (
-                <View>
-                    <ActivityIndicator size="large" />
-                    <Text style={ styles.statusText }> { statusMessage } </Text>
+            {
+                <View style={ styles.logoutButton }>
+                    <Button title="Sair" onPress={handleLogout} color="red" />
                 </View>
-            ) : currentJob ? (
-                <View style={ styles.jobContainer } >
-                    <Text style={ styles.jobLabel } > Trabalho Atual:</Text>
-                    <Text style={ styles.jobAddress} > { currentJob.address }</Text>
-                    <Button title="Registrar Entrada (CLOCK_IN)" onPress={handleClockIn} />
-                </View>
-            ) : (
-                <Text style={styles.statusText}>{statusMessage}</Text>
-            )} */}
-
-            <View style={ styles.logoutButton }>
-                <Button title="Sair" onPress={handleLogout} color="red" />
-            </View>
+            }
         </View>
     );
 };
