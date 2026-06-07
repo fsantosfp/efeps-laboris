@@ -6,8 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import JobDetailPage from "./pages/JobDetailPage";
 import CreateJobPage from "./pages/CreateJobPage";
-import PayrollReportPage from "./pages/PayrollReportPage";
-import JobCostReportPage from "./pages/JobCostReportPage";
+import ReportsPage from "./pages/ReportsPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import EmployeesPage from "./pages/EmployeesPage";
 
@@ -22,8 +21,7 @@ function App(){
         <Route path="/employees" element={ <EmployeesPage/> } />
         <Route path="/jobs/new" element={ <CreateJobPage/> } />
         <Route path="/jobs/:jobId" element={ <JobDetailPage/> } />
-        <Route path="reports" element={ <PayrollReportPage /> } />
-        <Route path="reports/jobs/:jobId" element={ <JobCostReportPage /> } />
+        <Route path="reports" element={ <ReportsPage /> } />
       </Route>
     </Routes>
   )
