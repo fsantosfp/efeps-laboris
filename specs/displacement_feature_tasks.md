@@ -42,7 +42,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Implementar a classe [DisplacementService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/DisplacementService.java) contendo os métodos `startDisplacement` (validando assignments >= 2, última batida OUT, sem viagem ativa, geocode do início) e `endDisplacement` (validando geolocalização perto do destino final).
   - **Critério de Aceitação:** Classe compilando normalmente com as validações de regras de negócio.
 
-- [ ] **Tarefa 2.4: Criar o controlador `DisplacementController`**
+- [x] **Tarefa 2.4: Criar o controlador `DisplacementController`**
   - **Ações:**
     - Criar a classe [DisplacementController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/DisplacementController.java) expondo endpoints `/start`, `/end` e `/active`.
   - **Critério de Aceitação:** Endpoints expostos e acessíveis via HTTP.
