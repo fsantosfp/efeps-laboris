@@ -185,7 +185,7 @@ function ReportsPage() {
                             <div className="summary-container">
                                 <div className="summary-box">
                                     <span className="summary-label">Total de Horas Trabalhadas</span>
-                                    <span className="summary-value">{formatDecimalHours(payrollData.periodTotals.totalHours)} h</span>
+                                    <span className="summary-value">{formatDecimalHours(payrollData.periodTotals.totalHours)}</span>
                                 </div>
                                 <div className="summary-box">
                                     <span className="summary-label">Valor Total a Pagar</span>
@@ -207,7 +207,7 @@ function ReportsPage() {
                                         {payrollData.employeePayrolls.map(data => (
                                             <tr key={data.employeeId}>
                                                 <td>{data.employeeName}</td>
-                                                <td className="text-right">{formatDecimalHours(data.totalHours)} h</td>
+                                                <td className="text-right">{formatDecimalHours(data.totalHours)}</td>
                                                 <td className="text-right">$ {data.totalAmount.toFixed(2)}</td>
                                             </tr>
                                         ))}
@@ -309,7 +309,7 @@ function ReportsPage() {
                                         </div>
                                         <div className="info-item">
                                             <span className="info-label">Total de Horas</span>
-                                            <span className="info-value">{formatDecimalHours(report.periodTotals.totalHours)} h</span>
+                                            <span className="info-value">{formatDecimalHours(report.periodTotals.totalHours)}</span>
                                         </div>
                                         <div className="info-item">
                                             <span className="info-label">Custo Total</span>
@@ -341,7 +341,7 @@ function ReportsPage() {
                                                             <td>{item.start} h</td>
                                                             <td>{item.end} h</td>
                                                             <td className="text-right">{item.employeesCount}</td>
-                                                            <td className="text-right">{formatDecimalHours(item.hoursWorked)} h</td>
+                                                            <td className="text-right">{formatDecimalHours(item.hoursWorked)}</td>
                                                             <td className="text-right">$ {item.amountToBill.toFixed(2)}</td>
                                                         </tr>
                                                     ))}

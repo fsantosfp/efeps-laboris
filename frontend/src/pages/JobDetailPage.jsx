@@ -350,7 +350,7 @@ function JobDetailPage(){
                                                     <td style={{ padding: '8px 10px' }}>{row.employeeName}</td>
                                                     <td style={{ padding: '8px 10px' }}>{row.start}</td>
                                                     <td style={{ padding: '8px 10px' }}>{row.end}</td>
-                                                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>{formatDecimalHours(row.hoursWorked)} h</td>
+                                                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>{formatDecimalHours(row.hoursWorked)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
