@@ -64,7 +64,8 @@ public class ReportService {
             int employeeCount = shiftGroup.size();
 
             BigDecimal hoursWorkedForShift = representativeShift.hoursWorked();
-            BigDecimal amountToBillingForGroup = job.getBillingRate()
+            BigDecimal billingRate = job.getBillingRate() != null ? job.getBillingRate() : BigDecimal.ZERO;
+            BigDecimal amountToBillingForGroup = billingRate
                 .multiply(hoursWorkedForShift)
                 .multiply(BigDecimal.valueOf(employeeCount))
                 .setScale(2, RoundingMode.HALF_UP);
