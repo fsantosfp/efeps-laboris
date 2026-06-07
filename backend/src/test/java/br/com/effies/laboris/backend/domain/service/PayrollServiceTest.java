@@ -283,7 +283,7 @@ public class PayrollServiceTest {
         SalaryHistory salary1 = createSalaryHistory(employee1, new BigDecimal("20.00"), workDate.minusDays(1));
         SalaryHistory salary2 = createSalaryHistory(employee2, new BigDecimal("30.00"), workDate.minusDays(1));
 
-        when(userRepository.findByCompanyIdAndRoleAndStatus(company.getId(), UserRole.EMPLOYEE, UserStatus.ACTIVE))
+        when(userRepository.findByCompanyIdAndRole(company.getId(), UserRole.EMPLOYEE))
             .thenReturn(List.of(employee1, employee2));
 
         when(timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(eq(employee1.getId()), any(), any())).thenReturn(entries1);

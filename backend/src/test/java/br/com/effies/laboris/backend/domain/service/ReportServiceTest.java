@@ -131,6 +131,29 @@ class ReportServiceTest {
         assertThat(result.getPeriodTotals().getTotalAmount()).isEqualByComparingTo("0");
     }
 
+    @Test
+    @DisplayName("Deve calcular corretamente o relatório de custo mesmo se a taxa de faturamento (billingRate) do Job for nula")
+    void calculateJobCostReport_WhenBillingRateIsNull_ShouldNotThrowNpe() {
+        // Arrange
+        job.setBillingRate(null); // Null billing rate!
+        List<TimeEntry> entries = List.of(
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(8).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(12).forUser(employee1).build()
+        );
+
+        when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
+        when(timeEntryRepository.findAllByJobIdAndPeriod(job.getId(), start, end)).thenReturn(entries);
+
+        // Act
+        JobCostResponseDto result = reportService.calculateJobCostReport(manager, job.getId(), start, end);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getDailyBreakdown()).hasSize(1);
+        assertThat(result.getPeriodTotals().getTotalAmount()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(result.getPeriodTotals().getTotalHours()).isEqualByComparingTo("4.00");
+    }
+
     // Métodos auxiliares
     private User createUser(UUID id, Company company) {
         User user = new User();

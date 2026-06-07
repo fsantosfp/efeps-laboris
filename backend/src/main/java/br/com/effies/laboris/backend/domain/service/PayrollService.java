@@ -60,8 +60,8 @@ public class PayrollService {
     }
 
     public CompanyPayrollResponseDto calculateCompanyPayroll(User manager, Instant start, Instant end){
-        List<User> employees = userRepository.findByCompanyIdAndRoleAndStatus(
-            manager.getCompany().getId(), UserRole.EMPLOYEE, UserStatus.ACTIVE);
+        List<User> employees = userRepository.findByCompanyIdAndRole(
+            manager.getCompany().getId(), UserRole.EMPLOYEE);
 
         BigDecimal grandTotalAmount = BigDecimal.ZERO;
         BigDecimal grandTotalHours = BigDecimal.ZERO;
@@ -73,6 +73,11 @@ public class PayrollService {
 
             BigDecimal employeeTotalAmount = individualPayroll.getOpenToReceive().getTotalAmount();
             BigDecimal employeeTotalHours = individualPayroll.getOpenToReceive().getTotalHours();
+
+            // Skip inactive employees who did not work in the period
+            if (employee.getStatus() == UserStatus.INACTIVE && employeeTotalHours.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
 
             grandTotalAmount = grandTotalAmount.add(employeeTotalAmount);
             grandTotalHours = grandTotalHours.add(employeeTotalHours);
