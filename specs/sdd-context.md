@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.2: Criar a classe de entidade Displacement.java (Slice 1)
-* **Objetivo:** Criar a classe [Displacement.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/entity/Displacement.java) mapeando a tabela de banco de dados com seus relacionamentos.
+* **Título:** Tarefa 5.4: Validação da Build e Fluxo Mobile (Slice 5)
+* **Objetivo:** Rodar build e validações do app React Native e atestar funcionamento com o emulador.
 
 ---
 
 ## 📂 Escopo dos Arquivos
-* **Criar:**
-  - [Displacement.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/entity/Displacement.java)
+* **Verificar:**
+  - [MainScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/MainScreen.js)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que a classe de entidade compile corretamente com JPA.
-2. **Conventional Commit:** Commitar no formato `feat(backend): create Displacement JPA entity` antes de prosseguir.
+1. **Build Sucesso:** Assegurar que o aplicativo móvel React Native compile e rode perfeitamente.
+2. **Conventional Commit:** Commitar no formato `feat(mobile): validate mobile build` antes de prosseguir.
