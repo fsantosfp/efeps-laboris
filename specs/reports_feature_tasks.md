@@ -6,7 +6,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
 
 ## ☕ Slice 1: Camada de Backend (API de Timesheet do Job)
 
-- [ ] **Tarefa 1.1: Criação do DTO de Resposta do Timesheet**
+- [x] **Tarefa 1.1: Criação do DTO de Resposta do Timesheet**
   - **Ações:**
     - Criar a classe [JobTimesheetResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JobTimesheetResponseDto.java) contendo a estrutura com dados do Job, lista de colaboradores e detalhamento de data/horas diárias.
   - **Critério de Aceitação:** Classe DTO criada e compilando normalmente.
