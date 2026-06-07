@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.4: Endpoint no ReportController (Slice 1)
-* **Objetivo:** Criar a rota `GET /api/v1/reports/jobs/{jobId}/timesheet` no `ReportController.java` recebendo parâmetros de período opcionais.
+* **Título:** Tarefa 1.5: Testes Unitários do Novo Relatório (Slice 1)
+* **Objetivo:** Escrever testes em `ReportServiceTest.java` para validar os cálculos de horas por funcionário e permissões de segurança. Executar `SPRING_PROFILES_ACTIVE=local mvn test` para certificar-se do sucesso de todos os testes do backend.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Modificar:**
-  - [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java)
+  - [ReportServiceTest.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/test/java/br/com/effies/laboris/backend/domain/service/ReportServiceTest.java)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que o endpoint do controlador compile corretamente e mapeie a rota e parâmetros esperados.
-2. **Conventional Commit:** Commitar no formato `feat(reports): add timesheet endpoint in ReportController` antes de prosseguir.
+1. **Compilação Limpa:** Certificar que os testes unitários compilem e executem com sucesso.
+2. **Conventional Commit:** Commitar no formato `test(reports): add unit tests for calculateJobTimesheetReport` antes de prosseguir.

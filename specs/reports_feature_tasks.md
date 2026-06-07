@@ -22,7 +22,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Agrupar e somar as horas diárias trabalhadas por cada colaborador usando `TimeEntryCalculationHelper.calculateHoursWorked`.
   - **Critério de Aceitação:** Retorno correto dos dados no DTO estruturado.
 
-- [ ] **Tarefa 1.4: Endpoint no ReportController**
+- [x] **Tarefa 1.4: Endpoint no ReportController**
   - **Ações:**
     - Criar a rota `GET /api/v1/reports/jobs/{jobId}/timesheet` no [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java) recebendo parâmetros de período opcionais.
   - **Critério de Aceitação:** Endpoint mapeado e acessível.
