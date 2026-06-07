@@ -107,7 +107,7 @@ Este documento contém a decomposição das tarefas para a implementação das m
     - Chamar `POST /api/v1/displacements/end` e registrar o ponto `IN` para o respectivo Job.
   - **Critério de Aceitação:** Finalização e clock-in integrados com sucesso.
 
-- [ ] **Tarefa 5.4: Validação da Build e Fluxo Mobile**
+- [x] **Tarefa 5.4: Validação da Build e Fluxo Mobile**
   - **Ações:**
     - Rodar build e validações do app React Native e atestar funcionamento com o emulador.
   - **Critério de Aceitação:** Build compilada com sucesso.
