@@ -23,7 +23,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
     - Criar o método `calculateEmployeeJourneyReport` no [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java) para obter a lista de funcionários ativos, buscar suas batidas e deslocamentos, mesclar os dados de forma cronológica diária em eventos `WORK`, `BREAK` e `DISPLACEMENT`, ordenar e retornar os dados.
   - **Critério de Aceitação:** Lógica implementada e sem erros de execução.
 
-- [ ] **Tarefa 1.4: Adicionar o endpoint no ReportController**
+- [x] **Tarefa 1.4: Adicionar o endpoint no ReportController**
   - **Ações:**
     - Adicionar a rota `GET /api/v1/reports/employee-journey` em [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java).
   - **Critério de Aceitação:** Endpoint exposto com segurança (restrito ao perfil `MANAGER`).

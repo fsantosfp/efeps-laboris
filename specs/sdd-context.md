@@ -9,14 +9,14 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.4: Adicionar o endpoint no ReportController (Slice 1)
-* **Objetivo:** Adicionar a rota GET /api/v1/reports/employee-journey em ReportController.java.
+* **Título:** Tarefa 1.5: Testes Unitários de Backend (Slice 1)
+* **Objetivo:** Escrever testes unitários em ReportServiceTest.java cobrando a geração de eventos da linha do tempo, e rodar a suíte inteira.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java)
+  - [ReportServiceTest.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/test/java/br/com/effies/laboris/backend/domain/service/ReportServiceTest.java)
 
 ---
 

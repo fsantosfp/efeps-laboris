@@ -6,6 +6,7 @@ import br.com.effies.laboris.backend.domain.service.ReportService;
 import br.com.effies.laboris.backend.presentation.dto.response.CompanyPayrollResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.EmployeeJourneyResponseDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -62,6 +64,17 @@ public class ReportController {
         @RequestParam(value = "end", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant end
     ){
         JobTimesheetResponseDto response = reportService.calculateJobTimesheetReport(manager, jobId, start, end);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/employee-journey")
+    public ResponseEntity<List<EmployeeJourneyResponseDto>> getEmployeeJourneyReport(
+        @AuthenticationPrincipal User manager,
+        @RequestParam(value = "employeeIds", required = false) List<UUID> employeeIds,
+        @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant start,
+        @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant end
+    ){
+        List<EmployeeJourneyResponseDto> response = reportService.calculateEmployeeJourneyReport(manager, employeeIds, start, end);
         return ResponseEntity.ok(response);
     }
 }
