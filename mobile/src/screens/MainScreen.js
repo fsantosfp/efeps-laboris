@@ -215,6 +215,32 @@ const MainScreen = () => {
         );
     };
 
+    const handleCancelDisplacement = async () => {
+        Alert.alert(
+            "Confirmar",
+            "Deseja realmente cancelar o deslocamento? O período decorrido será desconsiderado.",
+            [
+                { text: "Não", style: "cancel" },
+                {
+                    text: "Sim",
+                    onPress: async () => {
+                        setLoading(true);
+                        try {
+                            await api.delete('/displacements/active');
+                            setActiveDisplacement(null);
+                            setSelectedDestinationJobId('');
+                            Alert.alert("Sucesso", "Deslocamento cancelado.");
+                        } catch (error) {
+                            Alert.alert("Erro ao Cancelar", error.response?.data?.message || "Ocorreu um erro.");
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     const renderActionButtons = () => {
         if (!currentJob) return null;
 
@@ -385,18 +411,21 @@ const MainScreen = () => {
                                 <Text style={{ fontSize: 14.5, color: theme.colors.textMuted, marginBottom: 15, textAlign: 'center' }}>
                                     Selecione o Trabalho de Destino para finalizar o deslocamento e bater a entrada:
                                 </Text>
-                                {assignments.map(job => {
-                                    const isSelected = selectedDestinationJobId === job.jobId;
-                                    return (
-                                        <TouchableOpacity
-                                            key={job.jobId}
-                                            style={[styles.jobItem, isSelected && styles.jobItemSelected]}
-                                            onPress={() => setSelectedDestinationJobId(job.jobId)}
-                                        >
-                                            <Text style={[styles.jobItemText, isSelected && styles.jobItemTextSelected]}>{job.address}</Text>
-                                        </TouchableOpacity>
-                                    );
-                                })}
+                                {assignments
+                                    .filter(job => !lastEntry || job.jobId !== lastEntry.jobId)
+                                    .map(job => {
+                                        const isSelected = selectedDestinationJobId === job.jobId;
+                                        return (
+                                            <TouchableOpacity
+                                                key={job.jobId}
+                                                style={[styles.jobItem, isSelected && styles.jobItemSelected]}
+                                                onPress={() => setSelectedDestinationJobId(job.jobId)}
+                                            >
+                                                <Text style={[styles.jobItemText, isSelected && styles.jobItemTextSelected]}>{job.address}</Text>
+                                            </TouchableOpacity>
+                                        );
+                                    })
+                                }
                                 <View style={styles.buttonContainer}>
                                     <TouchableOpacity
                                         style={[globalStyles.btn, globalStyles.btnPrimary, { width: '100%' }, !selectedDestinationJobId && styles.buttonDisabled]}
@@ -404,6 +433,15 @@ const MainScreen = () => {
                                         disabled={!selectedDestinationJobId || loading}
                                     >
                                         <Text style={[globalStyles.btnText, globalStyles.btnPrimaryText, !selectedDestinationJobId && styles.buttonTextDisabled]}>Finalizar Deslocamento & Clock In</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={[styles.buttonContainer, { marginTop: 8 }]}>
+                                    <TouchableOpacity
+                                        style={[globalStyles.btn, globalStyles.btnDanger, { width: '100%' }]}
+                                        onPress={handleCancelDisplacement}
+                                        disabled={loading}
+                                    >
+                                        <Text style={[globalStyles.btnText, globalStyles.btnDangerText]}>Cancelar Deslocamento</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>

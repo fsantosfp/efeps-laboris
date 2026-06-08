@@ -144,9 +144,16 @@ class DisplacementServiceTest {
     @DisplayName("Deve finalizar deslocamento com sucesso quando próximo ao destino")
     void endDisplacement_ShouldSucceed_WhenCloseToDestination() {
         // Arrange
+        Job originJob = new Job();
+        originJob.setId(UUID.randomUUID());
+        TimeEntry lastEntry = new TimeEntry();
+        lastEntry.setJob(originJob);
+
         when(displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId()))
                 .thenReturn(Optional.of(activeDisplacement));
         when(jobRepository.findById(destinationJob.getId())).thenReturn(Optional.of(destinationJob));
+        when(timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId()))
+                .thenReturn(Optional.of(lastEntry));
         when(displacementRepository.save(any(Displacement.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // Act
@@ -172,6 +179,49 @@ class DisplacementServiceTest {
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () ->
                 displacementService.endDisplacement(41.0, -74.0, destinationJob.getId(), employee));
+    }
+
+    @Test
+    @DisplayName("Deve falhar ao finalizar se destino for igual a origem")
+    void endDisplacement_WhenDestinationEqualsOrigin_ShouldThrowException() {
+        // Arrange
+        when(displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId()))
+                .thenReturn(Optional.of(activeDisplacement));
+        when(jobRepository.findById(destinationJob.getId())).thenReturn(Optional.of(destinationJob));
+
+        TimeEntry lastEntry = new TimeEntry();
+        lastEntry.setJob(destinationJob); // Same destination job
+        when(timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId()))
+                .thenReturn(Optional.of(lastEntry));
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () ->
+                displacementService.endDisplacement(40.72, -74.01, destinationJob.getId(), employee));
+    }
+
+    @Test
+    @DisplayName("Deve cancelar deslocamento ativo com sucesso")
+    void cancelDisplacement_ShouldDeleteActiveDisplacement() {
+        // Arrange
+        when(displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId()))
+                .thenReturn(Optional.of(activeDisplacement));
+
+        // Act
+        displacementService.cancelDisplacement(employee);
+
+        // Assert
+        verify(displacementRepository).delete(activeDisplacement);
+    }
+
+    @Test
+    @DisplayName("Deve falhar ao cancelar se não houver deslocamento ativo")
+    void cancelDisplacement_WhenNoActiveDisplacement_ShouldThrowException() {
+        // Arrange
+        when(displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId()))
+                .thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> displacementService.cancelDisplacement(employee));
     }
 
     @Test
