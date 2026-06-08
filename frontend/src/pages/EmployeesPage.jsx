@@ -12,12 +12,39 @@ function EmployeesPage() {
   const createDialogRef = useRef(null);
   const salaryDialogRef = useRef(null);
   const deactivateDialogRef = useRef(null);
+  const timeEntriesDialogRef = useRef(null);
 
   // Selected Employee & Salaries
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [salaries, setSalaries] = useState([]);
   const [salariesLoading, setSalariesLoading] = useState(false);
   const [salariesError, setSalariesError] = useState("");
+
+  // Time Entries Management States
+  const [timeEntries, setTimeEntries] = useState([]);
+  const [timeEntriesLoading, setTimeEntriesLoading] = useState(false);
+  const [timeEntriesError, setTimeEntriesError] = useState("");
+  const [timeEntriesStart, setTimeEntriesStart] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d.toISOString().split("T")[0];
+  });
+  const [timeEntriesEnd, setTimeEntriesEnd] = useState(() => {
+    return new Date().toISOString().split("T")[0];
+  });
+  const [jobs, setJobs] = useState([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
+  const [editingTimeEntry, setEditingTimeEntry] = useState(null);
+  const [showTimeEntryForm, setShowTimeEntryForm] = useState(false);
+  const [timeEntryForm, setTimeEntryForm] = useState({
+    jobId: "",
+    entryType: "IN",
+    date: "",
+    time: "",
+    justification: ""
+  });
+  const [timeEntryFormError, setTimeEntryFormError] = useState("");
+  const [timeEntryFormLoading, setTimeEntryFormLoading] = useState(false);
 
   // Create Form State
   const [createForm, setCreateForm] = useState({
@@ -97,12 +124,14 @@ function EmployeesPage() {
     const cleanupSalary = bindLightDismiss(salaryDialogRef, handleCloseSalary);
     const cleanupDeactivate = bindLightDismiss(deactivateDialogRef, handleCloseDeactivate);
     const cleanupActivate = bindLightDismiss(activateDialogRef, handleCloseActivate);
+    const cleanupTimeEntries = bindLightDismiss(timeEntriesDialogRef, handleCloseTimeEntries);
 
     return () => {
       if (cleanupCreate) cleanupCreate();
       if (cleanupSalary) cleanupSalary();
       if (cleanupDeactivate) cleanupDeactivate();
       if (cleanupActivate) cleanupActivate();
+      if (cleanupTimeEntries) cleanupTimeEntries();
     };
   }, [selectedEmployee]);
 
@@ -172,6 +201,164 @@ function EmployeesPage() {
     activateDialogRef.current.close();
   };
 
+  // Time Entries Management Handlers
+  const handleOpenTimeEntries = async (employee) => {
+    setSelectedEmployee(employee);
+    setTimeEntriesError("");
+    setTimeEntryFormError("");
+    setShowTimeEntryForm(false);
+    timeEntriesDialogRef.current.showModal();
+
+    // Fetch jobs
+    setJobsLoading(true);
+    try {
+      const response = await api.get("/jobs");
+      setJobs(response.data);
+    } catch (err) {
+      console.error("Erro ao buscar trabalhos:", err);
+    } finally {
+      setJobsLoading(false);
+    }
+
+    // Fetch time entries for current dates
+    await fetchTimeEntries(employee.id, timeEntriesStart, timeEntriesEnd);
+  };
+
+  const fetchTimeEntries = async (employeeId, start, end) => {
+    setTimeEntriesLoading(true);
+    setTimeEntriesError("");
+    try {
+      const startISO = new Date(start).toISOString();
+      const endISO = new Date(end + "T23:59:59.999Z").toISOString();
+      const response = await api.get(`/employees/${employeeId}/time-entries?start=${startISO}&end=${endISO}`);
+      setTimeEntries(response.data);
+    } catch (err) {
+      console.error("Erro ao buscar pontos do funcionário:", err);
+      setTimeEntriesError("Não foi possível carregar os registros de ponto.");
+    } finally {
+      setTimeEntriesLoading(false);
+    }
+  };
+
+  const handleCloseTimeEntries = () => {
+    setSelectedEmployee(null);
+    setTimeEntries([]);
+    timeEntriesDialogRef.current.close();
+  };
+
+  const handleFilterTimeEntries = async (e) => {
+    e.preventDefault();
+    if (!selectedEmployee) return;
+    await fetchTimeEntries(selectedEmployee.id, timeEntriesStart, timeEntriesEnd);
+  };
+
+  const handleOpenNewTimeEntry = () => {
+    setTimeEntryFormError("");
+    setEditingTimeEntry(null);
+    setTimeEntryForm({
+      jobId: jobs.length > 0 ? jobs[0].id : "",
+      entryType: "IN",
+      date: new Date().toISOString().split("T")[0],
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+      justification: ""
+    });
+    setShowTimeEntryForm(true);
+  };
+
+  const handleOpenEditTimeEntry = (entry) => {
+    setTimeEntryFormError("");
+    setEditingTimeEntry(entry);
+    const entryDate = new Date(entry.timestamp);
+    // Format YYYY-MM-DD in local time
+    const localDateStr = entryDate.getFullYear() + "-" +
+      String(entryDate.getMonth() + 1).padStart(2, '0') + "-" +
+      String(entryDate.getDate()).padStart(2, '0');
+    // Format HH:MM in local time
+    const localTimeStr = String(entryDate.getHours()).padStart(2, '0') + ":" +
+      String(entryDate.getMinutes()).padStart(2, '0');
+
+    setTimeEntryForm({
+      jobId: entry.jobId,
+      entryType: entry.entryType,
+      date: localDateStr,
+      time: localTimeStr,
+      justification: entry.justification || ""
+    });
+    setShowTimeEntryForm(true);
+  };
+
+  const handleCloseTimeEntryForm = () => {
+    setShowTimeEntryForm(false);
+    setEditingTimeEntry(null);
+    setTimeEntryFormError("");
+  };
+
+  const handleTimeEntryFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedEmployee) return;
+
+    const actionText = editingTimeEntry ? "alteração" : "inclusão";
+    const confirmSave = window.confirm(`Confirmar a ${actionText} deste registro de ponto?`);
+    if (!confirmSave) return;
+
+    setTimeEntryFormError("");
+    setTimeEntryFormLoading(true);
+
+    try {
+      const timestampISO = new Date(`${timeEntryForm.date}T${timeEntryForm.time}:00`).toISOString();
+      const payload = {
+        jobId: timeEntryForm.jobId,
+        entryType: timeEntryForm.entryType,
+        timestamp: timestampISO,
+        justification: timeEntryForm.justification
+      };
+
+      if (editingTimeEntry) {
+        await api.put(`/employees/${selectedEmployee.id}/time-entries/${editingTimeEntry.id}`, payload);
+      } else {
+        await api.post(`/employees/${selectedEmployee.id}/time-entries`, payload);
+      }
+
+      setShowTimeEntryForm(false);
+      setEditingTimeEntry(null);
+      await fetchTimeEntries(selectedEmployee.id, timeEntriesStart, timeEntriesEnd);
+    } catch (err) {
+      console.error("Erro ao salvar registro de ponto:", err);
+      const errMsg = err.response?.data?.message || "Erro ao salvar o registro de ponto.";
+      setTimeEntryFormError(errMsg);
+    } finally {
+      setTimeEntryFormLoading(false);
+    }
+  };
+
+  const handleDeleteTimeEntry = async (entryId) => {
+    if (!selectedEmployee) return;
+
+    const confirmDelete = window.confirm("Confirmar a exclusão deste registro de ponto?");
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/employees/${selectedEmployee.id}/time-entries/${entryId}`);
+      await fetchTimeEntries(selectedEmployee.id, timeEntriesStart, timeEntriesEnd);
+    } catch (err) {
+      console.error("Erro ao deletar registro de ponto:", err);
+      alert(err.response?.data?.message || "Não foi possível excluir o registro de ponto.");
+    }
+  };
+
+  const formatDateTime = (isoString) => {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    return date.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+  };
+
   // Submit Actions
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
@@ -206,16 +393,16 @@ function EmployeesPage() {
         hourlyRate: parseFloat(salaryForm.hourlyRate),
         effectiveDate: salaryForm.effectiveDate,
       });
-      
+
       // Reload timeline and employees list
       const response = await api.get(`/employees/${selectedEmployee.id}/salaries`);
       setSalaries(response.data);
-      
+
       setSalaryForm({
         hourlyRate: "",
         effectiveDate: new Date().toISOString().split("T")[0],
       });
-      
+
       await fetchEmployees();
     } catch (err) {
       console.error("Erro ao adicionar taxa salarial:", err);
@@ -338,6 +525,12 @@ function EmployeesPage() {
                         >
                           Histórico Salarial
                         </button>
+                        <button
+                          className="btn-action btn-action-primary"
+                          onClick={() => handleOpenTimeEntries(emp)}
+                        >
+                          Ajustar Pontos
+                        </button>
                         {emp.status === "ACTIVE" && (
                           <button
                             className="btn-action btn-action-danger"
@@ -439,7 +632,7 @@ function EmployeesPage() {
             &times;
           </button>
         </div>
-        
+
         {selectedEmployee && (
           <p style={{ color: "var(--text-muted)", marginTop: "-15px", marginBottom: "20px", fontSize: "14px" }}>
             Funcionário(a): <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>{selectedEmployee.name}</span>
@@ -569,6 +762,186 @@ function EmployeesPage() {
             {activateLoading ? "Ativando..." : "Confirmar Reativação"}
           </button>
         </div>
+      </dialog>
+
+      {/* MODAL 5: Ajustes de Ponto de Funcionários */}
+      <dialog ref={timeEntriesDialogRef} className="glass-dialog" closedby="any" style={{ maxWidth: "880px" }}>
+        <div className="dialog-header">
+          <h3>Ajustes de Ponto</h3>
+          <button className="btn-close" onClick={handleCloseTimeEntries}>
+            &times;
+          </button>
+        </div>
+
+        {selectedEmployee && (
+          <p style={{ color: "var(--text-muted)", marginTop: "-15px", marginBottom: "20px", fontSize: "14px" }}>
+            Funcionário(a): <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>{selectedEmployee.name}</span>
+          </p>
+        )}
+
+        <form onSubmit={handleFilterTimeEntries} className="dialog-form" style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "20px" }}>
+          <div className="form-group" style={{ flex: 1, minWidth: "140px" }}>
+            <label className="form-label">Data de Início</label>
+            <input
+              type="date"
+              className="form-input"
+              value={timeEntriesStart}
+              onChange={(e) => setTimeEntriesStart(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group" style={{ flex: 1, minWidth: "140px" }}>
+            <label className="form-label">Data de Término</label>
+            <input
+              type="date"
+              className="form-input"
+              value={timeEntriesEnd}
+              onChange={(e) => setTimeEntriesEnd(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" style={{ height: "42px", display: "flex", alignItems: "center" }}>
+            Filtrar
+          </button>
+          {selectedEmployee?.status !== "INACTIVE" && (
+            <button type="button" className="btn btn-primary" onClick={handleOpenNewTimeEntry} style={{ height: "42px", display: "flex", alignItems: "center", backgroundColor: "var(--color-success)" }}>
+              + Incluir Ponto
+            </button>
+          )}
+        </form>
+
+        {showTimeEntryForm && (
+          <div style={{ border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-control)", padding: "16px", marginBottom: "20px", backgroundColor: "#f8fafc" }}>
+            <h4 style={{ margin: "0 0 15px 0" }}>{editingTimeEntry ? "Editar Registro de Ponto" : "Incluir Novo Registro de Ponto"}</h4>
+            {timeEntryFormError && <p className="alert alert-error" style={{ marginBottom: "15px" }}>{timeEntryFormError}</p>}
+            <form onSubmit={handleTimeEntryFormSubmit} className="dialog-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Trabalho (Destino/Local)</label>
+                  <select
+                    className="form-input"
+                    value={timeEntryForm.jobId}
+                    onChange={(e) => setTimeEntryForm({ ...timeEntryForm, jobId: e.target.value })}
+                    required
+                  >
+                    <option value="" disabled>Selecione um trabalho...</option>
+                    {jobs.map(j => (
+                      <option key={j.id} value={j.id}>{j.clientName} - {j.address}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Tipo de Batida</label>
+                  <select
+                    className="form-input"
+                    value={timeEntryForm.entryType}
+                    onChange={(e) => setTimeEntryForm({ ...timeEntryForm, entryType: e.target.value })}
+                    required
+                  >
+                    <option value="IN">Entrada (IN)</option>
+                    <option value="OUT">Saída (OUT)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Data</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={timeEntryForm.date}
+                    onChange={(e) => setTimeEntryForm({ ...timeEntryForm, date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Hora</label>
+                  <input
+                    type="time"
+                    className="form-input"
+                    value={timeEntryForm.time}
+                    onChange={(e) => setTimeEntryForm({ ...timeEntryForm, time: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Justificativa (Motivo da alteração/inclusão)</label>
+                <textarea
+                  className="form-input"
+                  style={{ minHeight: "60px", resize: "vertical" }}
+                  value={timeEntryForm.justification}
+                  onChange={(e) => setTimeEntryForm({ ...timeEntryForm, justification: e.target.value })}
+                  placeholder="Ex: Funcionário esqueceu de registrar o ponto de saída ao fim do turno."
+                  required
+                />
+              </div>
+              <div className="dialog-actions">
+                <button type="button" className="btn btn-secondary" onClick={handleCloseTimeEntryForm}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={timeEntryFormLoading}>
+                  {timeEntryFormLoading ? "Salvando..." : "Salvar Ponto"}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {timeEntriesError && <p className="alert alert-error" style={{ marginBottom: "15px" }}>{timeEntriesError}</p>}
+        {timeEntriesLoading ? (
+          <div className="loading-spinner"></div>
+        ) : (
+          <div style={{ maxHeight: "300px", overflowY: "auto", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-control)", backgroundColor: "#ffffff" }}>
+            <table className="modern-table" style={{ width: "100%", margin: 0 }}>
+              <thead>
+                <tr>
+                  <th>Data e Hora</th>
+                  <th>Tipo</th>
+                  <th>Trabalho</th>
+                  <th>Manual?</th>
+                  <th>Justificativa</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {timeEntries.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "var(--text-muted)" }}>Nenhum ponto registrado no período selecionado.</td>
+                  </tr>
+                ) : (
+                  timeEntries.map(entry => {
+                    const jobObj = jobs.find(j => j.id === entry.jobId);
+                    const jobLabel = jobObj ? `${jobObj.clientName} (${jobObj.address})` : `Trabalho ID: ${entry.jobId}`;
+                    return (
+                      <tr key={entry.id}>
+                        <td style={{ whiteSpace: "nowrap" }}>{formatDateTime(entry.timestamp)}</td>
+                        <td>
+                          <span className={`badge ${entry.entryType === 'IN' ? 'badge-active' : 'badge-inactive'}`}>
+                            {entry.entryType}
+                          </span>
+                        </td>
+                        <td style={{ fontSize: "13px" }}>{jobLabel}</td>
+                        <td>{entry.isManual ? "Sim" : "Não"}</td>
+                        <td style={{ fontSize: "13px", color: "var(--text-muted)", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={entry.justification}>{entry.justification || "-"}</td>
+                        <td>
+                          {selectedEmployee?.status === "INACTIVE" ? (
+                            <span style={{ color: "var(--text-muted)", fontSize: "12px", fontStyle: "italic" }}>Bloqueado (Inativo)</span>
+                          ) : (
+                            <div style={{ display: "flex", gap: "6px" }}>
+                              <button className="btn-action btn-action-primary" style={{ padding: "4px 8px", fontSize: "12px" }} onClick={() => handleOpenEditTimeEntry(entry)}>Editar</button>
+                              <button className="btn-action btn-action-danger" style={{ padding: "4px 8px", fontSize: "12px" }} onClick={() => handleDeleteTimeEntry(entry.id)}>Excluir</button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </dialog>
     </div>
   );
