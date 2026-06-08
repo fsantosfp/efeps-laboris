@@ -27,8 +27,8 @@
   align-items: start;
 }
 
-.job-detail-info-card h3,
-.job-detail-info-card h4 {
+.card-surface h3,
+.card-surface h4 {
   font-size: 18px;
   font-weight: 700;
   margin-top: 0;
