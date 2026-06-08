@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, SectionList, TextInput, ActivityIndicator, Alert } from 'react-native';
 import api from '../services/api';
 import { calculateWorkedHours } from '../utils/calculateWorkedHours';
+import { calculateBreakHours } from '../utils/calculateBreakHours';
 import { formatDecimalHours } from '../utils/formatters';
 
 const HistoryScreen = () => {
@@ -10,6 +11,7 @@ const HistoryScreen = () => {
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
     const [sections, setSections] = useState([]);
     const [totalHours, setTotalHours] = useState(0);
+    const [totalBreakHours, setTotalBreakHours] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const fetchHistory = async () => {
@@ -22,6 +24,7 @@ const HistoryScreen = () => {
         setLoading(true);
         setSections([]);
         setTotalHours(0);
+        setTotalBreakHours(0);
 
         try {
 
@@ -85,6 +88,9 @@ const HistoryScreen = () => {
             total += displacementTotalHours;
             setTotalHours(total);
 
+            let breakTotal = entries.length > 0 ? calculateBreakHours(entries) : 0;
+            setTotalBreakHours(breakTotal);
+
         } catch (error) {
             console.error("Erro ao buscar histórico:", error);
             Alert.alert("Erro", "Não foi possível buscar o histórico.");
@@ -137,8 +143,16 @@ const HistoryScreen = () => {
                 <>
                     {sections.length > 0 && (
                         <View style={style.summaryContainer}>
-                            <Text style={style.summaryText}> Total de Horas no Período:</Text>
-                            <Text style={style.summaryHours}> {formatDecimalHours(totalHours)} </Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
+                                <View style={{ alignItems: 'center' }}>
+                                    <Text style={style.summaryText}>Total Trabalhado:</Text>
+                                    <Text style={style.summaryHours}>{formatDecimalHours(totalHours)}</Text>
+                                </View>
+                                <View style={{ alignItems: 'center' }}>
+                                    <Text style={style.summaryText}>Total Intervalo:</Text>
+                                    <Text style={style.summaryHours}>{formatDecimalHours(totalBreakHours)}</Text>
+                                </View>
+                            </View>
                         </View>
                     )}
                     <SectionList 
