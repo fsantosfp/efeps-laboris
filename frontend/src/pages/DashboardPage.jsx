@@ -67,12 +67,10 @@ function DashboardPage(){
             ) : (
                 <div className="jobs-grid">
                     {jobs.map(job => {
-                        const refCode = `REF-${job.id.substring(0, 4).toUpperCase()}`;
                         return (
                             <div className="job-card" key={job.id}>
                                 <div>
                                     <div className="job-card-header">
-                                        <span className="job-ref">{refCode}</span>
                                         <span className={`status-badge ${job.status.toLowerCase()}`}>
                                             {STATUS[job.status]}
                                         </span>
