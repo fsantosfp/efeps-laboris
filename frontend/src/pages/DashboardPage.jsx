@@ -5,6 +5,7 @@ import "./DashboardPage.css";
 
 function DashboardPage(){
     const [jobs, setJobs] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const STATUS = {
@@ -28,6 +29,10 @@ function DashboardPage(){
 
         fetchJobs();
     }, []);
+
+    const filteredJobs = jobs.filter(job => 
+        job.address && job.address.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     if (loading) {
         return (
@@ -57,6 +62,24 @@ function DashboardPage(){
                 </Link>
             </header>
 
+            {jobs.length > 0 && (
+                <div className="dashboard-search-container">
+                    <div className="search-input-wrapper">
+                        <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input 
+                            type="text" 
+                            className="search-input" 
+                            placeholder="Buscar trabalhos por endereço..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                </div>
+            )}
+
             {error && <div className="login-error-alert" style={{ marginBottom: '24px' }}>{error}</div>}
 
             {jobs.length === 0 && !error ? (
@@ -64,9 +87,14 @@ function DashboardPage(){
                     <p style={{ margin: 0, fontSize: '16px', fontWeight: '500' }}>Você ainda não cadastrou nenhum trabalho.</p>
                     <p style={{ margin: '8px 0 0 0', fontSize: '14px', color: '#94a3b8' }}>Clique em "Novo Trabalho" para começar.</p>
                 </div>
+            ) : filteredJobs.length === 0 ? (
+                <div className="empty-dashboard-card">
+                    <p style={{ margin: 0, fontSize: '16px', fontWeight: '500' }}>Nenhum trabalho encontrado para o endereço digitado.</p>
+                    <p style={{ margin: '8px 0 0 0', fontSize: '14px', color: '#94a3b8' }}>Tente ajustar os termos da sua busca.</p>
+                </div>
             ) : (
                 <div className="jobs-grid">
-                    {jobs.map(job => {
+                    {filteredJobs.map(job => {
                         return (
                             <div className="job-card" key={job.id}>
                                 <div>
