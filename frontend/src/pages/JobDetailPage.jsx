@@ -252,47 +252,61 @@ function JobDetailPage(){
                         ) : (
                             <div className="info-card">
                                 <h3>Informações Gerais</h3>
-                                <ul className="info-list">
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        <span className="info-label">Contratante:</span>
-                                        <span className="info-value">{job.clientName || 'Não informado'}</span>
+                                <ul className="detail-list">
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            <span className="detail-label">Contratante</span>
+                                        </div>
+                                        <div className="detail-value">{job.clientName || 'Não informado'}</div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                        <span className="info-label">Endereço:</span>
-                                        <span className="info-value">{job.address}</span>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            <span className="detail-label">Endereço</span>
+                                        </div>
+                                        <div className="detail-value">{job.address}</div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                        <span className="info-label">Status:</span>
-                                        <span className="info-value">
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                            <span className="detail-label">Status</span>
+                                        </div>
+                                        <div className="detail-value">
                                             <span className={`status-badge ${job.status.toLowerCase()}`}>
                                                 {job.status === 'PENDING' ? 'A fazer' : 
                                                  job.status === 'IN_PROGRESS' ? 'Em andamento' : 
                                                  job.status === 'COMPLETED' ? 'Concluído' : 'Cancelado (Deletado)'}
                                             </span>
-                                        </span>
+                                        </div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                                        <span className="info-label">Faturamento/Hora:</span>
-                                        <span className="info-value">R$ {job.billingRate !== null && job.billingRate !== undefined ? job.billingRate.toFixed(2) : '0.00'}</span>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                            <span className="detail-label">Faturamento/Hora</span>
+                                        </div>
+                                        <div className="detail-value">R$ {job.billingRate !== null && job.billingRate !== undefined ? job.billingRate.toFixed(2) : '0.00'}</div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/></svg>
-                                        <span className="info-label">Orçamento Total:</span>
-                                        <span className="info-value">R$ {job.budget !== null && job.budget !== undefined ? job.budget.toFixed(2) : '0.00'}</span>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/></svg>
+                                            <span className="detail-label">Orçamento Total</span>
+                                        </div>
+                                        <div className="detail-value">R$ {job.budget !== null && job.budget !== undefined ? job.budget.toFixed(2) : '0.00'}</div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                        <span className="info-label">Data de Início:</span>
-                                        <span className="info-value">{job.startDate}</span>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                            <span className="detail-label">Data de Início</span>
+                                        </div>
+                                        <div className="detail-value">{job.startDate}</div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                        <span className="info-label">Data de Término (Est.):</span>
-                                        <span className="info-value">{job.endDate || 'Não informada'}</span>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                            <span className="detail-label">Data de Término (Est.)</span>
+                                        </div>
+                                        <div className="detail-value">{job.endDate || 'Não informada'}</div>
                                     </li>
                                 </ul>
                             </div>
@@ -302,18 +316,27 @@ function JobDetailPage(){
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                             <div className="info-card">
                                 <h3>Responsável</h3>
-                                <ul className="info-list">
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        <span className="info-value">{job.responsibleName}</span>
+                                <ul className="detail-list">
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            <span className="detail-label">Nome do Responsável</span>
+                                        </div>
+                                        <div className="detail-value">{job.responsibleName}</div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                                        <span className="info-value">{job.responsiblePhone}</span>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                            <span className="detail-label">Telefone</span>
+                                        </div>
+                                        <div className="detail-value">{job.responsiblePhone}</div>
                                     </li>
-                                    <li className="info-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                        <span className="info-value">{job.responsibleEmail || 'Não informado'}</span>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                            <span className="detail-label">E-mail</span>
+                                        </div>
+                                        <div className="detail-value">{job.responsibleEmail || 'Não informado'}</div>
                                     </li>
                                 </ul>
                             </div>
