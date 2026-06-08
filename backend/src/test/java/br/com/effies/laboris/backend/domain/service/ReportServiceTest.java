@@ -9,6 +9,7 @@ import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.domain.utils.TimeEntryBuilder;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -152,6 +153,85 @@ class ReportServiceTest {
         assertThat(result.getDailyBreakdown()).hasSize(1);
         assertThat(result.getPeriodTotals().getTotalAmount()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(result.getPeriodTotals().getTotalHours()).isEqualByComparingTo("4.00");
+    }
+
+    @Test
+    @DisplayName("Deve calcular corretamente as horas por colaborador dentro do período fornecido")
+    void calculateJobTimesheetReport_WhenPeriodProvided_ShouldFilterAndGroupCorrectly() {
+        // Arrange
+        employee1.setName("Alice");
+        employee2.setName("Bob");
+
+        List<TimeEntry> entries = List.of(
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(8).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(12).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(9).forUser(employee2).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(15).forUser(employee2).build()
+        );
+
+        when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
+        when(timeEntryRepository.findAllByJobIdAndPeriod(job.getId(), start, end)).thenReturn(entries);
+
+        // Act
+        JobTimesheetResponseDto result = reportService.calculateJobTimesheetReport(manager, job.getId(), start, end);
+
+        // Assert
+        assertThat(result.getJobId()).isEqualTo(job.getId());
+        assertThat(result.getEmployeeTimesheets()).hasSize(2);
+
+        // Sorted by employee name: Alice, then Bob
+        var aliceReport = result.getEmployeeTimesheets().get(0);
+        assertThat(aliceReport.getEmployeeName()).isEqualTo("Alice");
+        assertThat(aliceReport.getDailyHours()).hasSize(1);
+        assertThat(aliceReport.getDailyHours().get(0).getHoursWorked()).isEqualByComparingTo("4.00");
+        assertThat(aliceReport.getDailyHours().get(0).getStart()).isEqualTo(java.time.LocalTime.of(8, 0));
+        assertThat(aliceReport.getDailyHours().get(0).getEnd()).isEqualTo(java.time.LocalTime.of(12, 0));
+
+        var bobReport = result.getEmployeeTimesheets().get(1);
+        assertThat(bobReport.getEmployeeName()).isEqualTo("Bob");
+        assertThat(bobReport.getDailyHours()).hasSize(1);
+        assertThat(bobReport.getDailyHours().get(0).getHoursWorked()).isEqualByComparingTo("6.00");
+        assertThat(bobReport.getDailyHours().get(0).getStart()).isEqualTo(java.time.LocalTime.of(9, 0));
+        assertThat(bobReport.getDailyHours().get(0).getEnd()).isEqualTo(java.time.LocalTime.of(15, 0));
+    }
+
+    @Test
+    @DisplayName("Deve buscar todas as batidas e calcular horas por colaborador se o período não for fornecido")
+    void calculateJobTimesheetReport_WhenPeriodNotProvided_ShouldFetchAllAndGroupCorrectly() {
+        // Arrange
+        employee1.setName("Alice");
+
+        List<TimeEntry> entries = List.of(
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(8).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(12).forUser(employee1).build()
+        );
+
+        when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
+        when(timeEntryRepository.findAllByJobIdOrderByEntryTimestampAsc(job.getId())).thenReturn(entries);
+
+        // Act
+        JobTimesheetResponseDto result = reportService.calculateJobTimesheetReport(manager, job.getId(), null, null);
+
+        // Assert
+        assertThat(result.getJobId()).isEqualTo(job.getId());
+        assertThat(result.getEmployeeTimesheets()).hasSize(1);
+        var aliceReport = result.getEmployeeTimesheets().getFirst();
+        assertThat(aliceReport.getEmployeeName()).isEqualTo("Alice");
+        assertThat(aliceReport.getDailyHours().getFirst().getHoursWorked()).isEqualByComparingTo("4.00");
+    }
+
+    @Test
+    @DisplayName("Deve retornar um timesheet vazio se não houver batidas no período")
+    void calculateJobTimesheetReport_WhenNoEntries_ShouldReturnEmptyTimesheet() {
+        // Arrange
+        when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
+        when(timeEntryRepository.findAllByJobIdAndPeriod(job.getId(), start, end)).thenReturn(Collections.emptyList());
+
+        // Act
+        JobTimesheetResponseDto result = reportService.calculateJobTimesheetReport(manager, job.getId(), start, end);
+
+        // Assert
+        assertThat(result.getEmployeeTimesheets()).isEmpty();
     }
 
     // Métodos auxiliares

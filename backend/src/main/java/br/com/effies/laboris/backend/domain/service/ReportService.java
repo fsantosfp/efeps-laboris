@@ -9,6 +9,7 @@ import br.com.effies.laboris.backend.domain.model.DailyShift;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -161,5 +162,85 @@ public class ReportService {
         }
 
         return Stream.empty();
+    }
+
+    public JobTimesheetResponseDto calculateJobTimesheetReport(User manager, UUID jobId, Instant start, Instant end) {
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new EntityNotFoundException("Job not found with id: " + jobId));
+        job.ensureBelongsTo(manager);
+
+        List<TimeEntry> entries;
+        if (start != null && end != null) {
+            entries = timeEntryRepository.findAllByJobIdAndPeriod(jobId, start, end);
+        } else {
+            entries = timeEntryRepository.findAllByJobIdOrderByEntryTimestampAsc(jobId);
+        }
+
+        Map<User, List<TimeEntry>> entriesByUser = entries.stream()
+            .collect(Collectors.groupingBy(TimeEntry::getEmployee));
+
+        List<JobTimesheetResponseDto.EmployeeTimesheetDto> employeeTimesheets = new ArrayList<>();
+
+        for (Map.Entry<User, List<TimeEntry>> userEntry : entriesByUser.entrySet()) {
+            User employee = userEntry.getKey();
+            List<TimeEntry> userEntries = userEntry.getValue();
+
+            Map<LocalDate, List<TimeEntry>> entriesByDay = userEntries.stream()
+                .collect(Collectors.groupingBy(entry -> entry.getEntryTimestamp()
+                    .atZone(ZoneOffset.UTC)
+                    .toLocalDate()
+                ));
+
+            List<JobTimesheetResponseDto.DailyHoursDto> dailyHours = new ArrayList<>();
+            for (Map.Entry<LocalDate, List<TimeEntry>> dayEntry : entriesByDay.entrySet()) {
+                LocalDate date = dayEntry.getKey();
+                List<TimeEntry> dayEntries = dayEntry.getValue();
+
+                Optional<TimeEntry> firstIn = dayEntries.stream()
+                    .filter(entry -> entry.getEntryType() == TimeEntryType.IN)
+                    .min(Comparator.comparing(TimeEntry::getEntryTimestamp));
+
+                Optional<TimeEntry> lastOut = dayEntries.stream()
+                    .filter(entry -> entry.getEntryType() == TimeEntryType.OUT)
+                    .max(Comparator.comparing(TimeEntry::getEntryTimestamp));
+
+                LocalTime startLocalTime = null;
+                LocalTime endLocalTime = null;
+
+                if (firstIn.isPresent() && lastOut.isPresent()) {
+                    TimeEntry in = firstIn.get();
+                    TimeEntry out = lastOut.get();
+                    if (out.getEntryTimestamp().isAfter(in.getEntryTimestamp())) {
+                        startLocalTime = in.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                            .truncatedTo(ChronoUnit.MINUTES);
+                        endLocalTime = out.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                            .truncatedTo(ChronoUnit.MINUTES);
+                    }
+                }
+
+                BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dayEntries);
+                dailyHours.add(JobTimesheetResponseDto.DailyHoursDto.builder()
+                    .date(date)
+                    .start(startLocalTime)
+                    .end(endLocalTime)
+                    .hoursWorked(hoursWorked)
+                    .build());
+            }
+
+            dailyHours.sort(Comparator.comparing(JobTimesheetResponseDto.DailyHoursDto::getDate));
+
+            employeeTimesheets.add(JobTimesheetResponseDto.EmployeeTimesheetDto.builder()
+                .employeeId(employee.getId())
+                .employeeName(employee.getName())
+                .dailyHours(dailyHours)
+                .build());
+        }
+
+        employeeTimesheets.sort(Comparator.comparing(JobTimesheetResponseDto.EmployeeTimesheetDto::getEmployeeName));
+
+        return JobTimesheetResponseDto.builder()
+            .jobId(jobId)
+            .address(job.getAddress())
+            .employeeTimesheets(employeeTimesheets)
+            .build();
     }
 }

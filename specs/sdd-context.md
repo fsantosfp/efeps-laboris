@@ -1,26 +1,24 @@
 # SDD - Contexto Operacional da Tarefa Atual
 
+- Nunca executar todas as tarefas de um slice de uma vez. Sempre execute de uma em uma tarefa, testando e validando localmente cada uma.
+- sempre comitar o projeto antes de iniciar uma tarefa utilizando conventional commits
+- sempre que preciso crie ou renome as branches de forma que faça sentido para a tarefa em questão e faça um pull request para a branch develop mantendo a coerencia e isolando tarefas que possam impactar umas as outras.
+- Sempre obdeça o plano e as tasks definida nele, em caso de duvidas sobre a ordem ou prioridade das tarefas, pergunte.
+- Sempre atualize as tasks no documento
+
+---
+
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 2.1: Navegação e Registro de Rota, Tarefa 2.2: Tabela Principal e Estilização, Tarefa 2.3: Ação de Inativação (Slice 2)
-* **Objetivo:**
-  1. Adicionar o link de navegação "Equipe" no menu do `Layout.jsx` e registrar a rota `/employees` protegida com `ProtectedRoute` no `App.jsx`.
-  2. Criar `EmployeesPage.jsx` and `EmployeesPage.css` com listagem responsiva de funcionários, toggle para exibir inativos e ação de confirmação de inativação (DELETE).
+* **Título:** Concluído
+* **Objetivo:** Todas as tarefas de backend e frontend foram implementadas e validadas com sucesso.
 
 ---
 
 ## 📂 Escopo dos Arquivos
-* **Modificar:**
-  * [Layout.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/components/Layout.jsx)
-  * [App.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/App.jsx)
-* **Criar:**
-  * [EmployeesPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/EmployeesPage.jsx) [NEW]
-  * [EmployeesPage.css](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/EmployeesPage.css) [NEW]
+Nenhum.
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-
-1. **Design Consistente:** Seguir as diretrizes de visual premium (HSL tailored colors, glassmorphism, responsive table structure, hover states, loaders).
-2. **Quality Gate:**
-   - Compilação limpa via Vite.
-   - Confirmação de exclusão/inativação segura.
+1. **Compilação Limpa:** Certificar que o backend compile e teste com sucesso e que a build do frontend ocorra sem erros.
+2. **Conventional Commit:** Tudo foi comitado e empurrado na branch correspondente.

@@ -5,6 +5,7 @@ import br.com.effies.laboris.backend.domain.service.PayrollService;
 import br.com.effies.laboris.backend.domain.service.ReportService;
 import br.com.effies.laboris.backend.presentation.dto.response.CompanyPayrollResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,6 +51,17 @@ public class ReportController {
     ){
 
         JobCostResponseDto response = reportService.calculateJobCostReport(manager, jobId, start, end);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/jobs/{jobId}/timesheet")
+    public ResponseEntity<JobTimesheetResponseDto> getJobTimesheetReport(
+        @AuthenticationPrincipal User manager,
+        @PathVariable UUID jobId,
+        @RequestParam(value = "start", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant start,
+        @RequestParam(value = "end", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant end
+    ){
+        JobTimesheetResponseDto response = reportService.calculateJobTimesheetReport(manager, jobId, start, end);
         return ResponseEntity.ok(response);
     }
 }
