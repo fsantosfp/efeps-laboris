@@ -315,7 +315,7 @@ function ReportsPage() {
                             ) : jobs.length === 0 ? (
                                 <p style={{ color: 'var(--text-muted)' }}>Nenhum trabalho cadastrado.</p>
                             ) : (
-                                <div className="jobs-grid">
+                                <div className="reports-jobs-grid">
                                     {jobs.map(job => {
                                         const isSelected = selectedJobIds.includes(job.id);
                                         return (
@@ -454,7 +454,7 @@ function ReportsPage() {
                             ) : employees.length === 0 ? (
                                 <p style={{ color: 'var(--text-muted)' }}>Nenhum funcionário cadastrado.</p>
                             ) : (
-                                <div className="jobs-grid">
+                                <div className="reports-jobs-grid">
                                     {employees.map(emp => {
                                         const isSelected = selectedEmployeeIds.includes(emp.id);
                                         return (
