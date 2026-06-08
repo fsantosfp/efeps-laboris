@@ -9,14 +9,14 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.1: Criar a função utilitária calculateBreakHours
-* **Objetivo:** Criar o arquivo calculateBreakHours.js que calcula a soma das diferenças entre batidas consecutivas de OUT e IN no mesmo dia do calendário.
+* **Título:** Tarefa 1.2: Atualizar a tela de Histórico (HistoryScreen)
+* **Objetivo:** Importar e utilizar calculateBreakHours na busca do histórico, definir o estado totalBreakHours, e atualizar o layout de resumo.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [calculateBreakHours.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/utils/calculateBreakHours.js)
+  - [HistoryScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/HistoryScreen.js)
 
 ---
 
