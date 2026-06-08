@@ -12,7 +12,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
     - Criar [EmployeeJourneyResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/EmployeeJourneyResponseDto.java) para encapsular a lista de eventos de cada funcionário.
   - **Critério de Aceitação:** Classes criadas, compilando sem erros.
 
-- [ ] **Tarefa 1.2: Injetar UserRepository no ReportService**
+- [x] **Tarefa 1.2: Injetar UserRepository no ReportService**
   - **Ações:**
     - Modificar o construtor de [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java) para injetar e usar a interface `UserRepository`.
     - Atualizar a instanciação no arquivo de testes correspondente.

@@ -8,6 +8,7 @@ import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
 import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import br.com.effies.laboris.backend.domain.utils.TimeEntryBuilder;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
@@ -42,6 +43,8 @@ class ReportServiceTest {
     private TimeEntryRepository timeEntryRepository;
     @Mock
     private DisplacementRepository displacementRepository;
+    @Mock
+    private UserRepository userRepository;
     @InjectMocks
     private ReportService reportService;
 

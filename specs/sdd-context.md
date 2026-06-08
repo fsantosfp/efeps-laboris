@@ -9,15 +9,14 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.2: Injetar UserRepository no ReportService (Slice 1)
-* **Objetivo:** Modificar o construtor de ReportService.java para injetar e usar a interface UserRepository e atualizar a instanciação nos testes correspondentes.
+* **Título:** Tarefa 1.3: Implementar o cálculo cronológico no ReportService (Slice 1)
+* **Objetivo:** Criar o método calculateEmployeeJourneyReport no ReportService.java para obter a lista de funcionários ativos, buscar suas batidas e deslocamentos, mesclar os dados de forma cronológica diária em eventos WORK, BREAK e DISPLACEMENT, ordenar e retornar os dados.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
   - [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java)
-  - [ReportServiceTest.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/test/java/br/com/effies/laboris/backend/domain/service/ReportServiceTest.java)
 
 ---
 

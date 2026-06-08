@@ -10,6 +10,7 @@ import br.com.effies.laboris.backend.domain.model.DailyShift;
 import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import java.time.Duration;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
@@ -38,11 +39,18 @@ public class ReportService {
     private final JobRepository jobRepository;
     private final TimeEntryRepository timeEntryRepository;
     private final DisplacementRepository displacementRepository;
+    private final UserRepository userRepository;
 
-    public ReportService(JobRepository jobRepository, TimeEntryRepository timeEntryRepository, DisplacementRepository displacementRepository){
+    public ReportService(
+            JobRepository jobRepository,
+            TimeEntryRepository timeEntryRepository,
+            DisplacementRepository displacementRepository,
+            UserRepository userRepository
+    ){
         this.jobRepository = jobRepository;
         this.timeEntryRepository = timeEntryRepository;
         this.displacementRepository = displacementRepository;
+        this.userRepository = userRepository;
     }
 
     public JobCostResponseDto calculateJobCostReport(User manager, UUID jobId, Instant start, Instant end){
