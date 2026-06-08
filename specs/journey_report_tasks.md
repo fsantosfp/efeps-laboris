@@ -48,7 +48,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
     - Modificar a barra de abas e renderizar o novo formulário de filtro contendo multiselect de funcionários, data de início e de fim.
   - **Critério de Aceitação:** Abas alternando suavemente e sem erros de layout.
 
-- [ ] **Tarefa 2.3: Implementar a chamada e renderização da Timeline**
+- [x] **Tarefa 2.3: Implementar a chamada e renderização da Timeline**
   - **Ações:**
     - Invocar o novo endpoint HTTP e renderizar os resultados agrupados por funcionário em formato de linha do tempo vertical ou blocos cronológicos premium.
   - **Critério de Aceitação:** Jornadas exibidas de forma clara e visual.

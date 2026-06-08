@@ -9,14 +9,14 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 2.3: Implementar a chamada e renderização da Timeline
-* **Objetivo:** Invocar o novo endpoint HTTP e renderizar os resultados agrupados por funcionário em formato de linha do tempo vertical ou blocos cronológicos premium.
+* **Título:** Tarefa 2.4: Estilizar a Timeline no CSS
+* **Objetivo:** Criar estilos premium em ReportsPage.css com badges de cores harmoniosas (azul/teal para trabalho, cinza para intervalo e laranja/bronze para deslocamentos) e linhas conectoras de linha do tempo.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [ReportsPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.jsx)
+  - [ReportsPage.css](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.css)
 
 ---
 
