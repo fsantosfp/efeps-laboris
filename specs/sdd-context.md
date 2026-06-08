@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.5: Testes Unitários de Backend (Slice 1)
-* **Objetivo:** Escrever testes unitários em ReportServiceTest.java cobrando a geração de eventos da linha do tempo, e rodar a suíte inteira.
+* **Título:** Tarefa 2.1: Carregar lista de funcionários no frontend
+* **Objetivo:** Atualizar o componente ReportsPage.jsx para consultar a lista completa de funcionários da empresa e disponibilizá-los como opções de filtro.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [ReportServiceTest.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/test/java/br/com/effies/laboris/backend/domain/service/ReportServiceTest.java)
+  - [ReportsPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.jsx)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Build Sucesso:** Assegurar que o aplicativo móvel React Native compile e rode perfeitamente.
-2. **Conventional Commit:** Commitar no formato `feat(mobile): validate mobile build` antes de prosseguir.
+1. **Build Sucesso:** Assegurar que o frontend compile e rode perfeitamente.
+2. **Conventional Commit:** Commitar cada tarefa individualmente antes de prosseguir.

@@ -28,7 +28,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
     - Adicionar a rota `GET /api/v1/reports/employee-journey` em [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java).
   - **Critério de Aceitação:** Endpoint exposto com segurança (restrito ao perfil `MANAGER`).
 
-- [ ] **Tarefa 1.5: Testes Unitários de Backend**
+- [x] **Tarefa 1.5: Testes Unitários de Backend**
   - **Ações:**
     - Escrever testes unitários em [ReportServiceTest.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/test/java/br/com/effies/laboris/backend/domain/service/ReportServiceTest.java) cobrando a geração de eventos da linha do tempo.
     - Executar os testes usando `SPRING_PROFILES_ACTIVE=local mvn test`.
