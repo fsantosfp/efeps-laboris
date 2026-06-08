@@ -146,18 +146,18 @@ function ReportsPage() {
 
     // Toggle job selection
     const handleToggleJobSelection = (jobId) => {
-        setSelectedJobIds(prev => 
-            prev.includes(jobId) 
-                ? prev.filter(id => id !== jobId) 
+        setSelectedJobIds(prev =>
+            prev.includes(jobId)
+                ? prev.filter(id => id !== jobId)
                 : [...prev, jobId]
         );
     };
 
     // Toggle employee selection
     const handleToggleEmployeeSelection = (employeeId) => {
-        setSelectedEmployeeIds(prev => 
-            prev.includes(employeeId) 
-                ? prev.filter(id => id !== employeeId) 
+        setSelectedEmployeeIds(prev =>
+            prev.includes(employeeId)
+                ? prev.filter(id => id !== employeeId)
                 : [...prev, employeeId]
         );
     };
@@ -203,19 +203,19 @@ function ReportsPage() {
             </div>
 
             <div className="reports-tabs">
-                <button 
+                <button
                     className={`reports-tab-btn ${activeTab === 'payroll' ? 'active' : ''}`}
                     onClick={() => { setActiveTab('payroll'); setError(''); }}
                 >
                     Folha de Pagamento
                 </button>
-                <button 
+                <button
                     className={`reports-tab-btn ${activeTab === 'jobCosts' ? 'active' : ''}`}
                     onClick={() => { setActiveTab('jobCosts'); setError(''); }}
                 >
                     Custos de Serviços
                 </button>
-                <button 
+                <button
                     className={`reports-tab-btn ${activeTab === 'journey' ? 'active' : ''}`}
                     onClick={() => { setActiveTab('journey'); setError(''); }}
                 >
@@ -233,22 +233,22 @@ function ReportsPage() {
                         <div className="form-row">
                             <div className="form-group">
                                 <label className="form-label">Data de Início</label>
-                                <input 
-                                    type="date" 
-                                    className="form-input" 
-                                    value={payrollStart} 
-                                    onChange={(e) => setPayrollStart(e.target.value)} 
-                                    required 
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={payrollStart}
+                                    onChange={(e) => setPayrollStart(e.target.value)}
+                                    required
                                 />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Data de Término</label>
-                                <input 
-                                    type="date" 
-                                    className="form-input" 
-                                    value={payrollEnd} 
-                                    onChange={(e) => setPayrollEnd(e.target.value)} 
-                                    required 
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={payrollEnd}
+                                    onChange={(e) => setPayrollEnd(e.target.value)}
+                                    required
                                 />
                             </div>
                         </div>
@@ -319,16 +319,16 @@ function ReportsPage() {
                                     {jobs.map(job => {
                                         const isSelected = selectedJobIds.includes(job.id);
                                         return (
-                                            <div 
-                                                key={job.id} 
+                                            <div
+                                                key={job.id}
                                                 className={`job-selection-card ${isSelected ? 'selected' : ''}`}
                                                 onClick={() => handleToggleJobSelection(job.id)}
                                             >
-                                                <input 
-                                                    type="checkbox" 
-                                                    className="job-selection-checkbox" 
+                                                <input
+                                                    type="checkbox"
+                                                    className="job-selection-checkbox"
                                                     checked={isSelected}
-                                                    onChange={() => {}} // Controlled by card onClick
+                                                    onChange={() => { }} // Controlled by card onClick
                                                 />
                                                 <div className="job-card-details">
                                                     <span className="job-card-client">{job.clientName || 'Cliente sem nome'}</span>
@@ -344,22 +344,22 @@ function ReportsPage() {
                         <div className="form-row">
                             <div className="form-group">
                                 <label className="form-label">Data de Início</label>
-                                <input 
-                                    type="date" 
-                                    className="form-input" 
-                                    value={costStart} 
-                                    onChange={(e) => setCostStart(e.target.value)} 
-                                    required 
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={costStart}
+                                    onChange={(e) => setCostStart(e.target.value)}
+                                    required
                                 />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Data de Término</label>
-                                <input 
-                                    type="date" 
-                                    className="form-input" 
-                                    value={costEnd} 
-                                    onChange={(e) => setCostEnd(e.target.value)} 
-                                    required 
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={costEnd}
+                                    onChange={(e) => setCostEnd(e.target.value)}
+                                    required
                                 />
                             </div>
                         </div>
@@ -382,7 +382,7 @@ function ReportsPage() {
                                     <h3 className="job-report-title">
                                         Relatório de Custos: {report.jobInfo.clientName || 'Sem Cliente'}
                                     </h3>
-                                    
+
                                     <div className="job-info-grid">
                                         <div className="info-item">
                                             <span className="info-label">Endereço</span>
@@ -458,16 +458,16 @@ function ReportsPage() {
                                     {employees.map(emp => {
                                         const isSelected = selectedEmployeeIds.includes(emp.id);
                                         return (
-                                            <div 
-                                                key={emp.id} 
+                                            <div
+                                                key={emp.id}
                                                 className={`job-selection-card ${isSelected ? 'selected' : ''}`}
                                                 onClick={() => handleToggleEmployeeSelection(emp.id)}
                                             >
-                                                <input 
-                                                    type="checkbox" 
-                                                    className="job-selection-checkbox" 
+                                                <input
+                                                    type="checkbox"
+                                                    className="job-selection-checkbox"
                                                     checked={isSelected}
-                                                    onChange={() => {}} // Controlled by card onClick
+                                                    onChange={() => { }} // Controlled by card onClick
                                                 />
                                                 <div className="job-card-details">
                                                     <span className="job-card-client">{emp.name || 'Sem nome'}</span>
@@ -483,22 +483,22 @@ function ReportsPage() {
                         <div className="form-row">
                             <div className="form-group">
                                 <label className="form-label">Data de Início</label>
-                                <input 
-                                    type="date" 
-                                    className="form-input" 
-                                    value={journeyStart} 
-                                    onChange={(e) => setJourneyStart(e.target.value)} 
-                                    required 
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={journeyStart}
+                                    onChange={(e) => setJourneyStart(e.target.value)}
+                                    required
                                 />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Data de Término</label>
-                                <input 
-                                    type="date" 
-                                    className="form-input" 
-                                    value={journeyEnd} 
-                                    onChange={(e) => setJourneyEnd(e.target.value)} 
-                                    required 
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={journeyEnd}
+                                    onChange={(e) => setJourneyEnd(e.target.value)}
+                                    required
                                 />
                             </div>
                         </div>
@@ -528,59 +528,61 @@ function ReportsPage() {
                                         </div>
                                     ) : (
                                         <div className="timeline-container">
-                                            {employeeReport.events.map((event, eventIdx) => {
-                                                const eventTime = `${formatTime(event.startTimestamp)} - ${formatTime(event.endTimestamp)}`;
-                                                const eventDate = formatDate(event.startTimestamp);
-                                                
-                                                let eventBadgeClass = "";
-                                                let eventTypeLabel = "";
-                                                let eventIcon = "";
-                                                let eventDetail = "";
+                                            <div className="timeline-wrapper">
+                                                {employeeReport.events.map((event, eventIdx) => {
+                                                    const eventTime = `${formatTime(event.startTimestamp)} - ${formatTime(event.endTimestamp)}`;
+                                                    const eventDate = formatDate(event.startTimestamp);
 
-                                                if (event.type === 'WORK') {
-                                                    eventBadgeClass = "badge-work";
-                                                    eventTypeLabel = "Trabalho";
-                                                    eventIcon = "💼";
-                                                    eventDetail = `Serviço: ${event.jobAddress || 'Endereço não informado'}`;
-                                                } else if (event.type === 'BREAK') {
-                                                    eventBadgeClass = "badge-break";
-                                                    eventTypeLabel = "Intervalo";
-                                                    eventIcon = "☕";
-                                                    eventDetail = `Local: ${event.jobAddress || 'Endereço não informado'}`;
-                                                } else if (event.type === 'DISPLACEMENT') {
-                                                    eventBadgeClass = "badge-displacement";
-                                                    eventTypeLabel = "Deslocamento";
-                                                    eventIcon = "🚗";
-                                                    eventDetail = `De: ${event.originAddress || 'N/A'} ➔ Para: ${event.jobAddress || 'N/A'}`;
-                                                }
+                                                    let eventBadgeClass = "";
+                                                    let eventTypeLabel = "";
+                                                    let eventIcon = "";
+                                                    let eventDetail = "";
 
-                                                return (
-                                                    <div key={eventIdx} className="timeline-item">
-                                                        <div className="timeline-meta">
-                                                            <span className="timeline-date">{eventDate}</span>
-                                                            <span className="timeline-time">{eventTime}</span>
-                                                        </div>
-                                                        <div className="timeline-marker">
-                                                            <div className={`timeline-icon-container ${eventBadgeClass}`}>
-                                                                {eventIcon}
+                                                    if (event.type === 'WORK') {
+                                                        eventBadgeClass = "badge-work";
+                                                        eventTypeLabel = "Trabalho";
+                                                        eventIcon = "💼";
+                                                        eventDetail = `Serviço: ${event.jobAddress || 'Endereço não informado'}`;
+                                                    } else if (event.type === 'BREAK') {
+                                                        eventBadgeClass = "badge-break";
+                                                        eventTypeLabel = "Intervalo";
+                                                        eventIcon = "☕";
+                                                        eventDetail = `Local: ${event.jobAddress || 'Endereço não informado'}`;
+                                                    } else if (event.type === 'DISPLACEMENT') {
+                                                        eventBadgeClass = "badge-displacement";
+                                                        eventTypeLabel = "Deslocamento";
+                                                        eventIcon = "🚗";
+                                                        eventDetail = `De: ${event.originAddress || 'N/A'} ➔ Para: ${event.jobAddress || 'N/A'}`;
+                                                    }
+
+                                                    return (
+                                                        <div key={eventIdx} className="timeline-item">
+                                                            <div className="timeline-meta">
+                                                                <span className="timeline-date">{eventDate}</span>
+                                                                <span className="timeline-time">{eventTime}</span>
+                                                            </div>
+                                                            <div className="timeline-marker">
+                                                                <div className={`timeline-icon-container ${eventBadgeClass}`}>
+                                                                    {eventIcon}
+                                                                </div>
+                                                            </div>
+                                                            <div className="timeline-content">
+                                                                <div className="timeline-header-row">
+                                                                    <span className={`timeline-badge ${eventBadgeClass}`}>
+                                                                        {eventTypeLabel}
+                                                                    </span>
+                                                                    <span className="timeline-duration">
+                                                                        {formatDecimalHours(event.durationHours)}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="timeline-details">
+                                                                    {eventDetail}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div className="timeline-content">
-                                                            <div className="timeline-header-row">
-                                                                <span className={`timeline-badge ${eventBadgeClass}`}>
-                                                                    {eventTypeLabel}
-                                                                </span>
-                                                                <span className="timeline-duration">
-                                                                    {formatDecimalHours(event.durationHours)}
-                                                                </span>
-                                                            </div>
-                                                            <div className="timeline-details">
-                                                                {eventDetail}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     )}
                                 </div>

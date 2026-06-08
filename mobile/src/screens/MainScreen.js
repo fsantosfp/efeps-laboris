@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Button, StyleSheet, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import api from '../services/api';
+import { theme } from '../styles/theme';
+import { globalStyles } from '../styles/globalStyles';
+import ScreenHeader from '../components/ScreenHeader';
 
-const MainScreen = ({ onLogout: handleLogout }) => {
+const MainScreen = () => {
     const [loading, setLoading] = useState(true);
     const [currentJob, setCurrentJob] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [lastEntry, setLastEntry] = useState(null);
-    const [currentPosition, setCurrentPosition] = useState(null);
     const [assignments, setAssignments] = useState([]);
     const [activeDisplacement, setActiveDisplacement] = useState(null);
     const [selectedDestinationJobId, setSelectedDestinationJobId] = useState('');
+    const [secondsElapsed, setSecondsElapsed] = useState(0);
 
     const fetchData = useCallback(() => {
         setLoading(true);
@@ -20,11 +23,10 @@ const MainScreen = ({ onLogout: handleLogout }) => {
 
         Geolocation.getCurrentPosition(
             async (position) => {
-                const {latitude, longitude} = position.coords;
-                setCurrentPosition(position.coords);
+                const { latitude, longitude } = position.coords;
                 console.log(`[Developer Log] Dispositivo coordenadas: Lat: ${latitude}, Lon: ${longitude}`);
 
-                try{
+                try {
                     const [assignmentsRes, lastEntryRes, activeDisplacementRes] = await Promise.all([
                         api.get('/my-assignments'),
                         api.get('/time-entries/me/last').catch(err => {
@@ -46,18 +48,17 @@ const MainScreen = ({ onLogout: handleLogout }) => {
                     setActiveDisplacement(activeDisplacementRes.data);
                     console.log(`[Developer Log] Trabalhos designados:`, assignmentsRes.data);
 
-                    const foundJob = assignmentsRes.data.find( job => {
+                    const foundJob = assignmentsRes.data.find(job => {
                         const latDiff = Math.abs(job.latitude - latitude);
                         const lonDiff = Math.abs(job.longitude - longitude);
                         return latDiff < 0.1 && lonDiff < 0.1;
                     });
 
-                    if(foundJob){
+                    if (foundJob) {
                         setCurrentJob(foundJob);
                     } else {
                         if (assignmentsRes.data.length > 0) {
-                            const firstJob = assignmentsRes.data[0];
-                            setErrorMessage(`Você não parece estar perto do local de trabalho designado.\n\nSua posição atual:\nLat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}\n\nCoordenadas do trabalho:\nLat: ${firstJob.latitude.toFixed(4)}, Lon: ${firstJob.longitude.toFixed(4)}\n\n(Aproxime-se a menos de 0.1 graus ou configure seu emulador com estas coordenadas).`);
+                            setErrorMessage('Você não está no local de trabalho designado.');
                         } else {
                             setErrorMessage('Você não possui nenhum trabalho ativo designado.');
                         }
@@ -65,7 +66,7 @@ const MainScreen = ({ onLogout: handleLogout }) => {
                 }
                 catch (error) {
                     setErrorMessage('Falha ao buscar seus dados de trabalho.');
-                }finally{
+                } finally {
                     setLoading(false);
                 }
             },
@@ -82,14 +83,38 @@ const MainScreen = ({ onLogout: handleLogout }) => {
         fetchData();
     }, [fetchData]);
 
+    // Live Activity Clock Timer
+    useEffect(() => {
+        let intervalId;
+        if (lastEntry && lastEntry.entryType === 'IN') {
+            const calculateElapsed = () => {
+                const diffMs = new Date() - new Date(lastEntry.timestamp);
+                setSecondsElapsed(Math.max(0, Math.floor(diffMs / 1000)));
+            };
+            calculateElapsed();
+            intervalId = setInterval(calculateElapsed, 1000);
+        } else {
+            setSecondsElapsed(0);
+        }
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [lastEntry]);
+
+    const formatElapsedTime = (sec) => {
+        const hrs = Math.floor(sec / 3600);
+        const mins = Math.floor((sec % 3600) / 60);
+        const secs = sec % 60;
+        return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+
     const handlePunch = async (entryType) => {
-        if(!currentJob) return;
-        
+        if (!currentJob) return;
+
         setLoading(true);
         Geolocation.getCurrentPosition(
             async (position) => {
                 const { latitude, longitude } = position.coords;
-                setCurrentPosition(position.coords);
                 try {
                     const response = await api.post('/time-entries', {
                         jobId: currentJob.jobId,
@@ -100,10 +125,10 @@ const MainScreen = ({ onLogout: handleLogout }) => {
                     });
 
                     setLastEntry(response.data);
-                    Alert.alert("Sucesso!", `Ponto '${entryType}' registrado.`);
-                } catch(error){
+                    Alert.alert("Sucesso!", `Ponto registrado.`);
+                } catch (error) {
                     Alert.alert("Erro ao Bater o Ponto", error.response?.data?.message || "Ocorreu um erro.");
-                }finally{
+                } finally {
                     setLoading(false);
                 }
             },
@@ -120,7 +145,6 @@ const MainScreen = ({ onLogout: handleLogout }) => {
         Geolocation.getCurrentPosition(
             async (position) => {
                 const { latitude, longitude } = position.coords;
-                setCurrentPosition(position.coords);
                 try {
                     const response = await api.post('/displacements/start', {
                         latitude,
@@ -152,7 +176,6 @@ const MainScreen = ({ onLogout: handleLogout }) => {
         Geolocation.getCurrentPosition(
             async (position) => {
                 const { latitude, longitude } = position.coords;
-                setCurrentPosition(position.coords);
                 try {
                     await api.post('/displacements/end', {
                         latitude,
@@ -171,13 +194,13 @@ const MainScreen = ({ onLogout: handleLogout }) => {
                     setActiveDisplacement(null);
                     setSelectedDestinationJobId('');
                     setLastEntry(response.data);
-                    
+
                     const newJob = assignments.find(j => j.jobId === selectedDestinationJobId);
                     if (newJob) {
                         setCurrentJob(newJob);
                     }
 
-                    Alert.alert("Deslocamento Finalizado", "Deslocamento concluído e Entrada (IN) registrada com sucesso.");
+                    Alert.alert("Deslocamento Finalizado", "Deslocamento concluído e Clock In registrado com sucesso.");
                 } catch (error) {
                     Alert.alert("Erro ao Finalizar Deslocamento", error.response?.data?.message || "Ocorreu um erro.");
                 } finally {
@@ -193,103 +216,245 @@ const MainScreen = ({ onLogout: handleLogout }) => {
     };
 
     const renderActionButtons = () => {
-        if(!currentJob) return null;
+        if (!currentJob) return null;
 
         if (!lastEntry || lastEntry.entryType === 'OUT') {
-            return <Button title="Registrar Entrada (IN)" onPress={() => handlePunch('IN')} />;
-        } else { 
-            return <Button title="Registrar Saída (OUT)" onPress={() => handlePunch('OUT')} />;
+            return (
+                <TouchableOpacity
+                    style={[globalStyles.btn, globalStyles.btnSuccess, { width: '100%' }]}
+                    onPress={() => handlePunch('IN')}
+                >
+                    <Text style={[globalStyles.btnText, globalStyles.btnSuccessText]}>Clock In</Text>
+                </TouchableOpacity>
+            );
+        } else {
+            return (
+                <TouchableOpacity
+                    style={[globalStyles.btn, {
+                        backgroundColor: '#ffffff',
+                        borderWidth: 2,
+                        borderColor: theme.colors.success,
+                        width: '100%'
+                    }]}
+                    onPress={() => handlePunch('OUT')}
+                >
+                    <Text style={[globalStyles.btnText, { color: theme.colors.success }]}>Clock Out</Text>
+                </TouchableOpacity>
+            );
         }
     };
 
     const styles = StyleSheet.create({
-        container: { flex:1, justifyContent:'center', alignItems: 'center', padding: 20, backgroundColor: '#f5f6fa' },
-        card: { width: '100%', padding: 20, borderRadius: 10, backgroundColor: '#ffffff', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5, marginBottom: 20 },
-        title: { fontSize:24, fontWeight: 'bold', marginBottom:30, color: '#2c3e50' },
-        statusText: { fontSize:16, color:'gray', textAlign:'center'},
-        jobContainer: { alignItems: 'center', width: '100%' },
-        jobLabel: { fontSize:14, color:'#7f8c8d', fontWeight: '600' },
-        jobAddress: { fontSize:18, fontWeight:'bold', marginVertical:10, textAlign:'center', color: '#2c3e50' },
-        errorContainer: { alignItems: 'center', width: '100%' },
-        errorText: { fontSize: 14, color: '#e74c3c', textAlign: 'center', marginBottom: 20 },
-        displacementContainer: { width: '100%', alignItems: 'center' },
-        displacementTitle: { fontSize: 18, fontWeight: 'bold', color: '#d35400', marginBottom: 15 },
-        jobItem: { width: '100%', padding: 15, borderRadius: 8, borderWidth: 1, borderColor: '#bdc3c7', marginVertical: 5, backgroundColor: '#fff' },
-        jobItemSelected: { borderColor: '#d35400', backgroundColor: '#fef5e7' },
-        jobItemText: { fontSize: 14, color: '#2c3e50', fontWeight: '500' },
-        buttonContainer: { width: '100%', marginTop: 20 },
-        startDisplacementButton: { backgroundColor: '#e67e22', padding: 15, borderRadius: 8, width: '100%', alignItems: 'center', marginTop: 10 },
-        startDisplacementButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-        logoutButton: { position: 'absolute', bottom: 50, width: '100%' }
+        container: {
+            flex: 1,
+            padding: theme.spacing.sm,
+            backgroundColor: theme.colors.canvas,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        card: {
+            ...globalStyles.card,
+            width: '100%',
+            padding: theme.spacing.md,
+            alignItems: 'center',
+            marginBottom: theme.spacing.sm
+        },
+        statusText: {
+            fontSize: 16,
+            color: theme.colors.textMuted,
+            textAlign: 'center'
+        },
+        jobContainer: {
+            alignItems: 'center',
+            width: '100%'
+        },
+        jobLabel: {
+            fontSize: 12,
+            color: theme.colors.textMuted,
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+        },
+        jobAddress: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            marginVertical: theme.spacing.xs,
+            textAlign: 'center',
+            color: theme.colors.textMain
+        },
+        errorContainer: {
+            alignItems: 'center',
+            width: '100%'
+        },
+        errorCard: {
+            backgroundColor: theme.colors.danger,
+            borderRadius: theme.radius.card,
+            padding: theme.spacing.sm,
+            width: '100%',
+            alignItems: 'center',
+            marginBottom: theme.spacing.xs,
+        },
+        errorIcon: {
+            fontSize: 24,
+            color: '#ffffff',
+            marginBottom: 4,
+        },
+        errorText: {
+            fontSize: 14.5,
+            color: '#ffffff',
+            textAlign: 'center',
+            fontWeight: '500',
+        },
+        displacementContainer: {
+            width: '100%',
+            alignItems: 'center'
+        },
+        displacementTitle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: theme.colors.warning,
+            marginBottom: 15
+        },
+        jobItem: {
+            width: '100%',
+            padding: 12,
+            borderRadius: theme.radius.control,
+            borderWidth: 1.5,
+            borderColor: theme.colors.borderSubtle,
+            marginVertical: 4,
+            backgroundColor: theme.colors.surface
+        },
+        jobItemSelected: {
+            borderColor: theme.colors.primary,
+            backgroundColor: theme.colors.secondaryContainer
+        },
+        jobItemText: {
+            fontSize: 14,
+            color: theme.colors.textMain,
+            fontWeight: '500'
+        },
+        jobItemTextSelected: {
+            color: theme.colors.primary,
+            fontWeight: '600',
+        },
+        buttonContainer: {
+            width: '100%',
+            marginTop: theme.spacing.sm
+        },
+        buttonDisabled: {
+            backgroundColor: theme.colors.surfaceContainer,
+            elevation: 0,
+        },
+        buttonTextDisabled: {
+            color: theme.colors.textMuted,
+        },
+        clockContainer: {
+            alignItems: 'center',
+            marginVertical: theme.spacing.sm,
+            padding: theme.spacing.sm,
+            backgroundColor: theme.colors.surfaceLow,
+            borderRadius: theme.radius.card,
+            width: '100%',
+        },
+        clockLabel: {
+            fontSize: 11,
+            color: theme.colors.textMuted,
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+            marginBottom: 4,
+        },
+        clockText: {
+            fontSize: theme.typography.displayClock.fontSize,
+            fontWeight: theme.typography.displayClock.fontWeight,
+            color: theme.colors.textMain,
+        }
     });
 
     return (
-        <View style={ styles.container }>
-            <Text style={ styles.title }>Meu Ponto</Text>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.canvas }}>
+            <ScreenHeader title="Meu Ponto" />
+            <View style={styles.container}>
+                {loading && <ActivityIndicator size="large" color={theme.colors.primary} />}
 
-            { loading && <ActivityIndicator size="large" color="#0000ff" /> }
-
-            { !loading && (
-                <View style={ styles.card }>
-                    { activeDisplacement ? (
-                        <View style={ styles.displacementContainer }>
-                            <Text style={ styles.displacementTitle }>🚀 Em Deslocamento</Text>
-                            <Text style={{ fontSize: 14, color: '#7f8c8d', marginBottom: 15, textAlign: 'center' }}>
-                                Selecione o Trabalho de Destino para finalizar o deslocamento e bater a entrada:
-                            </Text>
-                            { assignments.map(job => {
-                                const isSelected = selectedDestinationJobId === job.jobId;
-                                return (
+                {!loading && (
+                    <View style={styles.card}>
+                        {activeDisplacement ? (
+                            <View style={styles.displacementContainer}>
+                                <Text style={styles.displacementTitle}>🚀 Em Deslocamento</Text>
+                                <Text style={{ fontSize: 14.5, color: theme.colors.textMuted, marginBottom: 15, textAlign: 'center' }}>
+                                    Selecione o Trabalho de Destino para finalizar o deslocamento e bater a entrada:
+                                </Text>
+                                {assignments.map(job => {
+                                    const isSelected = selectedDestinationJobId === job.jobId;
+                                    return (
+                                        <TouchableOpacity
+                                            key={job.jobId}
+                                            style={[styles.jobItem, isSelected && styles.jobItemSelected]}
+                                            onPress={() => setSelectedDestinationJobId(job.jobId)}
+                                        >
+                                            <Text style={[styles.jobItemText, isSelected && styles.jobItemTextSelected]}>{job.address}</Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                                <View style={styles.buttonContainer}>
                                     <TouchableOpacity
-                                        key={job.jobId}
-                                        style={[styles.jobItem, isSelected && styles.jobItemSelected]}
-                                        onPress={() => setSelectedDestinationJobId(job.jobId)}
+                                        style={[globalStyles.btn, globalStyles.btnPrimary, { width: '100%' }, !selectedDestinationJobId && styles.buttonDisabled]}
+                                        onPress={handleEndDisplacementAndClockIn}
+                                        disabled={!selectedDestinationJobId || loading}
                                     >
-                                        <Text style={styles.jobItemText}>{job.address}</Text>
+                                        <Text style={[globalStyles.btnText, globalStyles.btnPrimaryText, !selectedDestinationJobId && styles.buttonTextDisabled]}>Finalizar Deslocamento & Clock In</Text>
                                     </TouchableOpacity>
-                                );
-                            })}
-                            <View style={styles.buttonContainer}>
-                                <Button
-                                    title="Finalizar Deslocamento & Entrar"
-                                    color="#e67e22"
-                                    onPress={handleEndDisplacementAndClockIn}
-                                    disabled={!selectedDestinationJobId}
-                                />
+                                </View>
                             </View>
-                        </View>
-                    ) : (
-                        <View style={{ width: '100%', alignItems: 'center' }}>
-                            { currentJob ? (
-                                <View style={ styles.jobContainer } >
-                                    <Text style={ styles.jobLabel } > Trabalho Atual:</Text>
-                                    <Text style={ styles.jobAddress} > { currentJob.address }</Text>
-                                    <View style={styles.buttonContainer}>
-                                        {renderActionButtons()}
+                        ) : (
+                            <View style={{ width: '100%', alignItems: 'center' }}>
+                                {currentJob ? (
+                                    <View style={styles.jobContainer} >
+                                        <Text style={styles.jobLabel} >Trabalho Atual:</Text>
+                                        <Text style={styles.jobAddress} >{currentJob.address}</Text>
+
+                                        {lastEntry && lastEntry.entryType === 'IN' && (
+                                            <View style={styles.clockContainer}>
+                                                <Text style={styles.clockLabel}>Tempo em Atividade</Text>
+                                                <Text style={styles.clockText}>{formatElapsedTime(secondsElapsed)}</Text>
+                                            </View>
+                                        )}
+
+                                        <View style={styles.buttonContainer}>
+                                            {renderActionButtons()}
+                                        </View>
                                     </View>
-                                </View>
-                            ) : (
-                                <View style={styles.errorContainer}>
-                                    <Text style={styles.errorText}>{errorMessage}</Text>
-                                    <Button title="Atualizar Localização" onPress={fetchData} />
-                                </View>
-                            )}
-                        </View>
-                    )}
-                </View>
-            )}
+                                ) : (
+                                    <View style={styles.errorContainer}>
+                                        <View style={styles.errorCard}>
+                                            <Text style={styles.errorIcon}>⚠️</Text>
+                                            <Text style={styles.errorText}>{errorMessage}</Text>
+                                        </View>
+                                        <TouchableOpacity
+                                            style={[globalStyles.btn, globalStyles.btnPrimary, { width: '100%', marginTop: theme.spacing.sm }]}
+                                            onPress={fetchData}
+                                        >
+                                            <Text style={[globalStyles.btnText, globalStyles.btnPrimaryText]}>Atualizar Localização</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            </View>
+                        )}
+                    </View>
+                )}
 
-            {/* Iniciar Deslocamento Button */}
-            { !loading && !activeDisplacement && assignments.length >= 2 && (!lastEntry || lastEntry.entryType === 'OUT') && (
-                <TouchableOpacity style={styles.startDisplacementButton} onPress={handleStartDisplacement}>
-                    <Text style={styles.startDisplacementButtonText}>Iniciar Deslocamento (Translado)</Text>
-                </TouchableOpacity>
-            )}
-
-            <View style={ styles.logoutButton }>
-                <Button title="Sair" onPress={handleLogout} color="red" />
+                {/* Iniciar Deslocamento Button */}
+                {!loading && !activeDisplacement && assignments.length >= 2 && (!lastEntry || lastEntry.entryType === 'OUT') && (
+                    <TouchableOpacity
+                        style={[globalStyles.btn, globalStyles.btnSecondary, { width: '100%' }]}
+                        onPress={handleStartDisplacement}
+                    >
+                        <Text style={[globalStyles.btnText, globalStyles.btnSecondaryText]}>Iniciar Deslocamento</Text>
+                    </TouchableOpacity>
+                )}
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 
