@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from '../services/api';
 import { formatDecimalHours } from "../utils/formatters";
+import MultiSelectComboBox from "../components/MultiSelectComboBox";
 import './ReportsPage.css';
 
 const formatTime = (isoString) => {
@@ -26,6 +27,7 @@ function ReportsPage() {
     const [payrollStart, setPayrollStart] = useState('');
     const [payrollEnd, setPayrollEnd] = useState('');
     const [payrollData, setPayrollData] = useState(null);
+    const [selectedPayrollEmployeeIds, setSelectedPayrollEmployeeIds] = useState([]);
 
     // Tab 2: Job Costs State
     const [jobs, setJobs] = useState([]);
@@ -53,6 +55,8 @@ function ReportsPage() {
                 try {
                     const response = await api.get('/jobs');
                     setJobs(response.data);
+                    // Preselect all jobs by default
+                    setSelectedJobIds(response.data.map(j => j.id));
                 } catch (err) {
                     console.error("Erro ao buscar trabalhos para o filtro:", err);
                     setError(err.response?.data?.message || err.message || 'Não foi possível carregar a lista de trabalhos.');
@@ -66,12 +70,16 @@ function ReportsPage() {
 
     // Fetch employees for multi-select on mount or tab change
     useEffect(() => {
-        if (activeTab === 'journey' && employees.length === 0) {
+        if ((activeTab === 'journey' || activeTab === 'payroll') && employees.length === 0) {
             const fetchEmployees = async () => {
                 setLoadingEmployees(true);
                 try {
                     const response = await api.get('/employees');
                     setEmployees(response.data);
+                    // Preselect all employees by default for both tabs
+                    const ids = response.data.map(e => e.id);
+                    setSelectedEmployeeIds(ids);
+                    setSelectedPayrollEmployeeIds(ids);
                 } catch (err) {
                     console.error("Erro ao buscar funcionários para o filtro:", err);
                     setError(err.response?.data?.message || err.message || 'Não foi possível carregar a lista de funcionários.');
@@ -144,24 +152,6 @@ function ReportsPage() {
         }
     };
 
-    // Toggle job selection
-    const handleToggleJobSelection = (jobId) => {
-        setSelectedJobIds(prev =>
-            prev.includes(jobId)
-                ? prev.filter(id => id !== jobId)
-                : [...prev, jobId]
-        );
-    };
-
-    // Toggle employee selection
-    const handleToggleEmployeeSelection = (employeeId) => {
-        setSelectedEmployeeIds(prev =>
-            prev.includes(employeeId)
-                ? prev.filter(id => id !== employeeId)
-                : [...prev, employeeId]
-        );
-    };
-
     // Handle Journey Report Generation
     const handleGenerateJourney = async (e) => {
         e.preventDefault();
@@ -192,6 +182,25 @@ function ReportsPage() {
             setLoading(false);
         }
     };
+
+    const filteredPayrollData = React.useMemo(() => {
+        if (!payrollData) return null;
+        if (selectedPayrollEmployeeIds.length === 0) {
+            return {
+                periodTotals: { totalHours: 0, totalAmount: 0 },
+                employeePayrolls: []
+            };
+        }
+        const filteredEmployees = payrollData.employeePayrolls.filter(emp =>
+            selectedPayrollEmployeeIds.includes(emp.employeeId)
+        );
+        const totalHours = filteredEmployees.reduce((sum, emp) => sum + emp.totalHours, 0);
+        const totalAmount = filteredEmployees.reduce((sum, emp) => sum + emp.totalAmount, 0);
+        return {
+            periodTotals: { totalHours, totalAmount },
+            employeePayrolls: filteredEmployees
+        };
+    }, [payrollData, selectedPayrollEmployeeIds]);
 
     return (
         <div className="reports-page-wrapper">
@@ -229,30 +238,39 @@ function ReportsPage() {
                 /* Tab 1: Payroll */
                 <div>
                     <form className="reports-form" onSubmit={handleGeneratePayroll}>
-                        <div className="form-label">Período de Apuração</div>
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label className="form-label">Data de Início</label>
-                                <input
-                                    type="date"
-                                    className="form-input"
-                                    value={payrollStart}
-                                    onChange={(e) => setPayrollStart(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Data de Término</label>
-                                <input
-                                    type="date"
-                                    className="form-input"
-                                    value={payrollEnd}
-                                    onChange={(e) => setPayrollEnd(e.target.value)}
-                                    required
-                                />
-                            </div>
+                        <div className="form-group flex-2">
+                            <label className="form-label">Selecione os Funcionários (Multi-seleção)</label>
+                            <MultiSelectComboBox
+                                options={employees}
+                                selectedIds={selectedPayrollEmployeeIds}
+                                onChange={setSelectedPayrollEmployeeIds}
+                                placeholder="Filtrar funcionários..."
+                                labelField="name"
+                                subLabelField="email"
+                                loading={loadingEmployees}
+                            />
                         </div>
-                        <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginTop: '10px' }} disabled={loading}>
+                        <div className="form-group">
+                            <label className="form-label">Data de Início</label>
+                            <input
+                                type="date"
+                                className="form-input"
+                                value={payrollStart}
+                                onChange={(e) => setPayrollStart(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Data de Término</label>
+                            <input
+                                type="date"
+                                className="form-input"
+                                value={payrollEnd}
+                                onChange={(e) => setPayrollEnd(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="btn btn-primary btn-generate" disabled={loading || selectedPayrollEmployeeIds.length === 0}>
                             {loading ? 'Gerando...' : 'Gerar Relatório'}
                         </button>
                     </form>
@@ -264,17 +282,17 @@ function ReportsPage() {
                         </div>
                     )}
 
-                    {payrollData && !loading && (
+                    {filteredPayrollData && !loading && (
                         <div className="job-report-block card-surface">
                             <h3 className="job-report-title">Resumo do Período</h3>
                             <div className="summary-container">
                                 <div className="summary-box">
                                     <span className="summary-label">Total de Horas Trabalhadas</span>
-                                    <span className="summary-value">{formatDecimalHours(payrollData.periodTotals.totalHours)}</span>
+                                    <span className="summary-value">{formatDecimalHours(filteredPayrollData.periodTotals.totalHours)}</span>
                                 </div>
                                 <div className="summary-box">
                                     <span className="summary-label">Valor Total a Pagar</span>
-                                    <span className="summary-value">$ {payrollData.periodTotals.totalAmount.toFixed(2)}</span>
+                                    <span className="summary-value">$ {filteredPayrollData.periodTotals.totalAmount.toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -289,7 +307,7 @@ function ReportsPage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {payrollData.employeePayrolls.map(data => (
+                                        {filteredPayrollData.employeePayrolls.map(data => (
                                             <tr key={data.employeeId}>
                                                 <td>{data.employeeName}</td>
                                                 <td className="text-right">{formatDecimalHours(data.totalHours)}</td>
@@ -308,62 +326,41 @@ function ReportsPage() {
                 /* Tab 2: Job Costs */
                 <div>
                     <form className="reports-form" onSubmit={handleGenerateJobCosts}>
-                        <div className="jobs-selector-container">
+                        <div className="form-group flex-2">
                             <label className="form-label">Selecione os Trabalhos (Multi-seleção)</label>
-                            {loadingJobs ? (
-                                <p style={{ color: 'var(--text-muted)' }}>Carregando trabalhos...</p>
-                            ) : jobs.length === 0 ? (
-                                <p style={{ color: 'var(--text-muted)' }}>Nenhum trabalho cadastrado.</p>
-                            ) : (
-                                <div className="reports-jobs-grid">
-                                    {jobs.map(job => {
-                                        const isSelected = selectedJobIds.includes(job.id);
-                                        return (
-                                            <div
-                                                key={job.id}
-                                                className={`job-selection-card ${isSelected ? 'selected' : ''}`}
-                                                onClick={() => handleToggleJobSelection(job.id)}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    className="job-selection-checkbox"
-                                                    checked={isSelected}
-                                                    onChange={() => { }} // Controlled by card onClick
-                                                />
-                                                <div className="job-card-details">
-                                                    <span className="job-card-client">{job.clientName || 'Cliente sem nome'}</span>
-                                                    <span className="job-card-address">{job.address}</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                            <MultiSelectComboBox
+                                options={jobs}
+                                selectedIds={selectedJobIds}
+                                onChange={setSelectedJobIds}
+                                placeholder="Filtrar trabalhos..."
+                                labelField="clientName"
+                                subLabelField="address"
+                                loading={loadingJobs}
+                                loadingPlaceholder="Carregando trabalhos..."
+                            />
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label className="form-label">Data de Início</label>
-                                <input
-                                    type="date"
-                                    className="form-input"
-                                    value={costStart}
-                                    onChange={(e) => setCostStart(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Data de Término</label>
-                                <input
-                                    type="date"
-                                    className="form-input"
-                                    value={costEnd}
-                                    onChange={(e) => setCostEnd(e.target.value)}
-                                    required
-                                />
-                            </div>
+                        <div className="form-group">
+                            <label className="form-label">Data de Início</label>
+                            <input
+                                type="date"
+                                className="form-input"
+                                value={costStart}
+                                onChange={(e) => setCostStart(e.target.value)}
+                                required
+                            />
                         </div>
-                        <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginTop: '10px' }} disabled={loading || selectedJobIds.length === 0}>
+                        <div className="form-group">
+                            <label className="form-label">Data de Término</label>
+                            <input
+                                type="date"
+                                className="form-input"
+                                value={costEnd}
+                                onChange={(e) => setCostEnd(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="btn btn-primary btn-generate" disabled={loading || selectedJobIds.length === 0}>
                             {loading ? 'Gerando...' : 'Gerar Relatório'}
                         </button>
                     </form>
@@ -447,62 +444,41 @@ function ReportsPage() {
                 /* Tab 3: Journey */
                 <div>
                     <form className="reports-form" onSubmit={handleGenerateJourney}>
-                        <div className="jobs-selector-container">
+                        <div className="form-group flex-2">
                             <label className="form-label">Selecione os Funcionários (Multi-seleção)</label>
-                            {loadingEmployees ? (
-                                <p style={{ color: 'var(--text-muted)' }}>Carregando funcionários...</p>
-                            ) : employees.length === 0 ? (
-                                <p style={{ color: 'var(--text-muted)' }}>Nenhum funcionário cadastrado.</p>
-                            ) : (
-                                <div className="reports-jobs-grid">
-                                    {employees.map(emp => {
-                                        const isSelected = selectedEmployeeIds.includes(emp.id);
-                                        return (
-                                            <div
-                                                key={emp.id}
-                                                className={`job-selection-card ${isSelected ? 'selected' : ''}`}
-                                                onClick={() => handleToggleEmployeeSelection(emp.id)}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    className="job-selection-checkbox"
-                                                    checked={isSelected}
-                                                    onChange={() => { }} // Controlled by card onClick
-                                                />
-                                                <div className="job-card-details">
-                                                    <span className="job-card-client">{emp.name || 'Sem nome'}</span>
-                                                    <span className="job-card-address">{emp.email}</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                            <MultiSelectComboBox
+                                options={employees}
+                                selectedIds={selectedEmployeeIds}
+                                onChange={setSelectedEmployeeIds}
+                                placeholder="Filtrar funcionários..."
+                                labelField="name"
+                                subLabelField="email"
+                                loading={loadingEmployees}
+                                loadingPlaceholder="Carregando funcionários..."
+                            />
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label className="form-label">Data de Início</label>
-                                <input
-                                    type="date"
-                                    className="form-input"
-                                    value={journeyStart}
-                                    onChange={(e) => setJourneyStart(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Data de Término</label>
-                                <input
-                                    type="date"
-                                    className="form-input"
-                                    value={journeyEnd}
-                                    onChange={(e) => setJourneyEnd(e.target.value)}
-                                    required
-                                />
-                            </div>
+                        <div className="form-group">
+                            <label className="form-label">Data de Início</label>
+                            <input
+                                type="date"
+                                className="form-input"
+                                value={journeyStart}
+                                onChange={(e) => setJourneyStart(e.target.value)}
+                                required
+                            />
                         </div>
-                        <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginTop: '10px' }} disabled={loading || selectedEmployeeIds.length === 0}>
+                        <div className="form-group">
+                            <label className="form-label">Data de Término</label>
+                            <input
+                                type="date"
+                                className="form-input"
+                                value={journeyEnd}
+                                onChange={(e) => setJourneyEnd(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="btn btn-primary btn-generate" disabled={loading || selectedEmployeeIds.length === 0}>
                             {loading ? 'Gerando...' : 'Gerar Relatório'}
                         </button>
                     </form>

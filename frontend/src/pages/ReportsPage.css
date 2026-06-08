@@ -58,29 +58,54 @@
   padding: 24px;
   margin-bottom: 32px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
   gap: 20px;
   box-shadow: var(--shadow-md);
 }
 
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-/* Override global form-group behavior inside reports form row */
 .reports-form .form-group {
   flex: 1;
-  min-width: 200px;
+  min-width: 160px;
   margin-bottom: 0;
-}
-
-/* Jobs/Employee Multi-Selector */
-.jobs-selector-container {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.reports-form .form-group.flex-2 {
+  flex: 2;
+  min-width: 280px;
+}
+
+.reports-form .form-input {
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.reports-form .btn-generate {
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .reports-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .reports-form .form-group {
+    width: 100%;
+  }
+  .reports-form .btn-generate {
+    width: 100%;
+  }
 }
 
 .reports-jobs-grid {
