@@ -33,5 +33,6 @@ public class JobTimesheetResponseDto {
         private BigDecimal hoursWorked;
         private String displacement;
         private BigDecimal interval;
+        private BigDecimal displacementHours;
     }
 }

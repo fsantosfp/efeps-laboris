@@ -315,6 +315,7 @@ function JobDetailPage(){
                                                 end: day.end ? day.end.substring(0, 5) : '-',
                                                 hoursWorked: day.hoursWorked,
                                                 displacement: day.displacement || '-',
+                                                displacementHours: day.displacementHours || 0,
                                                 interval: day.interval
                                             });
                                         });
@@ -342,6 +343,7 @@ function JobDetailPage(){
                                                 <th style={{ padding: '8px 10px', textAlign: 'left' }}>Funcionário</th>
                                                 <th style={{ padding: '8px 10px', textAlign: 'left' }}>Hora de Entrada</th>
                                                 <th style={{ padding: '8px 10px', textAlign: 'left' }}>Hora de Saída</th>
+                                                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Deslocamento (Horas)</th>
                                                 <th style={{ padding: '8px 10px', textAlign: 'left' }}>Deslocamento (Partida)</th>
                                                 <th style={{ padding: '8px 10px', textAlign: 'right' }}>Intervalo</th>
                                                 <th style={{ padding: '8px 10px', textAlign: 'right' }}>Total de Horas Trabalhado</th>
@@ -354,6 +356,7 @@ function JobDetailPage(){
                                                     <td style={{ padding: '8px 10px' }}>{row.employeeName}</td>
                                                     <td style={{ padding: '8px 10px' }}>{row.start}</td>
                                                     <td style={{ padding: '8px 10px' }}>{row.end}</td>
+                                                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>{row.displacementHours > 0 ? formatDecimalHours(row.displacementHours) : '-'}</td>
                                                     <td style={{ padding: '8px 10px' }}>{row.displacement}</td>
                                                     <td style={{ padding: '8px 10px', textAlign: 'right' }}>{formatDecimalHours(row.interval)}</td>
                                                     <td style={{ padding: '8px 10px', textAlign: 'right' }}>{formatDecimalHours(row.hoursWorked)}</td>

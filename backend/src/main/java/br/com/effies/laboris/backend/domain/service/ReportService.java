@@ -290,6 +290,7 @@ public class ReportService {
                     .hoursWorked(hoursWorked)
                     .displacement(displacementAddress)
                     .interval(interval)
+                    .displacementHours(displacementHours)
                     .build());
             }
 
