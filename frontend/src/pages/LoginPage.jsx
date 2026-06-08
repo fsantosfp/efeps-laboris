@@ -3,6 +3,17 @@ import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
 import "./LoginPage.css";
 
+const AUTHORIZED_ROLES = ['MANAGER', 'SAAS_OWNER'];
+
+function parseJwtRole(token) {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role || null;
+    } catch {
+        return null;
+    }
+}
+
 function LoginPage(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -22,11 +33,23 @@ function LoginPage(){
                 password: password
             });
 
-            login(response.data.token, response.data.passwordResetRequired);
+            const token = response.data.token;
+            const role = parseJwtRole(token);
+
+            if (!AUTHORIZED_ROLES.includes(role)) {
+                setError('Acesso não autorizado. Esta plataforma é restrita a gestores e administradores.');
+                return;
+            }
+
+            login(token, response.data.passwordResetRequired);
 
         } catch (err) {
             console.error("Erro no login: ", err);
-            setError('E-mail ou senha inválidos. Por favor, tente novamente.');
+            if (err.response && err.response.status === 401) {
+                setError('E-mail ou senha inválidos. Por favor, tente novamente.');
+            } else {
+                setError('Não foi possível conectar ao servidor. Tente novamente.');
+            }
         } finally {
             setLoading(false);
         }

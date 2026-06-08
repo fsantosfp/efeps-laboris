@@ -7,6 +7,7 @@ import ChangePasswordScreen from "./src/screens/ChangePasswordScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TabNavigator from "./src/navigation/TabNavigator";
 import { Alert } from "react-native";
+import { setSessionExpiredCallback } from "./src/services/api";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,18 +17,25 @@ const App = (): React.JSX.Element => {
   const [passwordResetRequired, setPasswordResetRequired] = useState<boolean>(false);
 
   useEffect(() => {
-      const checkToken =  async() => {
-        try{
+      const checkToken = async () => {
+        try {
           const token = await AsyncStorage.getItem('authToken');
           const resetRequired = await AsyncStorage.getItem('passwordResetRequired');
           setIsLoggedIn(!!token);
           setPasswordResetRequired(resetRequired === 'true');
-        } catch (error){
-          console.error("Falha ao buscar o token do AsyncStorage:", error)
-          setIsLoggedIn(false)
+        } catch (error) {
+          console.error("Falha ao buscar o token do AsyncStorage:", error);
+          setIsLoggedIn(false);
         }
-      }
+      };
       checkToken();
+  }, []);
+
+  useEffect(() => {
+    setSessionExpiredCallback(() => {
+      setPasswordResetRequired(false);
+      setIsLoggedIn(false);
+    });
   }, []);
 
   const handleLoginSuccess = (resetRequired: boolean) => {
