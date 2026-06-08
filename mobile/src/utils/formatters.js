@@ -8,7 +8,7 @@ export const formatDecimalHours = (decimalHours) => {
     
     if(decimalHours == null || isNaN(decimalHours)) return "0:00h";
 
-    const hours = Math.floor(decimalHours);
+    let hours = Math.floor(decimalHours);
     const decimalPart = decimalHours - hours;
     let minutes = Math.round(decimalPart * 60);
 

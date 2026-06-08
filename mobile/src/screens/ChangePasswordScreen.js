@@ -10,9 +10,13 @@ import {
     BackHandler,
     KeyboardAvoidingView,
     Platform,
-    ScrollView
+    ScrollView,
+    SafeAreaView
 } from 'react-native';
 import api from '../services/api';
+import { theme } from '../styles/theme';
+import { globalStyles } from '../styles/globalStyles';
+import ScreenHeader from '../components/ScreenHeader';
 
 const ChangePasswordScreen = ({ onPasswordChanged }) => {
     const [newPassword, setNewPassword] = useState('');
@@ -57,135 +61,122 @@ const ChangePasswordScreen = ({ onPasswordChanged }) => {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={styles.keyboardContainer}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-                <View style={styles.card}>
-                    <Text style={styles.title}>Segurança da Conta</Text>
-                    <Text style={styles.subtitle}>
-                        Defina uma senha definitiva para continuar acessando o Laboris.
-                    </Text>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.canvas }}>
+            <ScreenHeader title="Segurança" />
+            <KeyboardAvoidingView
+                style={styles.keyboardContainer}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+                    <View style={styles.card}>
+                        <Text style={styles.title}>Segurança da Conta</Text>
+                        <Text style={styles.subtitle}>
+                            Defina uma senha definitiva para continuar acessando o Laboris.
+                        </Text>
 
-                    <Text style={styles.label}>Nova Senha</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite a nova senha"
-                        placeholderTextColor="#6b7280"
-                        value={newPassword}
-                        onChangeText={setNewPassword}
-                        secureTextEntry
-                        autoCapitalize="none"
-                        editable={!loading}
-                    />
+                        <Text style={styles.label}>Nova Senha</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Digite a nova senha"
+                            placeholderTextColor={theme.colors.textMuted}
+                            value={newPassword}
+                            onChangeText={setNewPassword}
+                            secureTextEntry
+                            autoCapitalize="none"
+                            editable={!loading}
+                        />
 
-                    <Text style={styles.label}>Confirmar Nova Senha</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Confirme a nova senha"
-                        placeholderTextColor="#6b7280"
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        secureTextEntry
-                        autoCapitalize="none"
-                        editable={!loading}
-                    />
+                        <Text style={styles.label}>Confirmar Nova Senha</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Confirme a nova senha"
+                            placeholderTextColor={theme.colors.textMuted}
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            secureTextEntry
+                            autoCapitalize="none"
+                            editable={!loading}
+                        />
 
-                    <View style={styles.requirementsBox}>
-                        <View style={styles.requirementItem}>
-                            <View style={[styles.bullet, isMinLength && styles.bulletValid]} />
-                            <Text style={[styles.requirementText, isMinLength && styles.textValid]}>
-                                Mínimo de 8 caracteres
-                            </Text>
+                        <View style={styles.requirementsBox}>
+                            <View style={styles.requirementItem}>
+                                <View style={[styles.bullet, isMinLength && styles.bulletValid]} />
+                                <Text style={[styles.requirementText, isMinLength && styles.textValid]}>
+                                    Mínimo de 8 caracteres
+                                </Text>
+                            </View>
+                            <View style={styles.requirementItem}>
+                                <View style={[styles.bullet, isMatching && styles.bulletValid]} />
+                                <Text style={[styles.requirementText, isMatching && styles.textValid]}>
+                                    As senhas devem ser iguais
+                                </Text>
+                            </View>
                         </View>
-                        <View style={styles.requirementItem}>
-                            <View style={[styles.bullet, isMatching && styles.bulletValid]} />
-                            <Text style={[styles.requirementText, isMatching && styles.textValid]}>
-                                As senhas devem ser iguais
-                            </Text>
-                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.button, !isValid && styles.buttonDisabled]}
+                            onPress={handleChangePassword}
+                            disabled={!isValid || loading}
+                        >
+                            {loading ? (
+                                <ActivityIndicator size="small" color="#ffffff" />
+                            ) : (
+                                <Text style={[styles.buttonText, !isValid && styles.buttonTextDisabled]}>Confirmar Nova Senha</Text>
+                            )}
+                        </TouchableOpacity>
                     </View>
-
-                    <TouchableOpacity
-                        style={[styles.button, !isValid && styles.buttonDisabled]}
-                        onPress={handleChangePassword}
-                        disabled={!isValid || loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator size="small" color="#ffffff" />
-                        ) : (
-                            <Text style={styles.buttonText}>Confirmar Nova Senha</Text>
-                        )}
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     keyboardContainer: {
         flex: 1,
-        backgroundColor: '#0b0c10',
+        backgroundColor: theme.colors.canvas,
     },
     scrollContainer: {
         flexGrow: 1,
         justifyContent: 'center',
-        padding: 20,
+        padding: theme.spacing.sm,
     },
     card: {
-        backgroundColor: '#111218',
-        borderRadius: 24,
-        padding: 24,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.08)',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.5,
-        shadowRadius: 15,
-        elevation: 10,
+        ...globalStyles.card,
+        padding: theme.spacing.md,
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#ffffff',
+        color: theme.colors.textMain,
         textAlign: 'center',
         marginBottom: 8,
     },
     subtitle: {
-        fontSize: 14,
-        color: '#9ca3af',
+        fontSize: 14.5,
+        color: theme.colors.textMuted,
         textAlign: 'center',
-        marginBottom: 28,
+        marginBottom: 24,
         lineHeight: 20,
     },
     label: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#a5b4fc',
+        color: theme.colors.textMuted,
         textTransform: 'uppercase',
         marginBottom: 8,
         letterSpacing: 0.5,
     },
     input: {
-        backgroundColor: 'rgba(15, 17, 26, 0.8)',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        borderWidth: 1.5,
-        borderRadius: 12,
-        height: 50,
-        paddingHorizontal: 16,
-        fontSize: 15,
-        color: '#ffffff',
-        marginBottom: 16,
+        ...globalStyles.input,
     },
     requirementsBox: {
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        borderRadius: 12,
+        backgroundColor: theme.colors.surfaceLow,
+        borderColor: theme.colors.borderSubtle,
+        borderWidth: 1,
+        borderRadius: theme.radius.card,
         padding: 12,
         marginBottom: 24,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.05)',
     },
     requirementItem: {
         flexDirection: 'row',
@@ -196,40 +187,33 @@ const styles = StyleSheet.create({
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#4b5563',
+        backgroundColor: theme.colors.textMuted,
         marginRight: 8,
     },
     bulletValid: {
-        backgroundColor: '#34d399',
+        backgroundColor: theme.colors.success,
     },
     requirementText: {
         fontSize: 13,
-        color: '#9ca3af',
+        color: theme.colors.textMuted,
     },
     textValid: {
-        color: '#34d399',
+        color: theme.colors.success,
     },
     button: {
-        backgroundColor: '#6366f1',
-        height: 50,
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#6366f1',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
-        elevation: 5,
+        ...globalStyles.btn,
+        backgroundColor: theme.colors.primary,
     },
     buttonDisabled: {
-        backgroundColor: 'rgba(99, 102, 241, 0.4)',
-        shadowOpacity: 0,
+        backgroundColor: theme.colors.surfaceContainer,
         elevation: 0,
     },
     buttonText: {
+        ...globalStyles.btnText,
         color: '#ffffff',
-        fontSize: 16,
-        fontWeight: 'bold',
+    },
+    buttonTextDisabled: {
+        color: theme.colors.textMuted,
     },
 });
 

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text, View, Button, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import LoginScreen from "./src/screens/LoginScreen";
-import MainScreen from "./src/screens/MainScreen";
 import ChangePasswordScreen from "./src/screens/ChangePasswordScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TabNavigator from "./src/navigation/TabNavigator";
@@ -78,7 +77,7 @@ const App = (): React.JSX.Element => {
             </Stack.Screen>
           )
         ) : (
-          <Stack.Screen name="Login">
+          <Stack.Screen name="Login" options={{ headerShown: false }}>
             {(props) => <LoginScreen {...props} onLoginSucess={handleLoginSuccess}/>}
           </Stack.Screen>
         )}

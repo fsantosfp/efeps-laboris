@@ -302,12 +302,16 @@
 }
 
 /* Vertical line through timeline markers */
-.timeline-container::before {
+.timeline-wrapper {
+  position: relative;
+}
+
+.timeline-wrapper::before {
   content: "";
   position: absolute;
-  left: 140px;
-  top: 10px;
-  bottom: 10px;
+  left: 145px;
+  top: 0;
+  bottom: 0;
   width: 2px;
   background-color: var(--border-subtle);
 }
@@ -316,7 +320,7 @@
   display: flex;
   position: relative;
   margin-bottom: 30px;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .timeline-item:last-child {
@@ -325,7 +329,7 @@
 
 /* Left part: Meta (Date and Time) */
 .timeline-meta {
-  width: 110px;
+  width: 115px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -424,6 +428,7 @@
   color: #15803d;
   border: 1px solid #bbf7d0;
 }
+
 .timeline-icon-container.badge-work {
   background-color: #f0fdf4;
   border-color: #15803d;
@@ -435,6 +440,7 @@
   color: #b45309;
   border: 1px solid #fde68a;
 }
+
 .timeline-icon-container.badge-break {
   background-color: #fffbeb;
   border-color: #b45309;
@@ -446,6 +452,7 @@
   color: #0369a1;
   border: 1px solid #bae6fd;
 }
+
 .timeline-icon-container.badge-displacement {
   background-color: #f0f9ff;
   border-color: #0369a1;
@@ -453,13 +460,15 @@
 
 /* Responsive adjustment for timeline on small viewports */
 @media (max-width: 640px) {
-  .timeline-container::before {
+  .timeline-wrapper::before {
     left: 28px;
   }
+
   .timeline-item {
     flex-direction: column;
     padding-left: 50px;
   }
+
   .timeline-meta {
     width: auto;
     align-items: flex-start;
@@ -467,12 +476,14 @@
     text-align: left;
     margin-bottom: 8px;
   }
+
   .timeline-marker {
     position: absolute;
     left: 0;
     top: 0;
     width: auto;
   }
+
   .timeline-content {
     margin-left: 0;
   }
