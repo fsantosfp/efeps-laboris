@@ -6,7 +6,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
 
 ## 💾 Slice 1: Estrutura de DTOs e Endpoints do Backend
 
-- [ ] **Tarefa 1.1: Criar os DTOs do Relatório**
+- [x] **Tarefa 1.1: Criar os DTOs do Relatório**
   - **Ações:**
     - Criar [JourneyEventDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JourneyEventDto.java) para representar eventos da linha do tempo.
     - Criar [EmployeeJourneyResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/EmployeeJourneyResponseDto.java) para encapsular a lista de eventos de cada funcionário.

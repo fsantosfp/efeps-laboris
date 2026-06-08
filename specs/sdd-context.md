@@ -9,15 +9,15 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.1: Criar os DTOs do Relatório (Slice 1)
-* **Objetivo:** Criar JourneyEventDto.java e EmployeeJourneyResponseDto.java para representar eventos da linha do tempo e empacotar a resposta do endpoint.
+* **Título:** Tarefa 1.2: Injetar UserRepository no ReportService (Slice 1)
+* **Objetivo:** Modificar o construtor de ReportService.java para injetar e usar a interface UserRepository e atualizar a instanciação nos testes correspondentes.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [JourneyEventDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JourneyEventDto.java)
-  - [EmployeeJourneyResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/EmployeeJourneyResponseDto.java)
+  - [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java)
+  - [ReportServiceTest.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/test/java/br/com/effies/laboris/backend/domain/service/ReportServiceTest.java)
 
 ---
 
