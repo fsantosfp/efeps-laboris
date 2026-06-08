@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Concluído
-* **Objetivo:** Todas as tarefas do Relatório de Jornada e Deslocamento por Funcionário (Slice 1 & Slice 2) foram concluídas com sucesso.
+* **Título:** Tarefa 1.1: Criar a função utilitária calculateBreakHours
+* **Objetivo:** Criar o arquivo calculateBreakHours.js que calcula a soma das diferenças entre batidas consecutivas de OUT e IN no mesmo dia do calendário.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - N/A
+  - [calculateBreakHours.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/utils/calculateBreakHours.js)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Build Sucesso:** Assegurar que os testes do backend e a compilação do frontend passem perfeitamente.
-2. **Conventional Commit:** Realizados os commits incrementais por tarefa conforme as diretrizes do SDD.
+1. **Build Sucesso:** Assegurar que o aplicativo móvel React Native compile e rode perfeitamente.
+2. **Conventional Commit:** Commitar cada tarefa individualmente antes de prosseguir.
