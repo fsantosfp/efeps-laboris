@@ -3,8 +3,11 @@ package br.com.effies.laboris.backend.presentation.controller;
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.model.Employee;
 import br.com.effies.laboris.backend.domain.service.EmployeeService;
+import br.com.effies.laboris.backend.domain.service.TimeEntryService;
 import br.com.effies.laboris.backend.presentation.dto.request.CreateEmployeeRequestDto;
+import br.com.effies.laboris.backend.presentation.dto.request.ManagerTimeEntryRequestDto;
 import br.com.effies.laboris.backend.presentation.dto.response.EmployeeResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.TimeEntryResponseDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,9 +24,11 @@ import java.util.UUID;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final TimeEntryService timeEntryService;
 
-    public EmployeeController(EmployeeService employeeService){
+    public EmployeeController(EmployeeService employeeService, TimeEntryService timeEntryService){
         this.employeeService = employeeService;
+        this.timeEntryService = timeEntryService;
     }
 
     @PostMapping
@@ -94,5 +100,54 @@ public class EmployeeController {
         br.com.effies.laboris.backend.domain.entity.SalaryHistory salaryHistory = employeeService.addSalaryHistory(employeeId, request, manager);
         br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto response = new br.com.effies.laboris.backend.presentation.dto.response.SalaryHistoryResponseDto(salaryHistory);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{employeeId}/time-entries")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<List<TimeEntryResponseDto>> getEmployeeTimeEntries(
+            @PathVariable UUID employeeId,
+            @RequestParam("start") Instant start,
+            @RequestParam("end") Instant end,
+            @AuthenticationPrincipal User manager
+    ) {
+        List<br.com.effies.laboris.backend.domain.entity.TimeEntry> entries = timeEntryService.findTimeEntriesForManager(employeeId, start, end, manager);
+        List<TimeEntryResponseDto> response = entries.stream()
+                .map(TimeEntryResponseDto::new)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{employeeId}/time-entries")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<TimeEntryResponseDto> createEmployeeTimeEntry(
+            @PathVariable UUID employeeId,
+            @Valid @RequestBody ManagerTimeEntryRequestDto request,
+            @AuthenticationPrincipal User manager
+    ) {
+        br.com.effies.laboris.backend.domain.entity.TimeEntry entry = timeEntryService.createTimeEntryForManager(employeeId, request, manager);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TimeEntryResponseDto(entry));
+    }
+
+    @PutMapping("/{employeeId}/time-entries/{timeEntryId}")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<TimeEntryResponseDto> updateEmployeeTimeEntry(
+            @PathVariable UUID employeeId,
+            @PathVariable UUID timeEntryId,
+            @Valid @RequestBody ManagerTimeEntryRequestDto request,
+            @AuthenticationPrincipal User manager
+    ) {
+        br.com.effies.laboris.backend.domain.entity.TimeEntry entry = timeEntryService.updateTimeEntryForManager(employeeId, timeEntryId, request, manager);
+        return ResponseEntity.ok(new TimeEntryResponseDto(entry));
+    }
+
+    @DeleteMapping("/{employeeId}/time-entries/{timeEntryId}")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<Void> deleteEmployeeTimeEntry(
+            @PathVariable UUID employeeId,
+            @PathVariable UUID timeEntryId,
+            @AuthenticationPrincipal User manager
+    ) {
+        timeEntryService.deleteTimeEntryForManager(employeeId, timeEntryId, manager);
+        return ResponseEntity.noContent().build();
     }
 }

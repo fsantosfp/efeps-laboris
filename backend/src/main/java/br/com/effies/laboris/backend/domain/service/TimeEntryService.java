@@ -5,11 +5,14 @@ import br.com.effies.laboris.backend.domain.entity.TimeEntry;
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.JobStatus;
 import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
+import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
 import br.com.effies.laboris.backend.domain.repository.JobAssignmentRepository;
 import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import br.com.effies.laboris.backend.presentation.dto.request.TimeEntryRequestDto;
+import br.com.effies.laboris.backend.presentation.dto.request.ManagerTimeEntryRequestDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class TimeEntryService {
@@ -25,17 +29,20 @@ public class TimeEntryService {
     private final JobRepository jobRepository;
     private final JobAssignmentRepository assignmentRepository;
     private final DisplacementRepository displacementRepository;
+    private final UserRepository userRepository;
 
     public TimeEntryService(
         TimeEntryRepository entryRepository,
         JobRepository jobRepository,
         JobAssignmentRepository assignmentRepository,
-        DisplacementRepository displacementRepository
+        DisplacementRepository displacementRepository,
+        UserRepository userRepository
     ){
         this.timeEntryRepository = entryRepository;
         this.jobRepository = jobRepository;
         this.assignmentRepository = assignmentRepository;
         this.displacementRepository = displacementRepository;
+        this.userRepository = userRepository;
     }
 
     public TimeEntry create (TimeEntryRequestDto request, User employee) {
@@ -132,5 +139,121 @@ public class TimeEntryService {
             TimeEntryType lastType = lastEntry.get().getEntryType();
             if( lastType == nextType) throw new IllegalStateException("Ação inválida. A última batida já foi do tipo '" + lastType + "'.");
         }
+    }
+
+    public List<TimeEntry> findTimeEntriesForManager(UUID employeeId, Instant start, Instant end, User manager) {
+        User employee = userRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado."));
+
+        if (!employee.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. O funcionário não pertence à sua empresa.");
+        }
+
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("A data de início não pode ser posterior à data final.");
+        }
+
+        return timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(
+                employeeId, start, end
+        );
+    }
+
+    public TimeEntry createTimeEntryForManager(UUID employeeId, ManagerTimeEntryRequestDto request, User manager) {
+        User employee = userRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado."));
+
+        if (!employee.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. O funcionário não pertence à sua empresa.");
+        }
+
+        if (employee.getStatus() == UserStatus.INACTIVE) {
+            throw new IllegalStateException("Não é permitido alterar pontos de funcionários inativos.");
+        }
+
+        var job = jobRepository.findById(request.getJobId())
+                .orElseThrow(() -> new EntityNotFoundException("Trabalho não encontrado."));
+
+        if (!job.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. O trabalho não pertence à sua empresa.");
+        }
+
+        if (request.getTimestamp().isAfter(Instant.now())) {
+            throw new IllegalArgumentException("A data e hora do ponto não podem ser no futuro.");
+        }
+
+        TimeEntry entry = new TimeEntry();
+        entry.setEmployee(employee);
+        entry.setJob(job);
+        entry.setEntryType(request.getEntryType());
+        entry.setLatitude(job.getLatitude() != null ? job.getLatitude() : 0.0);
+        entry.setLongitude(job.getLongitude() != null ? job.getLongitude() : 0.0);
+        entry.setManual(true);
+        entry.setEntryTimestamp(request.getTimestamp());
+        entry.setJustification(request.getJustification());
+
+        return timeEntryRepository.save(entry);
+    }
+
+    public TimeEntry updateTimeEntryForManager(UUID employeeId, UUID timeEntryId, ManagerTimeEntryRequestDto request, User manager) {
+        User employee = userRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado."));
+
+        if (!employee.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. O funcionário não pertence à sua empresa.");
+        }
+
+        if (employee.getStatus() == UserStatus.INACTIVE) {
+            throw new IllegalStateException("Não é permitido alterar pontos de funcionários inativos.");
+        }
+
+        TimeEntry entry = timeEntryRepository.findById(timeEntryId)
+                .orElseThrow(() -> new EntityNotFoundException("Registro de ponto não encontrado."));
+
+        if (!entry.getEmployee().getId().equals(employeeId)) {
+            throw new IllegalArgumentException("O registro de ponto não pertence a este funcionário.");
+        }
+
+        var job = jobRepository.findById(request.getJobId())
+                .orElseThrow(() -> new EntityNotFoundException("Trabalho não encontrado."));
+
+        if (!job.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. O trabalho não pertence à sua empresa.");
+        }
+
+        if (request.getTimestamp().isAfter(Instant.now())) {
+            throw new IllegalArgumentException("A data e hora do ponto não podem ser no futuro.");
+        }
+
+        entry.setJob(job);
+        entry.setLatitude(job.getLatitude() != null ? job.getLatitude() : 0.0);
+        entry.setLongitude(job.getLongitude() != null ? job.getLongitude() : 0.0);
+        entry.setEntryType(request.getEntryType());
+        entry.setEntryTimestamp(request.getTimestamp());
+        entry.setJustification(request.getJustification());
+        entry.setManual(true);
+
+        return timeEntryRepository.save(entry);
+    }
+
+    public void deleteTimeEntryForManager(UUID employeeId, UUID timeEntryId, User manager) {
+        User employee = userRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado."));
+
+        if (!employee.getCompany().getId().equals(manager.getCompany().getId())) {
+            throw new SecurityException("Acesso negado. O funcionário não pertence à sua empresa.");
+        }
+
+        if (employee.getStatus() == UserStatus.INACTIVE) {
+            throw new IllegalStateException("Não é permitido alterar pontos de funcionários inativos.");
+        }
+
+        TimeEntry entry = timeEntryRepository.findById(timeEntryId)
+                .orElseThrow(() -> new EntityNotFoundException("Registro de ponto não encontrado."));
+
+        if (!entry.getEmployee().getId().equals(employeeId)) {
+            throw new IllegalArgumentException("O registro de ponto não pertence a este funcionário.");
+        }
+
+        timeEntryRepository.delete(entry);
     }
 }
