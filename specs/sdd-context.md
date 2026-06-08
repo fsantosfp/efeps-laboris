@@ -9,14 +9,14 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.3: Implementar o cálculo cronológico no ReportService (Slice 1)
-* **Objetivo:** Criar o método calculateEmployeeJourneyReport no ReportService.java para obter a lista de funcionários ativos, buscar suas batidas e deslocamentos, mesclar os dados de forma cronológica diária em eventos WORK, BREAK e DISPLACEMENT, ordenar e retornar os dados.
+* **Título:** Tarefa 1.4: Adicionar o endpoint no ReportController (Slice 1)
+* **Objetivo:** Adicionar a rota GET /api/v1/reports/employee-journey em ReportController.java.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java)
+  - [ReportController.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/controller/ReportController.java)
 
 ---
 

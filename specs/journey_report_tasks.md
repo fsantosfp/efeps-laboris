@@ -18,7 +18,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
     - Atualizar a instanciação no arquivo de testes correspondente.
   - **Critério de Aceitação:** Projeto compilando perfeitamente após a injeção.
 
-- [ ] **Tarefa 1.3: Implementar o cálculo cronológico no ReportService**
+- [x] **Tarefa 1.3: Implementar o cálculo cronológico no ReportService**
   - **Ações:**
     - Criar o método `calculateEmployeeJourneyReport` no [ReportService.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/domain/service/ReportService.java) para obter a lista de funcionários ativos, buscar suas batidas e deslocamentos, mesclar os dados de forma cronológica diária em eventos `WORK`, `BREAK` e `DISPLACEMENT`, ordenar e retornar os dados.
   - **Critério de Aceitação:** Lógica implementada e sem erros de execução.
