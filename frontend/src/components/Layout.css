@@ -1,9 +1,14 @@
 .layout-container {
   display: flex;
-  min-height: 100vh;
+  height: calc(100vh - 4rem); /* Encaixa perfeitamente dentro do #root com padding de 2rem */
   background-color: #f7f9fc;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: #1e293b;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .sidebar {
@@ -14,12 +19,9 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 24px 16px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
   box-sizing: border-box;
-  z-index: 100;
+  flex-shrink: 0;
+  height: 100%;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -124,9 +126,9 @@
 
 .main-content {
   flex-grow: 1;
-  margin-left: 240px; /* deixa espaço para a sidebar fixa */
   padding: 40px;
   box-sizing: border-box;
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
   background-color: #f7f9fc;
 }
