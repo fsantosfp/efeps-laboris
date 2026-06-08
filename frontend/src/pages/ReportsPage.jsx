@@ -4,7 +4,7 @@ import { formatDecimalHours } from "../utils/formatters";
 import './ReportsPage.css';
 
 function ReportsPage() {
-    const [activeTab, setActiveTab] = useState('payroll'); // 'payroll' or 'jobCosts'
+    const [activeTab, setActiveTab] = useState('payroll'); // 'payroll', 'jobCosts' or 'journey'
 
     // Common Loading/Error states
     const [loading, setLoading] = useState(false);
@@ -22,6 +22,14 @@ function ReportsPage() {
     const [costEnd, setCostEnd] = useState('');
     const [jobsCostsData, setJobsCostsData] = useState([]);
     const [loadingJobs, setLoadingJobs] = useState(false);
+
+    // Tab 3: Journey State
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
+    const [journeyStart, setJourneyStart] = useState('');
+    const [journeyEnd, setJourneyEnd] = useState('');
+    const [journeyData, setJourneyData] = useState([]);
+    const [loadingEmployees, setLoadingEmployees] = useState(false);
 
     const lastHourOfDay = "T23:59:59.999Z";
 
@@ -43,6 +51,25 @@ function ReportsPage() {
             fetchJobs();
         }
     }, [activeTab, jobs.length]);
+
+    // Fetch employees for multi-select on mount or tab change
+    useEffect(() => {
+        if (activeTab === 'journey' && employees.length === 0) {
+            const fetchEmployees = async () => {
+                setLoadingEmployees(true);
+                try {
+                    const response = await api.get('/employees');
+                    setEmployees(response.data);
+                } catch (err) {
+                    console.error("Erro ao buscar funcionários para o filtro:", err);
+                    setError('Não foi possível carregar a lista de funcionários.');
+                } finally {
+                    setLoadingEmployees(false);
+                }
+            };
+            fetchEmployees();
+        }
+    }, [activeTab, employees.length]);
 
     // Handle Payroll Report Generation
     const handleGeneratePayroll = async (e) => {
