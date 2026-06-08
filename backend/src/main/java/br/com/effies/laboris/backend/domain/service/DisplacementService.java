@@ -107,4 +107,9 @@ public class DisplacementService {
     public Optional<Displacement> getActiveDisplacement(User employee) {
         return displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId());
     }
+
+    @Transactional(readOnly = true)
+    public List<Displacement> getMyDisplacements(User employee, Instant start, Instant end) {
+        return displacementRepository.findAllByUserIdAndPeriod(employee.getId(), start, end);
+    }
 }

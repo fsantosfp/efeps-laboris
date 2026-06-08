@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import java.time.Instant;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/displacements")
@@ -62,5 +64,18 @@ public class DisplacementController {
                 .map(DisplacementResponseDto::new)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<DisplacementResponseDto>> getMyDisplacements(
+            @AuthenticationPrincipal User employee,
+            @RequestParam("start") Instant start,
+            @RequestParam("end") Instant end) {
+
+        List<Displacement> displacements = displacementService.getMyDisplacements(employee, start, end);
+        List<DisplacementResponseDto> response = displacements.stream()
+                .map(DisplacementResponseDto::new)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 }

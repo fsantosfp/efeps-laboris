@@ -173,4 +173,21 @@ class DisplacementServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 displacementService.endDisplacement(41.0, -74.0, destinationJob.getId(), employee));
     }
+
+    @Test
+    @DisplayName("Deve buscar deslocamentos do usuário por período")
+    void getMyDisplacements_ShouldReturnList() {
+        // Arrange
+        java.time.Instant start = java.time.Instant.now();
+        java.time.Instant end = start.plus(1, java.time.temporal.ChronoUnit.DAYS);
+        List<Displacement> displacements = List.of(new Displacement());
+        when(displacementRepository.findAllByUserIdAndPeriod(employee.getId(), start, end)).thenReturn(displacements);
+
+        // Act
+        List<Displacement> result = displacementService.getMyDisplacements(employee, start, end);
+
+        // Assert
+        assertThat(result).hasSize(1);
+        verify(displacementRepository).findAllByUserIdAndPeriod(employee.getId(), start, end);
+    }
 }
