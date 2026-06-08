@@ -167,17 +167,10 @@ function JobDetailPage(){
 
     return (
         <div className="job-detail-container">
-            <Link to="/dashboard" className="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 18 9 12 15 6"/>
-                </svg>
-                Voltar para o Dashboard
-            </Link>
-            
             <header className="job-detail-header">
                 <h2 className="job-title">Detalhe do Trabalho</h2>
                 {job && !isEditing && (
-                    <button className="btn btn-secondary" onClick={handleStartEdit}>
+                    <button className="job-detail-btn job-detail-btn-secondary" onClick={handleStartEdit}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
                         </svg>
@@ -245,8 +238,8 @@ function JobDetailPage(){
                                 </div>
 
                                 <div className="form-actions">
-                                    <button className="btn btn-primary" type="submit">Salvar Alterações</button>
-                                    <button className="btn btn-secondary" type="button" onClick={() => setIsEditing(false)}>Cancelar</button>
+                                    <button className="job-detail-btn job-detail-btn-primary" type="submit">Salvar Alterações</button>
+                                    <button className="job-detail-btn job-detail-btn-secondary" type="button" onClick={() => setIsEditing(false)}>Cancelar</button>
                                 </div>
                             </form>
                         ) : (
@@ -344,7 +337,7 @@ function JobDetailPage(){
                             <div className="info-card">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px', marginBottom: '16px' }}>
                                     <h3 style={{ borderBottom: 'none', paddingBottom: 0, margin: 0 }}>Equipe</h3>
-                                    <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12.5px' }} onClick={() => setIsModalOpen(true)}>
+                                    <button className="job-detail-btn job-detail-btn-secondary" style={{ padding: '6px 12px', fontSize: '12.5px' }} onClick={() => setIsModalOpen(true)}>
                                         Gerenciar
                                     </button>
                                 </div>
@@ -388,14 +381,14 @@ function JobDetailPage(){
                             />
                         </div>
                         <button 
-                            className="btn btn-primary"
+                            className="job-detail-btn job-detail-btn-primary"
                             onClick={() => fetchTimesheet(timesheetStart, timesheetEnd)}
                             disabled={loadingTimesheet}
                         >
                             Filtrar
                         </button>
                         <button 
-                            className="btn btn-secondary"
+                            className="job-detail-btn job-detail-btn-secondary"
                             onClick={() => {
                                 setTimesheetStart('');
                                 setTimesheetEnd('');
@@ -483,7 +476,7 @@ function JobDetailPage(){
                             <p className="danger-desc">
                                 Esta ação irá deletar o trabalho permanentemente. Esta operação só é permitida enquanto o trabalho estiver com status "A fazer".
                             </p>
-                            <button className="btn btn-danger" onClick={() => setIsDeleteModalOpen(true)}>
+                            <button className="job-detail-btn job-detail-btn-danger" onClick={() => setIsDeleteModalOpen(true)}>
                                 Deletar Trabalho
                             </button>
                         </div>
@@ -517,11 +510,11 @@ function JobDetailPage(){
                             placeholder="Digite o endereço exato do trabalho"
                         />
                         <div className="modal-actions">
-                            <button className="btn btn-secondary" onClick={() => { setIsDeleteModalOpen(false); setConfirmAddressInput(''); }}>
+                            <button className="job-detail-btn job-detail-btn-secondary" onClick={() => { setIsDeleteModalOpen(false); setConfirmAddressInput(''); }}>
                                 Cancelar
                             </button>
                             <button 
-                                className="btn btn-danger"
+                                className="job-detail-btn job-detail-btn-danger"
                                 onClick={handleConfirmDelete} 
                                 disabled={confirmAddressInput !== job.address}
                                 style={{ 
