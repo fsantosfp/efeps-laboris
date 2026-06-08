@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 2.4: Estilizar a Timeline no CSS
-* **Objetivo:** Criar estilos premium em ReportsPage.css com badges de cores harmoniosas (azul/teal para trabalho, cinza para intervalo e laranja/bronze para deslocamentos) e linhas conectoras de linha do tempo.
+* **Título:** Concluído
+* **Objetivo:** Todas as tarefas do Relatório de Jornada e Deslocamento por Funcionário (Slice 1 & Slice 2) foram concluídas com sucesso.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [ReportsPage.css](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.css)
+  - N/A
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Build Sucesso:** Assegurar que o frontend compile e rode perfeitamente.
-2. **Conventional Commit:** Commitar cada tarefa individualmente antes de prosseguir.
+1. **Build Sucesso:** Assegurar que os testes do backend e a compilação do frontend passem perfeitamente.
+2. **Conventional Commit:** Realizados os commits incrementais por tarefa conforme as diretrizes do SDD.

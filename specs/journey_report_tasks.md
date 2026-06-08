@@ -53,7 +53,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
     - Invocar o novo endpoint HTTP e renderizar os resultados agrupados por funcionário em formato de linha do tempo vertical ou blocos cronológicos premium.
   - **Critério de Aceitação:** Jornadas exibidas de forma clara e visual.
 
-- [ ] **Tarefa 2.4: Estilizar a Timeline no CSS**
+- [x] **Tarefa 2.4: Estilizar a Timeline no CSS**
   - **Ações:**
     - Criar estilos premium em [ReportsPage.css](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.css) com badges de cores harmoniosas (azul/teal para trabalho, cinza para intervalo e laranja/bronze para deslocamentos) e linhas conectoras de linha do tempo.
   - **Critério de Aceitação:** Layout fluído e alinhado aos padrões estéticos de alto nível estabelecidos.
