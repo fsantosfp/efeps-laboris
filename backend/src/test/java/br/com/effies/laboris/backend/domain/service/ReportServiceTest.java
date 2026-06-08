@@ -160,6 +160,39 @@ class ReportServiceTest {
     }
 
     @Test
+    @DisplayName("Deve somar as horas de deslocamento no relatório de custo de trabalho")
+    void calculateJobCostReport_WhenDisplacementExists_ShouldIncludeDisplacementHours() {
+        // Arrange
+        // Func 1 trabalhou das 08:00 às 12:00 (4h líquidas) no job
+        List<TimeEntry> entries = List.of(
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(8).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(12).forUser(employee1).build()
+        );
+
+        // Deslocamento de 1.5 horas finalizado no mesmo dia
+        var displacement = new br.com.effies.laboris.backend.domain.entity.Displacement();
+        displacement.setUser(employee1);
+        displacement.setDestinationJob(job);
+        displacement.setStartTimestamp(entries.get(0).getEntryTimestamp().minus(90, ChronoUnit.MINUTES));
+        displacement.setEndTimestamp(entries.get(0).getEntryTimestamp());
+
+        when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
+        when(timeEntryRepository.findAllByJobIdAndPeriod(job.getId(), start, end)).thenReturn(entries);
+        when(displacementRepository.findAllByDestinationJobIdAndPeriod(job.getId(), start, end)).thenReturn(List.of(displacement));
+
+        // Act
+        JobCostResponseDto result = reportService.calculateJobCostReport(manager, job.getId(), start, end);
+
+        // Assert
+        assertThat(result.getDailyBreakdown()).hasSize(1);
+        JobCostResponseDto.DailyBreakdownDto group = result.getDailyBreakdown().getFirst();
+        // 4h trabalhadas + 1.5h de deslocamento = 5.5h
+        assertThat(group.getHoursWorked()).isEqualByComparingTo("5.50");
+        // (5.5h * R$50/h * 1 pessoa) = R$ 275.00
+        assertThat(group.getAmountToBill()).isEqualByComparingTo("275.00");
+    }
+
+    @Test
     @DisplayName("Deve calcular corretamente as horas por colaborador dentro do período fornecido")
     void calculateJobTimesheetReport_WhenPeriodProvided_ShouldFilterAndGroupCorrectly() {
         // Arrange

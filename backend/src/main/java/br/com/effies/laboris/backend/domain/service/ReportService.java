@@ -51,8 +51,9 @@ public class ReportService {
         job.ensureBelongsTo(manager);
 
         List<TimeEntry> entries = timeEntryRepository.findAllByJobIdAndPeriod(jobId, start, end);
+        List<Displacement> displacements = displacementRepository.findAllByDestinationJobIdAndPeriod(jobId, start, end);
 
-        List<DailyShift> allShifts = processEntriesIntoShifts(entries);
+        List<DailyShift> allShifts = processEntriesIntoShifts(entries, displacements);
 
         Map<String, List<DailyShift>> shiftsByGroup = allShifts.stream()
             .collect(Collectors.groupingBy(shift ->
@@ -108,11 +109,32 @@ public class ReportService {
             .build();
     }
 
-    private List<DailyShift> processEntriesIntoShifts(List<TimeEntry> allEntries){
-
+    private List<DailyShift> processEntriesIntoShifts(List<TimeEntry> allEntries, List<Displacement> displacements){
         Map<User, Map<LocalDate, List<TimeEntry>>> entriesByUserAndDay = groupEntriesByUserAndDay(allEntries);
+
+        Map<User, Map<LocalDate, List<Displacement>>> displacementsByUserAndDay = displacements.stream()
+            .collect(Collectors.groupingBy(
+                Displacement::getUser,
+                Collectors.groupingBy(d -> d.getStartTimestamp()
+                    .atZone(ZoneOffset.UTC)
+                    .toLocalDate()
+                )
+            ));
+
         return entriesByUserAndDay.entrySet().stream()
-            .flatMap(this::processEmployeeDailyEntries)
+            .flatMap(userEntry -> {
+                User employee = userEntry.getKey();
+                Map<LocalDate, List<TimeEntry>> dailyEntries = userEntry.getValue();
+                Map<LocalDate, List<Displacement>> userDailyDisplacements = displacementsByUserAndDay.getOrDefault(employee, Map.of());
+
+                return dailyEntries.entrySet().stream()
+                    .flatMap(dailyEntry -> {
+                        LocalDate date = dailyEntry.getKey();
+                        List<TimeEntry> dayEntries = dailyEntry.getValue();
+                        List<Displacement> dayDisplacements = userDailyDisplacements.getOrDefault(date, List.of());
+                        return createShiftFromDailyEntries(employee, date, dayEntries, dayDisplacements);
+                    });
+            })
             .collect(Collectors.toList());
     }
 
@@ -127,18 +149,7 @@ public class ReportService {
             ));
     }
 
-    private Stream<DailyShift> processEmployeeDailyEntries(Map.Entry<User, Map<LocalDate, List<TimeEntry>>> userEntry){
-        User employee = userEntry.getKey();
-        Map<LocalDate, List<TimeEntry>> dailyEntries = userEntry.getValue();
-
-        return dailyEntries.entrySet().stream()
-            .flatMap(dailyEntry ->
-                createShiftFromDailyEntries(employee, dailyEntry.getKey(), dailyEntry.getValue())
-            );
-
-    }
-
-    private Stream<DailyShift> createShiftFromDailyEntries(User employee, LocalDate date, List<TimeEntry> dailyEntries){
+    private Stream<DailyShift> createShiftFromDailyEntries(User employee, LocalDate date, List<TimeEntry> dailyEntries, List<Displacement> dayDisplacements){
         Optional<TimeEntry> firstIn = dailyEntries.stream()
             .filter(entry -> entry.getEntryType() == TimeEntryType.IN)
             .min(Comparator.comparing(TimeEntry::getEntryTimestamp));
@@ -159,6 +170,16 @@ public class ReportService {
                     .truncatedTo(ChronoUnit.MINUTES);
 
                 BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dailyEntries);
+
+                BigDecimal displacementHours = BigDecimal.ZERO;
+                for (Displacement d : dayDisplacements) {
+                    if (d.getEndTimestamp() != null) {
+                        long seconds = Duration.between(d.getStartTimestamp(), d.getEndTimestamp()).getSeconds();
+                        displacementHours = displacementHours.add(BigDecimal.valueOf(seconds / 3600.0));
+                    }
+                }
+                displacementHours = displacementHours.setScale(2, RoundingMode.HALF_UP);
+                hoursWorked = hoursWorked.add(displacementHours);
 
                 DailyShift shift = new DailyShift(date, startTime, endTime, hoursWorked, employee);
 
