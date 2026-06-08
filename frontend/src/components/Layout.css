@@ -127,7 +127,7 @@
 
 .main-content {
   flex-grow: 1;
-  padding: 40px;
+  padding: 24px; /* Reduced from 40px to maximize card container area */
   box-sizing: border-box;
   min-height: 100vh;
   min-height: 100dvh;
@@ -195,6 +195,6 @@
   }
 
   .main-content {
-    padding: 24px 16px;
+    padding: 16px; /* Reduced from 24px 16px to maximize space */
   }
 }
