@@ -38,7 +38,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
 
 ## 🖥️ Slice 2: Interface Web - Aba de Jornadas e Timeline
 
-- [ ] **Tarefa 2.1: Carregar lista de funcionários no frontend**
+- [x] **Tarefa 2.1: Carregar lista de funcionários no frontend**
   - **Ações:**
     - Atualizar o componente [ReportsPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.jsx) para consultar a lista completa de funcionários da empresa e disponibilizá-los como opções de filtro.
   - **Critério de Aceitação:** Funcionários carregados e armazenados no estado da página.

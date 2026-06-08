@@ -9,8 +9,8 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 2.1: Carregar lista de funcionários no frontend
-* **Objetivo:** Atualizar o componente ReportsPage.jsx para consultar a lista completa de funcionários da empresa e disponibilizá-los como opções de filtro.
+* **Título:** Tarefa 2.2: Adicionar a nova aba "Jornada de Funcionários"
+* **Objetivo:** Modificar a barra de abas e renderizar o novo formulário de filtro contendo multiselect de funcionários, data de início e de fim.
 
 ---
 
