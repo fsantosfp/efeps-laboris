@@ -43,7 +43,7 @@ Este documento contém a decomposição das tarefas para a implementação do no
     - Atualizar o componente [ReportsPage.jsx](file:///Users/fsantos/Documents/workspace/effies-laboris/frontend/src/pages/ReportsPage.jsx) para consultar a lista completa de funcionários da empresa e disponibilizá-los como opções de filtro.
   - **Critério de Aceitação:** Funcionários carregados e armazenados no estado da página.
 
-- [ ] **Tarefa 2.2: Adicionar a nova aba "Jornada de Funcionários"**
+- [x] **Tarefa 2.2: Adicionar a nova aba "Jornada de Funcionários"**
   - **Ações:**
     - Modificar a barra de abas e renderizar o novo formulário de filtro contendo multiselect de funcionários, data de início e de fim.
   - **Critério de Aceitação:** Abas alternando suavemente e sem erros de layout.

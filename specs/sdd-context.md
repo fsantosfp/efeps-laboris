@@ -9,8 +9,8 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 2.2: Adicionar a nova aba "Jornada de Funcionários"
-* **Objetivo:** Modificar a barra de abas e renderizar o novo formulário de filtro contendo multiselect de funcionários, data de início e de fim.
+* **Título:** Tarefa 2.3: Implementar a chamada e renderização da Timeline
+* **Objetivo:** Invocar o novo endpoint HTTP e renderizar os resultados agrupados por funcionário em formato de linha do tempo vertical ou blocos cronológicos premium.
 
 ---
 
