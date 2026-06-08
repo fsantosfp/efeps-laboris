@@ -108,26 +108,36 @@
 
 /* Custom styling for Google Places Autocomplete Web Component */
 gmp-place-autocomplete {
-  width: 100%;
+  width: 100% !important;
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  box-sizing: border-box !important;
+  transition: all 0.25s ease !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  --gmp-search-button-background: transparent !important;
+  --gmp-button-border-color: transparent !important;
+  --gmp-search-icon-color: #64748b !important;
+}
+
+gmp-place-autocomplete:focus-within {
+  border-color: #0a52c6 !important;
 }
 
 gmp-place-autocomplete::part(input) {
   width: 100% !important;
   padding: 10px 12px !important;
   font-size: 14px !important;
-  border: 1.5px solid #e2e8f0 !important;
-  border-radius: 6px !important;
-  background-color: #ffffff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
   color: #1e293b !important;
   outline: none !important;
   box-sizing: border-box !important;
-  transition: all 0.25s ease !important;
   font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-}
-
-gmp-place-autocomplete::part(input):focus {
-  border-color: #0a52c6 !important;
-  background-color: #ffffff !important;
 }
 
 .job-create-error {

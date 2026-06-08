@@ -79,13 +79,6 @@ function CreateJobPage(){
 
     return (
         <div className="job-create-container">
-            <Link to="/dashboard" className="job-create-back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 18 9 12 15 6"/>
-                </svg>
-                Voltar para o Dashboard
-            </Link>
-
             <header className="job-create-header">
                 <h2 className="job-create-title">Criar Novo Trabalho</h2>
             </header>
