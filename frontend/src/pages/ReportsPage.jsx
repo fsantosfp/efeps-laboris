@@ -55,7 +55,7 @@ function ReportsPage() {
                     setJobs(response.data);
                 } catch (err) {
                     console.error("Erro ao buscar trabalhos para o filtro:", err);
-                    setError('Não foi possível carregar a lista de trabalhos.');
+                    setError(err.response?.data?.message || err.message || 'Não foi possível carregar a lista de trabalhos.');
                 } finally {
                     setLoadingJobs(false);
                 }
@@ -74,7 +74,7 @@ function ReportsPage() {
                     setEmployees(response.data);
                 } catch (err) {
                     console.error("Erro ao buscar funcionários para o filtro:", err);
-                    setError('Não foi possível carregar a lista de funcionários.');
+                    setError(err.response?.data?.message || err.message || 'Não foi possível carregar a lista de funcionários.');
                 } finally {
                     setLoadingEmployees(false);
                 }
