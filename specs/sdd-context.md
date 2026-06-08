@@ -9,14 +9,15 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 5.4: Validação da Build e Fluxo Mobile (Slice 5)
-* **Objetivo:** Rodar build e validações do app React Native e atestar funcionamento com o emulador.
+* **Título:** Tarefa 1.1: Criar os DTOs do Relatório (Slice 1)
+* **Objetivo:** Criar JourneyEventDto.java e EmployeeJourneyResponseDto.java para representar eventos da linha do tempo e empacotar a resposta do endpoint.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [MainScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/MainScreen.js)
+  - [JourneyEventDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/JourneyEventDto.java)
+  - [EmployeeJourneyResponseDto.java](file:///Users/fsantos/Documents/workspace/effies-laboris/backend/src/main/java/br/com/effies/laboris/backend/presentation/dto/response/EmployeeJourneyResponseDto.java)
 
 ---
 
