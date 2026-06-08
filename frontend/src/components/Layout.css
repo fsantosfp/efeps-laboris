@@ -1,0 +1,132 @@
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f7f9fc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #0f172a; /* sidebar escura */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 16px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  z-index: 100;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.sidebar-logo {
+  width: 24px;
+  height: 24px;
+  color: #0a52c6;
+}
+
+.sidebar-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  color: #94a3b8;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-link.active {
+  color: #ffffff;
+  background-color: #0a52c6; /* active background */
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 20px;
+}
+
+.system-status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+  padding: 0 8px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #007a5a; /* success green */
+  box-shadow: 0 0 8px #007a5a;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  color: #ffffff;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-left: 240px; /* deixa espaço para a sidebar fixa */
+  padding: 40px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: #f7f9fc;
+}
