@@ -3,8 +3,20 @@ import api from '../services/api';
 import { formatDecimalHours } from "../utils/formatters";
 import './ReportsPage.css';
 
+const formatTime = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+};
+
+const formatDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
 function ReportsPage() {
-    const [activeTab, setActiveTab] = useState('payroll'); // 'payroll' or 'jobCosts'
+    const [activeTab, setActiveTab] = useState('payroll'); // 'payroll', 'jobCosts' or 'journey'
 
     // Common Loading/Error states
     const [loading, setLoading] = useState(false);
@@ -23,6 +35,14 @@ function ReportsPage() {
     const [jobsCostsData, setJobsCostsData] = useState([]);
     const [loadingJobs, setLoadingJobs] = useState(false);
 
+    // Tab 3: Journey State
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
+    const [journeyStart, setJourneyStart] = useState('');
+    const [journeyEnd, setJourneyEnd] = useState('');
+    const [journeyData, setJourneyData] = useState([]);
+    const [loadingEmployees, setLoadingEmployees] = useState(false);
+
     const lastHourOfDay = "T23:59:59.999Z";
 
     // Fetch jobs for multi-select on mount or tab change
@@ -35,7 +55,7 @@ function ReportsPage() {
                     setJobs(response.data);
                 } catch (err) {
                     console.error("Erro ao buscar trabalhos para o filtro:", err);
-                    setError('Não foi possível carregar a lista de trabalhos.');
+                    setError(err.response?.data?.message || err.message || 'Não foi possível carregar a lista de trabalhos.');
                 } finally {
                     setLoadingJobs(false);
                 }
@@ -43,6 +63,25 @@ function ReportsPage() {
             fetchJobs();
         }
     }, [activeTab, jobs.length]);
+
+    // Fetch employees for multi-select on mount or tab change
+    useEffect(() => {
+        if (activeTab === 'journey' && employees.length === 0) {
+            const fetchEmployees = async () => {
+                setLoadingEmployees(true);
+                try {
+                    const response = await api.get('/employees');
+                    setEmployees(response.data);
+                } catch (err) {
+                    console.error("Erro ao buscar funcionários para o filtro:", err);
+                    setError(err.response?.data?.message || err.message || 'Não foi possível carregar a lista de funcionários.');
+                } finally {
+                    setLoadingEmployees(false);
+                }
+            };
+            fetchEmployees();
+        }
+    }, [activeTab, employees.length]);
 
     // Handle Payroll Report Generation
     const handleGeneratePayroll = async (e) => {
@@ -114,6 +153,46 @@ function ReportsPage() {
         );
     };
 
+    // Toggle employee selection
+    const handleToggleEmployeeSelection = (employeeId) => {
+        setSelectedEmployeeIds(prev => 
+            prev.includes(employeeId) 
+                ? prev.filter(id => id !== employeeId) 
+                : [...prev, employeeId]
+        );
+    };
+
+    // Handle Journey Report Generation
+    const handleGenerateJourney = async (e) => {
+        e.preventDefault();
+        if (selectedEmployeeIds.length === 0) {
+            setError('Por favor, selecione pelo menos um funcionário.');
+            return;
+        }
+        if (!journeyStart || !journeyEnd) {
+            setError('Por favor, selecione as datas de início e fim.');
+            return;
+        }
+
+        setError('');
+        setLoading(true);
+        setJourneyData([]);
+
+        try {
+            const startISO = new Date(journeyStart).toISOString();
+            const endISO = new Date(journeyEnd + lastHourOfDay).toISOString();
+            const empIdsParam = selectedEmployeeIds.join(',');
+
+            const response = await api.get(`/reports/employee-journey?employeeIds=${empIdsParam}&start=${startISO}&end=${endISO}`);
+            setJourneyData(response.data);
+        } catch (err) {
+            console.error("Erro ao gerar relatório de jornada:", err);
+            setError(err.response?.data?.message || 'Falha ao gerar o relatório de jornada.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="reports-page-wrapper">
             <div className="reports-glow-orb orb-indigo"></div>
@@ -136,11 +215,17 @@ function ReportsPage() {
                 >
                     Custos de Serviços
                 </button>
+                <button 
+                    className={`reports-tab-btn ${activeTab === 'journey' ? 'active' : ''}`}
+                    onClick={() => { setActiveTab('journey'); setError(''); }}
+                >
+                    Jornada de Funcionários
+                </button>
             </div>
 
             {error && <div className="error-message">{error}</div>}
 
-            {activeTab === 'payroll' ? (
+            {activeTab === 'payroll' && (
                 /* Tab 1: Payroll */
                 <div>
                     <form className="reports-form" onSubmit={handleGeneratePayroll}>
@@ -217,7 +302,9 @@ function ReportsPage() {
                         </div>
                     )}
                 </div>
-            ) : (
+            )}
+
+            {activeTab === 'jobCosts' && (
                 /* Tab 2: Job Costs */
                 <div>
                     <form className="reports-form" onSubmit={handleGenerateJobCosts}>
@@ -347,6 +434,153 @@ function ReportsPage() {
                                                     ))}
                                                 </tbody>
                                             </table>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {activeTab === 'journey' && (
+                /* Tab 3: Journey */
+                <div>
+                    <form className="reports-form" onSubmit={handleGenerateJourney}>
+                        <div className="jobs-selector-container">
+                            <label className="form-label">Selecione os Funcionários (Multi-seleção)</label>
+                            {loadingEmployees ? (
+                                <p style={{ color: 'var(--text-muted)' }}>Carregando funcionários...</p>
+                            ) : employees.length === 0 ? (
+                                <p style={{ color: 'var(--text-muted)' }}>Nenhum funcionário cadastrado.</p>
+                            ) : (
+                                <div className="jobs-grid">
+                                    {employees.map(emp => {
+                                        const isSelected = selectedEmployeeIds.includes(emp.id);
+                                        return (
+                                            <div 
+                                                key={emp.id} 
+                                                className={`job-selection-card ${isSelected ? 'selected' : ''}`}
+                                                onClick={() => handleToggleEmployeeSelection(emp.id)}
+                                            >
+                                                <input 
+                                                    type="checkbox" 
+                                                    className="job-selection-checkbox" 
+                                                    checked={isSelected}
+                                                    onChange={() => {}} // Controlled by card onClick
+                                                />
+                                                <div className="job-card-details">
+                                                    <span className="job-card-client">{emp.name || 'Sem nome'}</span>
+                                                    <span className="job-card-address">{emp.email}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Data de Início</label>
+                                <input 
+                                    type="date" 
+                                    className="form-input" 
+                                    value={journeyStart} 
+                                    onChange={(e) => setJourneyStart(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Data de Término</label>
+                                <input 
+                                    type="date" 
+                                    className="form-input" 
+                                    value={journeyEnd} 
+                                    onChange={(e) => setJourneyEnd(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                        </div>
+                        <button type="submit" className="btn-generate" disabled={loading || selectedEmployeeIds.length === 0}>
+                            {loading ? 'Gerando...' : 'Gerar Relatório'}
+                        </button>
+                    </form>
+
+                    {loading && (
+                        <div className="spinner-container">
+                            <div className="spinner"></div>
+                            <p>Calculando jornada dos funcionários...</p>
+                        </div>
+                    )}
+
+                    {journeyData.length > 0 && !loading && (
+                        <div className="reports-results-stack">
+                            {journeyData.map((employeeReport) => (
+                                <div key={employeeReport.employeeId} className="job-report-block">
+                                    <h3 className="job-report-title">
+                                        Linha do Tempo: {employeeReport.employeeName}
+                                    </h3>
+
+                                    {employeeReport.events.length === 0 ? (
+                                        <div className="info-message">
+                                            Nenhuma atividade registrada (Trabalho, Intervalo ou Deslocamento) no período.
+                                        </div>
+                                    ) : (
+                                        <div className="timeline-container">
+                                            {employeeReport.events.map((event, eventIdx) => {
+                                                const eventTime = `${formatTime(event.startTimestamp)} - ${formatTime(event.endTimestamp)}`;
+                                                const eventDate = formatDate(event.startTimestamp);
+                                                
+                                                let eventBadgeClass = "";
+                                                let eventTypeLabel = "";
+                                                let eventIcon = "";
+                                                let eventDetail = "";
+
+                                                if (event.type === 'WORK') {
+                                                    eventBadgeClass = "badge-work";
+                                                    eventTypeLabel = "Trabalho";
+                                                    eventIcon = "💼";
+                                                    eventDetail = `Serviço: ${event.jobAddress || 'Endereço não informado'}`;
+                                                } else if (event.type === 'BREAK') {
+                                                    eventBadgeClass = "badge-break";
+                                                    eventTypeLabel = "Intervalo";
+                                                    eventIcon = "☕";
+                                                    eventDetail = `Local: ${event.jobAddress || 'Endereço não informado'}`;
+                                                } else if (event.type === 'DISPLACEMENT') {
+                                                    eventBadgeClass = "badge-displacement";
+                                                    eventTypeLabel = "Deslocamento";
+                                                    eventIcon = "🚗";
+                                                    eventDetail = `De: ${event.originAddress || 'N/A'} ➔ Para: ${event.jobAddress || 'N/A'}`;
+                                                }
+
+                                                return (
+                                                    <div key={eventIdx} className="timeline-item">
+                                                        <div className="timeline-meta">
+                                                            <span className="timeline-date">{eventDate}</span>
+                                                            <span className="timeline-time">{eventTime}</span>
+                                                        </div>
+                                                        <div className="timeline-marker">
+                                                            <div className={`timeline-icon-container ${eventBadgeClass}`}>
+                                                                {eventIcon}
+                                                            </div>
+                                                        </div>
+                                                        <div className="timeline-content">
+                                                            <div className="timeline-header-row">
+                                                                <span className={`timeline-badge ${eventBadgeClass}`}>
+                                                                    {eventTypeLabel}
+                                                                </span>
+                                                                <span className="timeline-duration">
+                                                                    {formatDecimalHours(event.durationHours)}
+                                                                </span>
+                                                            </div>
+                                                            <div className="timeline-details">
+                                                                {eventDetail}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     )}
                                 </div>

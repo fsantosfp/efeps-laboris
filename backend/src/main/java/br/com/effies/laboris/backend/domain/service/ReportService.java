@@ -10,9 +10,13 @@ import br.com.effies.laboris.backend.domain.model.DailyShift;
 import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import java.time.Duration;
+import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.EmployeeJourneyResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.JourneyEventDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +42,18 @@ public class ReportService {
     private final JobRepository jobRepository;
     private final TimeEntryRepository timeEntryRepository;
     private final DisplacementRepository displacementRepository;
+    private final UserRepository userRepository;
 
-    public ReportService(JobRepository jobRepository, TimeEntryRepository timeEntryRepository, DisplacementRepository displacementRepository){
+    public ReportService(
+            JobRepository jobRepository,
+            TimeEntryRepository timeEntryRepository,
+            DisplacementRepository displacementRepository,
+            UserRepository userRepository
+    ){
         this.jobRepository = jobRepository;
         this.timeEntryRepository = timeEntryRepository;
         this.displacementRepository = displacementRepository;
+        this.userRepository = userRepository;
     }
 
     public JobCostResponseDto calculateJobCostReport(User manager, UUID jobId, Instant start, Instant end){
@@ -310,5 +321,94 @@ public class ReportService {
             .address(job.getAddress())
             .employeeTimesheets(employeeTimesheets)
             .build();
+    }
+
+    public List<EmployeeJourneyResponseDto> calculateEmployeeJourneyReport(
+            User manager, List<UUID> employeeIds, Instant start, Instant end) {
+
+        List<User> companyEmployees = userRepository.findByCompanyIdAndRole(manager.getCompany().getId(), UserRole.EMPLOYEE);
+
+        List<User> targetEmployees;
+        if (employeeIds != null && !employeeIds.isEmpty()) {
+            targetEmployees = companyEmployees.stream()
+                .filter(emp -> employeeIds.contains(emp.getId()))
+                .toList();
+        } else {
+            targetEmployees = companyEmployees;
+        }
+
+        List<EmployeeJourneyResponseDto> result = new ArrayList<>();
+
+        for (User employee : targetEmployees) {
+            List<TimeEntry> entries = timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(
+                employee.getId(), start, end);
+
+            List<Displacement> displacements = displacementRepository.findAllByUserIdAndPeriod(employee.getId(), start, end);
+
+            List<JourneyEventDto> events = new ArrayList<>();
+
+            for (Displacement d : displacements) {
+                if (d.getEndTimestamp() != null) {
+                    events.add(JourneyEventDto.builder()
+                        .type("DISPLACEMENT")
+                        .date(d.getStartTimestamp().atZone(ZoneOffset.UTC).toLocalDate())
+                        .startTimestamp(d.getStartTimestamp())
+                        .endTimestamp(d.getEndTimestamp())
+                        .originAddress(d.getStartAddress())
+                        .jobAddress(d.getDestinationJob() != null ? d.getDestinationJob().getAddress() : null)
+                        .durationHours(BigDecimal.valueOf(Duration.between(d.getStartTimestamp(), d.getEndTimestamp()).getSeconds() / 3600.0).setScale(2, java.math.RoundingMode.HALF_UP))
+                        .build());
+                }
+            }
+
+            TimeEntry lastIn = null;
+            TimeEntry lastOut = null;
+
+            for (TimeEntry entry : entries) {
+                if (entry.getEntryType() == TimeEntryType.IN) {
+                    if (lastOut != null && lastOut.getJob() != null && entry.getJob() != null &&
+                            lastOut.getJob().getId().equals(entry.getJob().getId())) {
+                        LocalDate outDate = lastOut.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate();
+                        LocalDate inDate = entry.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate();
+                        if (outDate.equals(inDate)) {
+                            events.add(JourneyEventDto.builder()
+                                .type("BREAK")
+                                .date(inDate)
+                                .startTimestamp(lastOut.getEntryTimestamp())
+                                .endTimestamp(entry.getEntryTimestamp())
+                                .jobAddress(entry.getJob().getAddress())
+                                .durationHours(BigDecimal.valueOf(Duration.between(lastOut.getEntryTimestamp(), entry.getEntryTimestamp()).getSeconds() / 3600.0).setScale(2, java.math.RoundingMode.HALF_UP))
+                                .build());
+                        }
+                    }
+                    lastIn = entry;
+                } else if (entry.getEntryType() == TimeEntryType.OUT) {
+                    if (lastIn != null) {
+                        events.add(JourneyEventDto.builder()
+                            .type("WORK")
+                            .date(lastIn.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate())
+                            .startTimestamp(lastIn.getEntryTimestamp())
+                            .endTimestamp(entry.getEntryTimestamp())
+                            .jobAddress(entry.getJob().getAddress())
+                            .durationHours(BigDecimal.valueOf(Duration.between(lastIn.getEntryTimestamp(), entry.getEntryTimestamp()).getSeconds() / 3600.0).setScale(2, java.math.RoundingMode.HALF_UP))
+                            .build());
+                        lastIn = null;
+                    }
+                    lastOut = entry;
+                }
+            }
+
+            events.sort(Comparator.comparing(JourneyEventDto::getStartTimestamp));
+
+            result.add(EmployeeJourneyResponseDto.builder()
+                .employeeId(employee.getId())
+                .employeeName(employee.getName())
+                .events(events)
+                .build());
+        }
+
+        result.sort(Comparator.comparing(EmployeeJourneyResponseDto::getEmployeeName));
+
+        return result;
     }
 }

@@ -430,3 +430,192 @@
     transform: rotate(360deg);
   }
 }
+
+/* Timeline Styling */
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: 20px 0;
+  padding-left: 20px;
+}
+
+/* Vertical line through timeline markers */
+.timeline-container::before {
+  content: "";
+  position: absolute;
+  left: 140px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.timeline-item {
+  display: flex;
+  position: relative;
+  margin-bottom: 30px;
+  align-items: flex-start;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Left part: Meta (Date and Time) */
+.timeline-meta {
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding-right: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.timeline-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.timeline-time {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+/* Center part: Marker (icon and dot) */
+.timeline-marker {
+  width: 62px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.timeline-icon-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Right part: Content Card */
+.timeline-content {
+  flex-grow: 1;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-left: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: var(--transition-smooth);
+}
+
+.timeline-content:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.timeline-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.timeline-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.timeline-duration {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.timeline-details {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Event Types Colors and Badges */
+/* 1. Work (Blue/Teal) */
+.badge-work {
+  background: rgba(20, 184, 166, 0.15);
+  color: #2dd4bf;
+  border-color: rgba(20, 184, 166, 0.3);
+}
+.timeline-icon-container.badge-work {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.2) 0%, rgba(13, 148, 136, 0.4) 100%);
+  border-color: #14b8a6;
+  box-shadow: 0 0 15px rgba(20, 184, 166, 0.25);
+}
+
+/* 2. Break (Gray) */
+.badge-break {
+  background: rgba(156, 163, 175, 0.15);
+  color: #d1d5db;
+  border-color: rgba(156, 163, 175, 0.3);
+}
+.timeline-icon-container.badge-break {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.2) 0%, rgba(107, 114, 128, 0.4) 100%);
+  border-color: #9ca3af;
+  box-shadow: 0 0 15px rgba(156, 163, 175, 0.15);
+}
+
+/* 3. Displacement (Orange/Bronze) */
+.badge-displacement {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.timeline-icon-container.badge-displacement {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6) 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+}
+
+/* Responsive adjustment for timeline on small viewports */
+@media (max-width: 640px) {
+  .timeline-container::before {
+    left: 28px;
+  }
+  .timeline-item {
+    flex-direction: column;
+    padding-left: 50px;
+  }
+  .timeline-meta {
+    width: auto;
+    align-items: flex-start;
+    padding-right: 0;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+  .timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: auto;
+  }
+  .timeline-content {
+    margin-left: 0;
+  }
+}

@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 5.4: Validação da Build e Fluxo Mobile (Slice 5)
-* **Objetivo:** Rodar build e validações do app React Native e atestar funcionamento com o emulador.
+* **Título:** Concluído
+* **Objetivo:** A exibição do tempo total de intervalo no histórico mobile foi implementada com sucesso.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [MainScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/MainScreen.js)
+  - N/A
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
 1. **Build Sucesso:** Assegurar que o aplicativo móvel React Native compile e rode perfeitamente.
-2. **Conventional Commit:** Commitar no formato `feat(mobile): validate mobile build` antes de prosseguir.
+2. **Conventional Commit:** Realizados os commits incrementais por tarefa conforme as diretrizes do SDD.

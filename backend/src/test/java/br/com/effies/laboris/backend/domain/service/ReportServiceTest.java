@@ -8,9 +8,13 @@ import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
 import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import br.com.effies.laboris.backend.domain.repository.UserRepository;
 import br.com.effies.laboris.backend.domain.utils.TimeEntryBuilder;
+import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.EmployeeJourneyResponseDto;
+import br.com.effies.laboris.backend.presentation.dto.response.JourneyEventDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +46,8 @@ class ReportServiceTest {
     private TimeEntryRepository timeEntryRepository;
     @Mock
     private DisplacementRepository displacementRepository;
+    @Mock
+    private UserRepository userRepository;
     @InjectMocks
     private ReportService reportService;
 
@@ -273,6 +279,70 @@ class ReportServiceTest {
 
         // Assert
         assertThat(result.getEmployeeTimesheets()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve gerar o relatório de jornada do funcionário de forma cronológica diária com batidas, intervalos e deslocamentos")
+    void calculateEmployeeJourneyReport_ShouldSucceedAndReturnTimeline() {
+        // Arrange
+        employee1.setName("Alice");
+
+        // Batidas: Entrada (08:00), Saída (12:00), Entrada (13:00), Saída (17:00) no mesmo job
+        List<TimeEntry> entries = List.of(
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(8).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(12).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockIn().withJob(job).atTime(13).forUser(employee1).build(),
+            TimeEntryBuilder.aTimeEntry().withClockOut().withJob(job).atTime(17).forUser(employee1).build()
+        );
+
+        // Deslocamento de 1h antes do primeiro clock-in
+        var displacement = new br.com.effies.laboris.backend.domain.entity.Displacement();
+        displacement.setUser(employee1);
+        displacement.setDestinationJob(job);
+        displacement.setStartTimestamp(entries.get(0).getEntryTimestamp().minus(60, ChronoUnit.MINUTES));
+        displacement.setEndTimestamp(entries.get(0).getEntryTimestamp());
+        displacement.setStartAddress("Rua das Oliveiras, 12");
+
+        when(userRepository.findByCompanyIdAndRole(manager.getCompany().getId(), UserRole.EMPLOYEE))
+            .thenReturn(List.of(employee1));
+        when(timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(employee1.getId(), start, end))
+            .thenReturn(entries);
+        when(displacementRepository.findAllByUserIdAndPeriod(employee1.getId(), start, end))
+            .thenReturn(List.of(displacement));
+
+        // Act
+        List<EmployeeJourneyResponseDto> result = reportService.calculateEmployeeJourneyReport(
+            manager, List.of(employee1.getId()), start, end);
+
+        // Assert
+        assertThat(result).hasSize(1);
+        EmployeeJourneyResponseDto aliceReport = result.getFirst();
+        assertThat(aliceReport.getEmployeeName()).isEqualTo("Alice");
+
+        // Deve conter 4 eventos: 1 deslocamento, 2 trabalhos e 1 intervalo (break)
+        // Ordenados por startTimestamp:
+        // 1. Deslocamento (07:00 - 08:00)
+        // 2. Trabalho (08:00 - 12:00)
+        // 3. Intervalo (12:00 - 13:00)
+        // 4. Trabalho (13:00 - 17:00)
+        assertThat(aliceReport.getEvents()).hasSize(4);
+
+        JourneyEventDto event1 = aliceReport.getEvents().get(0);
+        assertThat(event1.getType()).isEqualTo("DISPLACEMENT");
+        assertThat(event1.getOriginAddress()).isEqualTo("Rua das Oliveiras, 12");
+        assertThat(event1.getDurationHours()).isEqualByComparingTo("1.00");
+
+        JourneyEventDto event2 = aliceReport.getEvents().get(1);
+        assertThat(event2.getType()).isEqualTo("WORK");
+        assertThat(event2.getDurationHours()).isEqualByComparingTo("4.00");
+
+        JourneyEventDto event3 = aliceReport.getEvents().get(2);
+        assertThat(event3.getType()).isEqualTo("BREAK");
+        assertThat(event3.getDurationHours()).isEqualByComparingTo("1.00");
+
+        JourneyEventDto event4 = aliceReport.getEvents().get(3);
+        assertThat(event4.getType()).isEqualTo("WORK");
+        assertThat(event4.getDurationHours()).isEqualByComparingTo("4.00");
     }
 
     // Métodos auxiliares
