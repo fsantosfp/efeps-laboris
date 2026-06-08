@@ -6,13 +6,13 @@ Este documento contém a decomposição das tarefas para a exibição do tempo t
 
 ## 💾 Slice 1: Cálculo e Exibição do Total de Intervalo no Histórico Mobile
 
-- [ ] **Tarefa 1.1: Criar a função utilitária `calculateBreakHours`**
+- [x] **Tarefa 1.1: Criar a função utilitária `calculateBreakHours`**
   - **Ações:**
     - Criar o arquivo [calculateBreakHours.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/utils/calculateBreakHours.js).
     - Implementar a lógica para ordenar as batidas, rastrear pares consecutivos de `OUT` ➔ `IN` que ocorrem no mesmo dia do calendário e somar suas durações.
   - **Critério de Aceitação:** Função criada, retornando as horas em formato decimal.
 
-- [ ] **Tarefa 1.2: Atualizar a tela de Histórico (HistoryScreen)**
+- [x] **Tarefa 1.2: Atualizar a tela de Histórico (HistoryScreen)**
   - **Ações:**
     - Modificar [HistoryScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/HistoryScreen.js) para importar e utilizar `calculateBreakHours` no método `fetchHistory`.
     - Definir o estado `totalBreakHours`.

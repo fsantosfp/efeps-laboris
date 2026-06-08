@@ -9,17 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Tarefa 1.2: Atualizar a tela de Histórico (HistoryScreen)
-* **Objetivo:** Importar e utilizar calculateBreakHours na busca do histórico, definir o estado totalBreakHours, e atualizar o layout de resumo.
+* **Título:** Concluído
+* **Objetivo:** A exibição do tempo total de intervalo no histórico mobile foi implementada com sucesso.
 
 ---
 
 ## 📂 Escopo dos Arquivos
 * **Verificar:**
-  - [HistoryScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/HistoryScreen.js)
+  - N/A
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
 1. **Build Sucesso:** Assegurar que o aplicativo móvel React Native compile e rode perfeitamente.
-2. **Conventional Commit:** Commitar cada tarefa individualmente antes de prosseguir.
+2. **Conventional Commit:** Realizados os commits incrementais por tarefa conforme as diretrizes do SDD.
