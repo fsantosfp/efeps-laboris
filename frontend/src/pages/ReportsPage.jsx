@@ -3,6 +3,18 @@ import api from '../services/api';
 import { formatDecimalHours } from "../utils/formatters";
 import './ReportsPage.css';
 
+const formatTime = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+};
+
+const formatDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
 function ReportsPage() {
     const [activeTab, setActiveTab] = useState('payroll'); // 'payroll', 'jobCosts' or 'journey'
 
@@ -504,9 +516,75 @@ function ReportsPage() {
 
                     {journeyData.length > 0 && !loading && (
                         <div className="reports-results-stack">
-                            <div className="info-message">
-                                Relatório gerado com sucesso. {journeyData.length} funcionário(s) encontrado(s).
-                            </div>
+                            {journeyData.map((employeeReport) => (
+                                <div key={employeeReport.employeeId} className="job-report-block">
+                                    <h3 className="job-report-title">
+                                        Linha do Tempo: {employeeReport.employeeName}
+                                    </h3>
+
+                                    {employeeReport.events.length === 0 ? (
+                                        <div className="info-message">
+                                            Nenhuma atividade registrada (Trabalho, Intervalo ou Deslocamento) no período.
+                                        </div>
+                                    ) : (
+                                        <div className="timeline-container">
+                                            {employeeReport.events.map((event, eventIdx) => {
+                                                const eventTime = `${formatTime(event.startTimestamp)} - ${formatTime(event.endTimestamp)}`;
+                                                const eventDate = formatDate(event.startTimestamp);
+                                                
+                                                let eventBadgeClass = "";
+                                                let eventTypeLabel = "";
+                                                let eventIcon = "";
+                                                let eventDetail = "";
+
+                                                if (event.type === 'WORK') {
+                                                    eventBadgeClass = "badge-work";
+                                                    eventTypeLabel = "Trabalho";
+                                                    eventIcon = "💼";
+                                                    eventDetail = `Serviço: ${event.jobAddress || 'Endereço não informado'}`;
+                                                } else if (event.type === 'BREAK') {
+                                                    eventBadgeClass = "badge-break";
+                                                    eventTypeLabel = "Intervalo";
+                                                    eventIcon = "☕";
+                                                    eventDetail = `Local: ${event.jobAddress || 'Endereço não informado'}`;
+                                                } else if (event.type === 'DISPLACEMENT') {
+                                                    eventBadgeClass = "badge-displacement";
+                                                    eventTypeLabel = "Deslocamento";
+                                                    eventIcon = "🚗";
+                                                    eventDetail = `De: ${event.originAddress || 'N/A'} ➔ Para: ${event.jobAddress || 'N/A'}`;
+                                                }
+
+                                                return (
+                                                    <div key={eventIdx} className="timeline-item">
+                                                        <div className="timeline-meta">
+                                                            <span className="timeline-date">{eventDate}</span>
+                                                            <span className="timeline-time">{eventTime}</span>
+                                                        </div>
+                                                        <div className="timeline-marker">
+                                                            <div className={`timeline-icon-container ${eventBadgeClass}`}>
+                                                                {eventIcon}
+                                                            </div>
+                                                        </div>
+                                                        <div className="timeline-content">
+                                                            <div className="timeline-header-row">
+                                                                <span className={`timeline-badge ${eventBadgeClass}`}>
+                                                                    {eventTypeLabel}
+                                                                </span>
+                                                                <span className="timeline-duration">
+                                                                    {formatDecimalHours(event.durationHours)}
+                                                                </span>
+                                                            </div>
+                                                            <div className="timeline-details">
+                                                                {eventDetail}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
