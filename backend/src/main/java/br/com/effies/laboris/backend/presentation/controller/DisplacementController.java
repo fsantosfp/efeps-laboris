@@ -66,6 +66,13 @@ public class DisplacementController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/active")
+    public ResponseEntity<Void> cancelDisplacement(
+            @AuthenticationPrincipal User employee) {
+        displacementService.cancelDisplacement(employee);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/me")
     public ResponseEntity<List<DisplacementResponseDto>> getMyDisplacements(
             @AuthenticationPrincipal User employee,

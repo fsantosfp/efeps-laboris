@@ -94,13 +94,25 @@ public class DisplacementService {
             throw new IllegalArgumentException("Você precisa estar no perímetro geográfico do trabalho de destino para finalizar o deslocamento.");
         }
 
-        // 4. Finaliza e salva deslocamento
+        // 4. Validação lógica: o destino não pode ser igual à origem (último ponto batido)
+        Optional<TimeEntry> lastEntry = timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId());
+        if (lastEntry.isPresent() && lastEntry.get().getJob().getId().equals(destinationJobId)) {
+            throw new IllegalArgumentException("O trabalho de destino não pode ser o mesmo do local de origem.");
+        }
+
+        // 5. Finaliza e salva deslocamento
         activeDisplacement.setEndTimestamp(Instant.now());
         activeDisplacement.setEndLatitude(latitude);
         activeDisplacement.setEndLongitude(longitude);
         activeDisplacement.setDestinationJob(job);
 
         return displacementRepository.save(activeDisplacement);
+    }
+
+    public void cancelDisplacement(User employee) {
+        Displacement activeDisplacement = displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId())
+                .orElseThrow(() -> new IllegalStateException("Nenhum deslocamento ativo encontrado."));
+        displacementRepository.delete(activeDisplacement);
     }
 
     @Transactional(readOnly = true)
