@@ -1,7 +1,7 @@
 package br.com.effies.laboris.backend.presentation.dto.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -34,7 +34,7 @@ public class CreateJobRequestDto {
     private BigDecimal billingRate;
 
     @NotNull(message = "Data de início é obrigatória.")
-    @Future(message = "A data de inicio não pode ser no passado.")
+    @FutureOrPresent(message = "A data de início não pode ser no passado.")
     private LocalDate startDate;
 
     private LocalDate endDate;
