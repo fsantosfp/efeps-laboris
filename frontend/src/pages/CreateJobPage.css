@@ -1,0 +1,103 @@
+.job-create-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.job-create-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.job-create-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.job-create-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+}
+
+.job-create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 8px;
+}
+
+/* Custom layout helper to span 2 columns */
+.full-width {
+  grid-column: span 2;
+}
+
+/* Custom styling for Google Places Autocomplete Web Component */
+gmp-place-autocomplete {
+  width: 100% !important;
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+  border: 1.5px solid var(--border-subtle) !important;
+  border-radius: var(--radius-control) !important;
+  box-sizing: border-box !important;
+  transition: all 0.25s ease !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  --gmp-search-button-background: transparent !important;
+  --gmp-button-border-color: transparent !important;
+  --gmp-search-icon-color: var(--text-muted) !important;
+}
+
+gmp-place-autocomplete:focus-within {
+  border-color: var(--color-primary) !important;
+}
+
+gmp-place-autocomplete::part(input) {
+  width: 100% !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  color: var(--text-main) !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  font-family: var(--font-main) !important;
+}
+
+.job-create-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: flex-start;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .job-create-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .full-width {
+    grid-column: unset;
+  }
+
+  .job-create-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .job-create-actions .btn {
+    width: 100%;
+  }
+}

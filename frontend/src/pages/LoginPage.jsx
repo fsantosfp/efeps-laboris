@@ -34,7 +34,7 @@ function LoginPage(){
 
     return (
         <div className="login-page-container">
-            <div className="login-card">
+            <div className="login-card card-surface">
                 <div className="login-logo-container">
                     <svg className="login-logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="32" cy="32" r="28" stroke="#0A52C6" strokeWidth="3.5" fill="none" />
@@ -45,7 +45,7 @@ function LoginPage(){
                     <p className="login-subtitle">Acesso Mactron Solutions</p>
                 </div>
 
-                {error && <div className="login-error-alert">{error}</div>}
+                {error && <div className="alert alert-error">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -53,7 +53,7 @@ function LoginPage(){
                         <div className="input-wrapper">
                             <input 
                                 type="email"
-                                className="input-field"
+                                className="form-input"
                                 placeholder="nome@mactron.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -68,7 +68,7 @@ function LoginPage(){
                         <div className="input-wrapper">
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className="input-field"
+                                className="form-input"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -98,7 +98,7 @@ function LoginPage(){
                         </div>
                     </div>
 
-                    <button type="submit" className="login-btn" disabled={loading}>
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
                         {loading ? 'Entrando...' : 'Entrar'}
                     </button>
                 </form>

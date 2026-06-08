@@ -282,13 +282,13 @@ function EmployeesPage() {
             <div className="toggle-switch"></div>
             <span>Mostrar Inativos</span>
           </div>
-          <button className="btn-primary" onClick={handleOpenCreate}>
+          <button className="btn btn-primary" onClick={handleOpenCreate}>
             + Cadastrar Funcionário
           </button>
         </div>
       </div>
 
-      {error && <p className="form-alert form-alert-error" style={{ marginBottom: "20px" }}>{error}</p>}
+      {error && <p className="alert alert-error" style={{ marginBottom: "20px" }}>{error}</p>}
 
       {loading ? (
         <div className="loading-spinner"></div>
@@ -364,7 +364,6 @@ function EmployeesPage() {
         </div>
       )}
 
-      {/* MODAL 1: Cadastro de Funcionário */}
       <dialog ref={createDialogRef} className="glass-dialog" closedby="any">
         <div className="dialog-header">
           <h3>Cadastrar Novo Funcionário</h3>
@@ -372,7 +371,7 @@ function EmployeesPage() {
             &times;
           </button>
         </div>
-        {createError && <p className="form-alert form-alert-error" style={{ marginBottom: "15px" }}>{createError}</p>}
+        {createError && <p className="alert alert-error" style={{ marginBottom: "15px" }}>{createError}</p>}
         <form onSubmit={handleCreateSubmit} className="dialog-form">
           <div className="form-group">
             <label className="form-label">Nome Completo</label>
@@ -422,10 +421,10 @@ function EmployeesPage() {
             </div>
           </div>
           <div className="dialog-actions">
-            <button type="button" className="btn-secondary" onClick={handleCloseCreate}>
+            <button type="button" className="btn btn-secondary" onClick={handleCloseCreate}>
               Cancelar
             </button>
-            <button type="submit" className="btn-primary" disabled={createLoading}>
+            <button type="submit" className="btn btn-primary" disabled={createLoading}>
               {createLoading ? "Salvando..." : "Cadastrar"}
             </button>
           </div>
@@ -443,11 +442,11 @@ function EmployeesPage() {
         
         {selectedEmployee && (
           <p style={{ color: "var(--text-muted)", marginTop: "-15px", marginBottom: "20px", fontSize: "14px" }}>
-            Funcionário(a): <span style={{ color: "#ffffff", fontWeight: 600 }}>{selectedEmployee.name}</span>
+            Funcionário(a): <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>{selectedEmployee.name}</span>
           </p>
         )}
 
-        {salariesError && <p className="form-alert form-alert-error" style={{ marginBottom: "15px" }}>{salariesError}</p>}
+        {salariesError && <p className="alert alert-error" style={{ marginBottom: "15px" }}>{salariesError}</p>}
 
         {salariesLoading ? (
           <div className="loading-spinner" style={{ margin: "20px auto" }}></div>
@@ -477,9 +476,9 @@ function EmployeesPage() {
         )}
 
         {selectedEmployee && selectedEmployee.status === "ACTIVE" && (
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "20px" }}>
-            <h4 style={{ margin: "0 0 15px 0", fontSize: "16px", color: "#ffffff" }}>Adicionar Nova Vigência</h4>
-            {salaryFormError && <p className="form-alert form-alert-error" style={{ marginBottom: "15px" }}>{salaryFormError}</p>}
+          <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "20px" }}>
+            <h4 style={{ margin: "0 0 15px 0", fontSize: "16px", color: "var(--text-main)" }}>Adicionar Nova Vigência</h4>
+            {salaryFormError && <p className="alert alert-error" style={{ marginBottom: "15px" }}>{salaryFormError}</p>}
             <form onSubmit={handleSalarySubmit} className="dialog-form">
               <div className="form-row">
                 <div className="form-group">
@@ -507,7 +506,7 @@ function EmployeesPage() {
                 </div>
               </div>
               <div className="dialog-actions">
-                <button type="submit" className="btn-primary" disabled={salaryFormLoading}>
+                <button type="submit" className="btn btn-primary" disabled={salaryFormLoading}>
                   {salaryFormLoading ? "Adicionando..." : "Adicionar Taxa"}
                 </button>
               </div>
@@ -516,7 +515,6 @@ function EmployeesPage() {
         )}
       </dialog>
 
-      {/* MODAL 3: Confirmação de Inativação */}
       <dialog ref={deactivateDialogRef} className="glass-dialog" closedby="any">
         <div className="dialog-header">
           <h3>Confirmar Inativação</h3>
@@ -524,7 +522,7 @@ function EmployeesPage() {
             &times;
           </button>
         </div>
-        {deactivateError && <p className="form-alert form-alert-error" style={{ marginBottom: "15px" }}>{deactivateError}</p>}
+        {deactivateError && <p className="alert alert-error" style={{ marginBottom: "15px" }}>{deactivateError}</p>}
         {selectedEmployee && (
           <div style={{ marginBottom: "25px" }}>
             <p style={{ margin: "0 0 10px 0" }}>
@@ -536,16 +534,15 @@ function EmployeesPage() {
           </div>
         )}
         <div className="dialog-actions">
-          <button className="btn-secondary" onClick={handleCloseDeactivate}>
+          <button className="btn btn-secondary" onClick={handleCloseDeactivate}>
             Cancelar
           </button>
-          <button className="btn-danger" onClick={handleDeactivateSubmit} disabled={deactivateLoading}>
+          <button className="btn btn-danger" onClick={handleDeactivateSubmit} disabled={deactivateLoading}>
             {deactivateLoading ? "Inativando..." : "Confirmar Inativação"}
           </button>
         </div>
       </dialog>
 
-      {/* MODAL 4: Confirmação de Reativação */}
       <dialog ref={activateDialogRef} className="glass-dialog" closedby="any">
         <div className="dialog-header">
           <h3>Confirmar Reativação</h3>
@@ -553,7 +550,7 @@ function EmployeesPage() {
             &times;
           </button>
         </div>
-        {activateError && <p className="form-alert form-alert-error" style={{ marginBottom: "15px" }}>{activateError}</p>}
+        {activateError && <p className="alert alert-error" style={{ marginBottom: "15px" }}>{activateError}</p>}
         {selectedEmployee && (
           <div style={{ marginBottom: "25px" }}>
             <p style={{ margin: "0 0 10px 0" }}>
@@ -565,10 +562,10 @@ function EmployeesPage() {
           </div>
         )}
         <div className="dialog-actions">
-          <button className="btn-secondary" onClick={handleCloseActivate}>
+          <button className="btn btn-secondary" onClick={handleCloseActivate}>
             Cancelar
           </button>
-          <button className="btn-primary" onClick={handleActivateSubmit} disabled={activateLoading}>
+          <button className="btn btn-primary" onClick={handleActivateSubmit} disabled={activateLoading}>
             {activateLoading ? "Ativando..." : "Confirmar Reativação"}
           </button>
         </div>

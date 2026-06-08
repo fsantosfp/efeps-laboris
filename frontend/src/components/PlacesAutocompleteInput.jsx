@@ -51,7 +51,7 @@ const PlacesAutocompleteInput = ({ onPlaceSelect, value }) => {
     }, [value]);
 
     return (
-        <div ref={containerRef} style={{ width: '300px' }} />
+        <div ref={containerRef} className="places-autocomplete-container" style={{ width: '100%' }} />
     )
 }
 

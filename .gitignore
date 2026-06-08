@@ -126,3 +126,9 @@ xcuserdata
 .vscode/
 *.swp
 *.swo
+
+# ================
+# IA Docs
+# ================
+docs/*
+specs/*

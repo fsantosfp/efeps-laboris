@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ManageTeamModal from '../components/ManageTeamModal';
 import { formatDecimalHours } from "../utils/formatters";
+import "./JobDetailPage.css";
 
 function JobDetailPage(){
 
@@ -148,232 +149,336 @@ function JobDetailPage(){
         }
     };
 
-    if(loading) return <div> Carregando detalhes do trabalho... </div>
+    if(loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                <span>Carregando detalhes do trabalho...</span>
+            </div>
+        );
+    }
 
-    if(error) return <div style={{ color: 'red' }}>{error}</div>;
+    if(error) {
+        return (
+            <div className="login-error-alert" style={{ marginTop: '20px', textAlign: 'left' }}>
+                {error}
+            </div>
+        );
+    }
 
     return (
-        <div>
-            <Link to="/dashboard">{ "< Voltar para o Dashboard" }</Link>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-                <h1>Detalhe do Trabalho</h1>
+        <div className="job-detail-container">
+            <header className="job-detail-header">
+                <h2 className="job-title">Detalhe do Trabalho</h2>
                 {job && !isEditing && (
-                    <button onClick={handleStartEdit}>Editar Dados do Trabalho</button>
+                    <button className="btn btn-secondary" onClick={handleStartEdit}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                        </svg>
+                        Editar Trabalho
+                    </button>
                 )}
-            </div>
+            </header>
 
             { job && (
                 <div>
-                    {isEditing ? (
-                        <form onSubmit={handleSaveEdit} style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #ddd' }}>
-                            <h3>Editar Informações do Trabalho</h3>
-                            
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>Status:*</label><br />
-                                <select name="status" value={editData.status} onChange={handleEditChange} required>
-                                    <option value="PENDING">A fazer</option>
-                                    <option value="IN_PROGRESS">Em Andamento</option>
-                                    <option value="COMPLETED">Concluído</option>
-                                    {job.status === 'DELETED' && <option value="DELETED">Cancelado (Deletado)</option>}
-                                </select>
-                            </div>
+                    <div className="job-detail-grid">
+                        {/* Left Card: Info or Edit Form */}
+                        {isEditing ? (
+                            <form className="card-surface" onSubmit={handleSaveEdit}>
+                                <h3>Editar Informações do Trabalho</h3>
+                                
+                                <div className="job-detail-edit-form-grid">
+                                    <div className="form-group">
+                                        <label className="form-label">Status:*</label>
+                                        <select className="form-select" name="status" value={editData.status} onChange={handleEditChange} required>
+                                            <option value="PENDING">A fazer</option>
+                                            <option value="IN_PROGRESS">Em Andamento</option>
+                                            <option value="COMPLETED">Concluído</option>
+                                            {job.status === 'DELETED' && <option value="DELETED">Cancelado (Deletado)</option>}
+                                        </select>
+                                    </div>
 
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>Valor/Hora (Faturamento):*</label><br />
-                                <input type="number" name="billingRate" value={editData.billingRate} onChange={handleEditChange} required step="0.01" />
-                            </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Valor/Hora (Faturamento):*</label>
+                                        <input className="form-input" type="number" name="billingRate" value={editData.billingRate} onChange={handleEditChange} required step="0.01" />
+                                    </div>
 
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>Orçamento:*</label><br />
-                                <input type="number" name="budget" value={editData.budget} onChange={handleEditChange} required step="0.01" />
-                            </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Orçamento:*</label>
+                                        <input className="form-input" type="number" name="budget" value={editData.budget} onChange={handleEditChange} required step="0.01" />
+                                    </div>
 
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>Data de Início:*</label><br />
-                                <input type="date" name="startDate" value={editData.startDate} onChange={handleEditChange} required />
-                            </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Data de Início:*</label>
+                                        <input className="form-input" type="date" name="startDate" value={editData.startDate} onChange={handleEditChange} required />
+                                    </div>
 
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>Data de Término (Estimada):</label><br />
-                                <input type="date" name="endDate" value={editData.endDate} onChange={handleEditChange} />
-                            </div>
-
-                            <hr style={{ margin: '15px 0', border: '0', borderTop: '1px solid #ccc' }} />
-                            <h4>Dados do Responsável</h4>
-
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>Nome do Responsável:*</label><br />
-                                <input type="text" name="responsibleName" value={editData.responsibleName} onChange={handleEditChange} required style={{ width: '300px' }} />
-                            </div>
-
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>Telefone do Responsável:*</label><br />
-                                <input type="text" name="responsiblePhone" value={editData.responsiblePhone} onChange={handleEditChange} required style={{ width: '300px' }} />
-                            </div>
-
-                            <div style={{ marginBottom: '10px' }}>
-                                <label>E-mail do Responsável (Opcional):</label><br />
-                                <input type="email" name="responsibleEmail" value={editData.responsibleEmail} onChange={handleEditChange} style={{ width: '300px' }} />
-                            </div>
-
-                            <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-                                <button type="submit">Salvar Alterações</button>
-                                <button type="button" onClick={() => setIsEditing(false)} style={{ background: '#7f8c8d', color: 'white' }}>Cancelar</button>
-                            </div>
-                        </form>
-                    ) : (
-                        <div style={{ background: '#fdfdfd', padding: '20px', borderRadius: '8px', border: '1px solid #eee', marginBottom: '20px' }}>
-                            <p><strong>Endereço:</strong> { job.address }</p>
-                            <p><strong>Contratante:</strong> { job.clientName }</p>
-                            <p><strong>Status:</strong> { 
-                                job.status === 'PENDING' ? 'A fazer' : 
-                                job.status === 'IN_PROGRESS' ? 'Em andamento' : 
-                                job.status === 'COMPLETED' ? 'Concluído' : 'Cancelado (Deletado)' 
-                            }</p>
-                            <p><strong>Valor/Hora (Faturamento):</strong> R$ { job.billingRate }</p>
-                            <p><strong>Orçamento:</strong> R$ { job.budget}</p>
-                            <p><strong>Data de Início:</strong> { job.startDate }</p>
-                            <p><strong>Data de Término (Estimada):</strong> { job.endDate || 'Não informada' }</p>
-
-                            <hr style={{ margin: '15px 0', border: '0', borderTop: '1px solid #ccc' }} />
-                            <h4>Dados do Responsável</h4>
-                            <p><strong>Nome do Responsável:</strong> { job.responsibleName }</p>
-                            <p><strong>Telefone do Responsável:</strong> { job.responsiblePhone }</p>
-                            <p><strong>E-mail do Responsável:</strong> { job.responsibleEmail || 'Não informado' }</p>
-                        </div>
-                    )}
-
-                    <h3>Equipe Designada</h3>
-                    <button onClick={ () => setIsModalOpen(true) }>Gerenciar Equipe</button>
-                    {job.assignedTeam && job.assignedTeam.length > 0 ? (
-                        <ul>
-                            { job.assignedTeam.map(employee => (<li key={employee.id}>{employee.name}</li>)) }
-                        </ul>
-                    ):( 
-                        <p>Nenhum funcionário designado para este trabalho ainda.</p> 
-                    )}
-
-                    <hr style={{ margin: '20px 0' }} />
-
-                    <h3>Relatório de Presença e Horas Diárias</h3>
-                    <div style={{ background: '#fcfcfc', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
-                        <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-                            <div>
-                                <label style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '5px', color: '#555' }}>Data de Início:</label>
-                                <input 
-                                    type="date" 
-                                    value={timesheetStart} 
-                                    onChange={(e) => setTimesheetStart(e.target.value)} 
-                                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                                />
-                            </div>
-                            <div>
-                                <label style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '5px', color: '#555' }}>Data de Término:</label>
-                                <input 
-                                    type="date" 
-                                    value={timesheetEnd} 
-                                    onChange={(e) => setTimesheetEnd(e.target.value)} 
-                                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                                />
-                            </div>
-                            <button 
-                                onClick={() => fetchTimesheet(timesheetStart, timesheetEnd)}
-                                disabled={loadingTimesheet}
-                                style={{ padding: '8px 16px', background: '#3498db', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                            >
-                                Filtrar
-                            </button>
-                            <button 
-                                onClick={() => {
-                                    setTimesheetStart('');
-                                    setTimesheetEnd('');
-                                    fetchTimesheet('', '');
-                                }}
-                                disabled={loadingTimesheet}
-                                style={{ padding: '8px 16px', background: '#95a5a6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                            >
-                                Limpar
-                            </button>
-                        </div>
-
-                        {timesheetError && <p style={{ color: 'red' }}>{timesheetError}</p>}
-                        
-                        {loadingTimesheet ? (
-                            <p>Carregando dados do relatório...</p>
-                        ) : (() => {
-                            const flatRows = [];
-                            if (timesheetData && timesheetData.employeeTimesheets) {
-                                timesheetData.employeeTimesheets.forEach(empSheet => {
-                                    if (empSheet.dailyHours) {
-                                        empSheet.dailyHours.forEach(day => {
-                                            flatRows.push({
-                                                date: day.date,
-                                                employeeName: empSheet.employeeName,
-                                                employeeId: empSheet.employeeId,
-                                                start: day.start ? day.start.substring(0, 5) : '-',
-                                                end: day.end ? day.end.substring(0, 5) : '-',
-                                                hoursWorked: day.hoursWorked,
-                                                displacement: day.displacement || '-',
-                                                displacementHours: day.displacementHours || 0,
-                                                interval: day.interval
-                                            });
-                                        });
-                                    }
-                                });
-                            }
-
-                            if (flatRows.length === 0) {
-                                return <p style={{ margin: 0, color: '#7f8c8d' }}>Não há registros de ponto para este trabalho no período selecionado.</p>;
-                            }
-
-                            // Sort by date descending, then by employeeName ascending
-                            flatRows.sort((a, b) => {
-                                const dateCompare = b.date.localeCompare(a.date);
-                                if (dateCompare !== 0) return dateCompare;
-                                return a.employeeName.localeCompare(b.employeeName);
-                            });
-
-                            return (
-                                <div style={{ overflowX: 'auto' }}>
-                                    <table border="1" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                        <thead>
-                                            <tr style={{ background: '#f9f9f9', color: '#555' }}>
-                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Data</th>
-                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Funcionário</th>
-                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Hora de Entrada</th>
-                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Hora de Saída</th>
-                                                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Deslocamento (Horas)</th>
-                                                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Deslocamento (Partida)</th>
-                                                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Intervalo</th>
-                                                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Total de Horas Trabalhado</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {flatRows.map((row, idx) => (
-                                                <tr key={idx}>
-                                                    <td style={{ padding: '8px 10px' }}>{row.date}</td>
-                                                    <td style={{ padding: '8px 10px' }}>{row.employeeName}</td>
-                                                    <td style={{ padding: '8px 10px' }}>{row.start}</td>
-                                                    <td style={{ padding: '8px 10px' }}>{row.end}</td>
-                                                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>{row.displacementHours > 0 ? formatDecimalHours(row.displacementHours) : '-'}</td>
-                                                    <td style={{ padding: '8px 10px' }}>{row.displacement}</td>
-                                                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>{formatDecimalHours(row.interval)}</td>
-                                                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>{formatDecimalHours(row.hoursWorked)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                    <div className="form-group">
+                                        <label className="form-label">Data de Término (Estimada):</label>
+                                        <input className="form-input" type="date" name="endDate" value={editData.endDate} onChange={handleEditChange} />
+                                    </div>
                                 </div>
-                            );
-                        })()}
+
+                                <h4 style={{ marginTop: '24px' }}>Dados do Responsável</h4>
+                                <div className="job-detail-edit-form-grid">
+                                    <div className="form-group">
+                                        <label className="form-label">Nome do Responsável:*</label>
+                                        <input className="form-input" type="text" name="responsibleName" value={editData.responsibleName} onChange={handleEditChange} required />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Telefone do Responsável:*</label>
+                                        <input className="form-input" type="text" name="responsiblePhone" value={editData.responsiblePhone} onChange={handleEditChange} required />
+                                    </div>
+
+                                    <div className="form-group full-width">
+                                        <label className="form-label">E-mail do Responsável (Opcional):</label>
+                                        <input className="form-input" type="email" name="responsibleEmail" value={editData.responsibleEmail} onChange={handleEditChange} />
+                                    </div>
+                                </div>
+
+                                <div className="form-actions">
+                                    <button className="btn btn-primary" type="submit">Salvar Alterações</button>
+                                    <button className="btn btn-secondary" type="button" onClick={() => setIsEditing(false)}>Cancelar</button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="card-surface">
+                                <h3>Informações Gerais</h3>
+                                <ul className="detail-list">
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            <span className="detail-label">Contratante</span>
+                                        </div>
+                                        <div className="detail-value">{job.clientName || 'Não informado'}</div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            <span className="detail-label">Endereço</span>
+                                        </div>
+                                        <div className="detail-value">{job.address}</div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                            <span className="detail-label">Status</span>
+                                        </div>
+                                        <div className="detail-value">
+                                            <span className={`status-badge ${job.status.toLowerCase()}`}>
+                                                {job.status === 'PENDING' ? 'A fazer' : 
+                                                 job.status === 'IN_PROGRESS' ? 'Em andamento' : 
+                                                 job.status === 'COMPLETED' ? 'Concluído' : 'Cancelado (Deletado)'}
+                                            </span>
+                                        </div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                            <span className="detail-label">Faturamento/Hora</span>
+                                        </div>
+                                        <div className="detail-value">R$ {job.billingRate !== null && job.billingRate !== undefined ? job.billingRate.toFixed(2) : '0.00'}</div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/></svg>
+                                            <span className="detail-label">Orçamento Total</span>
+                                        </div>
+                                        <div className="detail-value">R$ {job.budget !== null && job.budget !== undefined ? job.budget.toFixed(2) : '0.00'}</div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                            <span className="detail-label">Data de Início</span>
+                                        </div>
+                                        <div className="detail-value">{job.startDate}</div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                            <span className="detail-label">Data de Término (Est.)</span>
+                                        </div>
+                                        <div className="detail-value">{job.endDate || 'Não informada'}</div>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* Right Cards: Responsible and Team */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            <div className="card-surface">
+                                <h3>Responsável</h3>
+                                <ul className="detail-list">
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            <span className="detail-label">Nome do Responsável</span>
+                                        </div>
+                                        <div className="detail-value">{job.responsibleName}</div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                            <span className="detail-label">Telefone</span>
+                                        </div>
+                                        <div className="detail-value">{job.responsiblePhone}</div>
+                                    </li>
+                                    <li className="detail-item">
+                                        <div className="detail-label-row">
+                                            <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                            <span className="detail-label">E-mail</span>
+                                        </div>
+                                        <div className="detail-value">{job.responsibleEmail || 'Não informado'}</div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="card-surface">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px', marginBottom: '16px' }}>
+                                    <h3 style={{ borderBottom: 'none', paddingBottom: 0, margin: 0 }}>Equipe</h3>
+                                    <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12.5px' }} onClick={() => setIsModalOpen(true)}>
+                                        Gerenciar
+                                    </button>
+                                </div>
+                                {job.assignedTeam && job.assignedTeam.length > 0 ? (
+                                    <ul className="team-list">
+                                        {job.assignedTeam.map(employee => {
+                                            const initials = employee.name ? employee.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'EE';
+                                            return (
+                                                <li className="team-member-item" key={employee.id}>
+                                                    <span className="team-member-avatar">{initials}</span>
+                                                    <span>{employee.name}</span>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                ) : (
+                                    <p className="empty-team-text">Nenhum funcionário designado para este trabalho ainda.</p>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    <hr style={{ margin: '20px 0' }} />
+                    <h3 className="timesheet-section-title">Relatório de Presença e Horas Diárias</h3>
+                    <div className="timesheet-filters">
+                        <div className="filter-group">
+                            <label className="filter-label">Data de Início:</label>
+                            <input 
+                                className="filter-input"
+                                type="date" 
+                                value={timesheetStart} 
+                                onChange={(e) => setTimesheetStart(e.target.value)} 
+                            />
+                        </div>
+                        <div className="filter-group">
+                            <label className="filter-label">Data de Término:</label>
+                            <input 
+                                className="filter-input"
+                                type="date" 
+                                value={timesheetEnd} 
+                                onChange={(e) => setTimesheetEnd(e.target.value)} 
+                            />
+                        </div>
+                        <button 
+                            className="btn btn-primary"
+                            onClick={() => fetchTimesheet(timesheetStart, timesheetEnd)}
+                            disabled={loadingTimesheet}
+                        >
+                            Filtrar
+                        </button>
+                        <button 
+                            className="btn btn-secondary"
+                            onClick={() => {
+                                setTimesheetStart('');
+                                setTimesheetEnd('');
+                                fetchTimesheet('', '');
+                            }}
+                            disabled={loadingTimesheet}
+                        >
+                            Limpar
+                        </button>
+                    </div>
+
+                    {timesheetError && <p className="timesheet-error">{timesheetError}</p>}
+                    
+                    {loadingTimesheet ? (
+                        <p style={{ textAlign: 'left', color: '#64748b' }}>Carregando dados do relatório...</p>
+                    ) : (() => {
+                        const flatRows = [];
+                        if (timesheetData && timesheetData.employeeTimesheets) {
+                            timesheetData.employeeTimesheets.forEach(empSheet => {
+                                if (empSheet.dailyHours) {
+                                    empSheet.dailyHours.forEach(day => {
+                                        flatRows.push({
+                                            date: day.date,
+                                            employeeName: empSheet.employeeName,
+                                            employeeId: empSheet.employeeId,
+                                            start: day.start ? day.start.substring(0, 5) : '-',
+                                            end: day.end ? day.end.substring(0, 5) : '-',
+                                            hoursWorked: day.hoursWorked,
+                                            displacement: day.displacement || '-',
+                                            displacementHours: day.displacementHours || 0,
+                                            interval: day.interval
+                                        });
+                                    });
+                                }
+                            });
+                        }
+
+                        if (flatRows.length === 0) {
+                            return <p style={{ margin: 0, color: '#64748b', textAlign: 'left', fontStyle: 'italic' }}>Não há registros de ponto para este trabalho no período selecionado.</p>;
+                        }
+
+                        flatRows.sort((a, b) => {
+                            const dateCompare = b.date.localeCompare(a.date);
+                            if (dateCompare !== 0) return dateCompare;
+                            return a.employeeName.localeCompare(b.employeeName);
+                        });
+
+                        return (
+                            <div className="table-wrapper">
+                                <table className="timesheet-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Funcionário</th>
+                                            <th>Entrada</th>
+                                            <th>Saída</th>
+                                            <th className="text-right">Deslocamento (h)</th>
+                                            <th>Deslocamento (Partida)</th>
+                                            <th className="text-right">Intervalo (h)</th>
+                                            <th className="text-right">Total Trabalhado (h)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {flatRows.map((row, idx) => (
+                                            <tr key={idx}>
+                                                <td>{row.date}</td>
+                                                <td style={{ fontWeight: 600 }}>{row.employeeName}</td>
+                                                <td>{row.start}</td>
+                                                <td>{row.end}</td>
+                                                <td className="text-right">{row.displacementHours > 0 ? formatDecimalHours(row.displacementHours) : '-'}</td>
+                                                <td>{row.displacement}</td>
+                                                <td className="text-right">{formatDecimalHours(row.interval)}</td>
+                                                <td className="text-right" style={{ fontWeight: 600, color: '#0a52c6' }}>{formatDecimalHours(row.hoursWorked)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        );
+                    })()}
+
                     {job.status === 'PENDING' && !isEditing && (
-                        <div>
-                            <h4>Ação Perigosa</h4>
-                            <button onClick={() => setIsDeleteModalOpen(true)} style={{ background:'red', color:'white'}}> Deletar Trabalho</button>
+                        <div className="danger-card">
+                            <h4 className="danger-title">Zona de Ação Perigosa</h4>
+                            <p className="danger-desc">
+                                Esta ação irá deletar o trabalho permanentemente. Esta operação só é permitida enquanto o trabalho estiver com status "A fazer".
+                            </p>
+                            <button className="btn btn-danger" onClick={() => setIsDeleteModalOpen(true)}>
+                                Deletar Trabalho
+                            </button>
                         </div>
                     )}
                 </div>
@@ -390,38 +495,30 @@ function JobDetailPage(){
 
             {/* Modal de exclusão segura */}
             {isDeleteModalOpen && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex',
-                    justifyContent: 'center', alignItems: 'center', zIndex: 1000
-                }}>
-                    <div style={{
-                        backgroundColor: '#fff', color: '#333', padding: '25px',
-                        borderRadius: '8px', width: '450px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                        border: '1px solid #ccc'
-                    }}>
-                        <h3 style={{ marginTop: 0, color: '#c0392b' }}>Confirmar Exclusão do Trabalho</h3>
-                        <p>Esta ação é permanente e não poderá ser desfeita. Para prosseguir, digite exatamente o endereço do trabalho abaixo para confirmar:</p>
-                        <p style={{ fontStyle: 'italic', background: '#f5f5f5', padding: '10px', borderRadius: '4px', borderLeft: '4px solid #c0392b', wordBreak: 'break-all' }}>
+                <div className="modal-backdrop">
+                    <div className="modal-card">
+                        <h3 className="modal-title">Confirmar Exclusão</h3>
+                        <p className="modal-desc">Esta ação é permanente. Para prosseguir, digite exatamente o endereço do trabalho abaixo:</p>
+                        <div className="modal-highlight-box">
                             {job.address}
-                        </p>
+                        </div>
                         <input 
                             type="text" 
+                            className="modal-confirm-input"
                             value={confirmAddressInput} 
                             onChange={(e) => setConfirmAddressInput(e.target.value)} 
-                            style={{ width: '100%', padding: '10px', marginBottom: '20px', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '4px' }}
                             placeholder="Digite o endereço exato do trabalho"
                         />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                            <button onClick={() => { setIsDeleteModalOpen(false); setConfirmAddressInput(''); }} style={{ background: '#7f8c8d', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
+                        <div className="modal-actions">
+                            <button className="btn btn-secondary" onClick={() => { setIsDeleteModalOpen(false); setConfirmAddressInput(''); }}>
                                 Cancelar
                             </button>
                             <button 
+                                className="btn btn-danger"
                                 onClick={handleConfirmDelete} 
                                 disabled={confirmAddressInput !== job.address}
                                 style={{ 
-                                    background: confirmAddressInput === job.address ? '#d9534f' : '#ccc', 
-                                    color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', 
+                                    opacity: confirmAddressInput === job.address ? 1 : 0.5,
                                     cursor: confirmAddressInput === job.address ? 'pointer' : 'not-allowed'
                                 }}
                             >
