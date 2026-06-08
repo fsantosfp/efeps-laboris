@@ -28,26 +28,61 @@ const HistoryScreen = () => {
             const startISO = new Date(startDate + "T00:00:00.000Z").toISOString();
             const endISO = new Date(endDate + "T23:59:59.999Z").toISOString();
 
-            const response = await api.get(`/time-entries/me?start=${startISO}&end=${endISO}`);
-            const entries = response.data;
+            const [entriesRes, displacementsRes] = await Promise.all([
+                api.get(`/time-entries/me?start=${startISO}&end=${endISO}`),
+                api.get(`/displacements/me?start=${startISO}&end=${endISO}`).catch(err => {
+                    console.error("Erro ao buscar deslocamentos:", err);
+                    return { data: [] };
+                })
+            ]);
+            const entries = entriesRes.data;
+            const displacements = displacementsRes.data;
 
-            const groupedByDate = entries.reduce((acc, entry) => {
-                const date = new Date(entry.timestamp).toISOString().split('T')[0];
+            const mappedEntries = entries.map(e => ({
+                id: e.id,
+                entryType: e.entryType,
+                timestamp: e.timestamp,
+                jobAddress: e.jobAddress || ''
+            }));
+
+            const mappedDisplacements = displacements.map(d => ({
+                id: d.id,
+                entryType: 'DESLOCAMENTO',
+                timestamp: d.startTimestamp,
+                endTimestamp: d.endTimestamp,
+                address: d.startAddress
+            }));
+
+            const combinedList = [...mappedEntries, ...mappedDisplacements];
+
+            const groupedByDate = combinedList.reduce((acc, item) => {
+                const date = new Date(item.timestamp).toISOString().split('T')[0];
                 if(!acc[date]){
                     acc[date] = []
                 }
-                acc[date].push(entry);
+                acc[date].push(item);
                 return acc;
             }, {});
 
-            const formattedSections = Object.keys(groupedByDate).map(date => ({
-                title: new Date(date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}),
-                data: groupedByDate[date]
-            })).sort((a, b) => b.title.localeCompare(a.title));
+            const formattedSections = Object.keys(groupedByDate).map(date => {
+                const sortedDayData = groupedByDate[date].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                return {
+                    title: new Date(date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}),
+                    data: sortedDayData
+                };
+            }).sort((a, b) => b.title.localeCompare(a.title));
 
             setSections(formattedSections);
 
-            const total = entries.length > 0 ? calculateWorkedHours(entries) : 0;
+            let total = entries.length > 0 ? calculateWorkedHours(entries) : 0;
+            let displacementTotalHours = 0;
+            displacements.forEach(d => {
+                if (d.endTimestamp) {
+                    const durationMs = new Date(d.endTimestamp) - new Date(d.startTimestamp);
+                    displacementTotalHours += durationMs / 3600000;
+                }
+            });
+            total += displacementTotalHours;
             setTotalHours(total);
 
         } catch (error) {
@@ -111,8 +146,26 @@ const HistoryScreen = () => {
                         keyExtractor={(item) => item.id}
                         renderItem={({item}) => (
                             <View style={style.entryItem}>
-                                <Text style={ style.entryType }> {item.entryType === 'IN' ? 'Entrada' : 'Saída'} </Text>
-                                <Text style={ style.entryTime}> {formatTime(item.timestamp)} </Text>
+                                {item.entryType === 'DESLOCAMENTO' ? (
+                                    <View style={{ flex: 1 }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Text style={[style.entryType, { color: '#e67e22', fontWeight: 'bold' }]}>🚀 Translado (Deslocamento)</Text>
+                                            <Text style={style.entryTime}>
+                                                {formatTime(item.timestamp)} - {item.endTimestamp ? formatTime(item.endTimestamp) : 'Em andamento'}
+                                            </Text>
+                                        </View>
+                                        {item.address ? (
+                                            <Text style={{ fontSize: 12, color: 'gray', marginTop: 4 }}>
+                                                Partida: {item.address}
+                                            </Text>
+                                        ) : null}
+                                    </View>
+                                ) : (
+                                    <>
+                                        <Text style={ style.entryType }> {item.entryType === 'IN' ? 'Entrada' : 'Saída'} </Text>
+                                        <Text style={ style.entryTime}> {formatTime(item.timestamp)} </Text>
+                                    </>
+                                )}
                             </View>
                         )}
                         renderSectionHeader={({ section: {title} }) => (

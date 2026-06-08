@@ -9,16 +9,17 @@
 ---
 
 ## 🎯 Tarefa Atual
-* **Título:** Concluído
-* **Objetivo:** Todas as tarefas de backend e frontend foram implementadas e validadas com sucesso.
+* **Título:** Tarefa 5.4: Validação da Build e Fluxo Mobile (Slice 5)
+* **Objetivo:** Rodar build e validações do app React Native e atestar funcionamento com o emulador.
 
 ---
 
 ## 📂 Escopo dos Arquivos
-Nenhum.
+* **Verificar:**
+  - [MainScreen.js](file:///Users/fsantos/Documents/workspace/effies-laboris/mobile/src/screens/MainScreen.js)
 
 ---
 
 ## 🛡️ Diretrizes de Qualidade Mandatórias
-1. **Compilação Limpa:** Certificar que o backend compile e teste com sucesso e que a build do frontend ocorra sem erros.
-2. **Conventional Commit:** Tudo foi comitado e empurrado na branch correspondente.
+1. **Build Sucesso:** Assegurar que o aplicativo móvel React Native compile e rode perfeitamente.
+2. **Conventional Commit:** Commitar no formato `feat(mobile): validate mobile build` antes de prosseguir.

@@ -4,10 +4,13 @@ import br.com.effies.laboris.backend.domain.entity.Job;
 import br.com.effies.laboris.backend.domain.entity.TimeEntry;
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
+import br.com.effies.laboris.backend.domain.entity.Displacement;
 import br.com.effies.laboris.backend.domain.helper.TimeEntryCalculationHelper;
 import br.com.effies.laboris.backend.domain.model.DailyShift;
+import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
+import java.time.Duration;
 import br.com.effies.laboris.backend.presentation.dto.response.JobCostResponseDto;
 import br.com.effies.laboris.backend.presentation.dto.response.JobTimesheetResponseDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,10 +37,12 @@ public class ReportService {
 
     private final JobRepository jobRepository;
     private final TimeEntryRepository timeEntryRepository;
+    private final DisplacementRepository displacementRepository;
 
-    public ReportService(JobRepository jobRepository, TimeEntryRepository timeEntryRepository){
+    public ReportService(JobRepository jobRepository, TimeEntryRepository timeEntryRepository, DisplacementRepository displacementRepository){
         this.jobRepository = jobRepository;
         this.timeEntryRepository = timeEntryRepository;
+        this.displacementRepository = displacementRepository;
     }
 
     public JobCostResponseDto calculateJobCostReport(User manager, UUID jobId, Instant start, Instant end){
@@ -46,8 +51,9 @@ public class ReportService {
         job.ensureBelongsTo(manager);
 
         List<TimeEntry> entries = timeEntryRepository.findAllByJobIdAndPeriod(jobId, start, end);
+        List<Displacement> displacements = displacementRepository.findAllByDestinationJobIdAndPeriod(jobId, start, end);
 
-        List<DailyShift> allShifts = processEntriesIntoShifts(entries);
+        List<DailyShift> allShifts = processEntriesIntoShifts(entries, displacements);
 
         Map<String, List<DailyShift>> shiftsByGroup = allShifts.stream()
             .collect(Collectors.groupingBy(shift ->
@@ -103,11 +109,32 @@ public class ReportService {
             .build();
     }
 
-    private List<DailyShift> processEntriesIntoShifts(List<TimeEntry> allEntries){
-
+    private List<DailyShift> processEntriesIntoShifts(List<TimeEntry> allEntries, List<Displacement> displacements){
         Map<User, Map<LocalDate, List<TimeEntry>>> entriesByUserAndDay = groupEntriesByUserAndDay(allEntries);
+
+        Map<User, Map<LocalDate, List<Displacement>>> displacementsByUserAndDay = displacements.stream()
+            .collect(Collectors.groupingBy(
+                Displacement::getUser,
+                Collectors.groupingBy(d -> d.getStartTimestamp()
+                    .atZone(ZoneOffset.UTC)
+                    .toLocalDate()
+                )
+            ));
+
         return entriesByUserAndDay.entrySet().stream()
-            .flatMap(this::processEmployeeDailyEntries)
+            .flatMap(userEntry -> {
+                User employee = userEntry.getKey();
+                Map<LocalDate, List<TimeEntry>> dailyEntries = userEntry.getValue();
+                Map<LocalDate, List<Displacement>> userDailyDisplacements = displacementsByUserAndDay.getOrDefault(employee, Map.of());
+
+                return dailyEntries.entrySet().stream()
+                    .flatMap(dailyEntry -> {
+                        LocalDate date = dailyEntry.getKey();
+                        List<TimeEntry> dayEntries = dailyEntry.getValue();
+                        List<Displacement> dayDisplacements = userDailyDisplacements.getOrDefault(date, List.of());
+                        return createShiftFromDailyEntries(employee, date, dayEntries, dayDisplacements);
+                    });
+            })
             .collect(Collectors.toList());
     }
 
@@ -122,18 +149,7 @@ public class ReportService {
             ));
     }
 
-    private Stream<DailyShift> processEmployeeDailyEntries(Map.Entry<User, Map<LocalDate, List<TimeEntry>>> userEntry){
-        User employee = userEntry.getKey();
-        Map<LocalDate, List<TimeEntry>> dailyEntries = userEntry.getValue();
-
-        return dailyEntries.entrySet().stream()
-            .flatMap(dailyEntry ->
-                createShiftFromDailyEntries(employee, dailyEntry.getKey(), dailyEntry.getValue())
-            );
-
-    }
-
-    private Stream<DailyShift> createShiftFromDailyEntries(User employee, LocalDate date, List<TimeEntry> dailyEntries){
+    private Stream<DailyShift> createShiftFromDailyEntries(User employee, LocalDate date, List<TimeEntry> dailyEntries, List<Displacement> dayDisplacements){
         Optional<TimeEntry> firstIn = dailyEntries.stream()
             .filter(entry -> entry.getEntryType() == TimeEntryType.IN)
             .min(Comparator.comparing(TimeEntry::getEntryTimestamp));
@@ -155,6 +171,16 @@ public class ReportService {
 
                 BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dailyEntries);
 
+                BigDecimal displacementHours = BigDecimal.ZERO;
+                for (Displacement d : dayDisplacements) {
+                    if (d.getEndTimestamp() != null) {
+                        long seconds = Duration.between(d.getStartTimestamp(), d.getEndTimestamp()).getSeconds();
+                        displacementHours = displacementHours.add(BigDecimal.valueOf(seconds / 3600.0));
+                    }
+                }
+                displacementHours = displacementHours.setScale(2, RoundingMode.HALF_UP);
+                hoursWorked = hoursWorked.add(displacementHours);
+
                 DailyShift shift = new DailyShift(date, startTime, endTime, hoursWorked, employee);
 
                 return Stream.of(shift);
@@ -175,6 +201,20 @@ public class ReportService {
             entries = timeEntryRepository.findAllByJobIdOrderByEntryTimestampAsc(jobId);
         }
 
+        Instant periodStart = start;
+        Instant periodEnd = end;
+        if (periodStart == null || periodEnd == null) {
+            Optional<Instant> minTime = entries.stream().map(TimeEntry::getEntryTimestamp).min(Comparator.naturalOrder());
+            Optional<Instant> maxTime = entries.stream().map(TimeEntry::getEntryTimestamp).max(Comparator.naturalOrder());
+            if (minTime.isPresent() && maxTime.isPresent()) {
+                periodStart = minTime.get().atZone(ZoneOffset.UTC).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant();
+                periodEnd = maxTime.get().atZone(ZoneOffset.UTC).toLocalDate().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+            } else {
+                periodStart = Instant.now().minus(30, java.time.temporal.ChronoUnit.DAYS);
+                periodEnd = Instant.now();
+            }
+        }
+
         Map<User, List<TimeEntry>> entriesByUser = entries.stream()
             .collect(Collectors.groupingBy(TimeEntry::getEmployee));
 
@@ -183,6 +223,9 @@ public class ReportService {
         for (Map.Entry<User, List<TimeEntry>> userEntry : entriesByUser.entrySet()) {
             User employee = userEntry.getKey();
             List<TimeEntry> userEntries = userEntry.getValue();
+
+            List<TimeEntry> allEmployeeEntries = timeEntryRepository.findByEmployee_IdAndEntryTimestampBetweenOrderByEntryTimestampAsc(employee.getId(), periodStart, periodEnd);
+            List<Displacement> userDisplacements = displacementRepository.findAllByUserIdAndDestinationJobIdAndPeriod(employee.getId(), jobId, periodStart, periodEnd);
 
             Map<LocalDate, List<TimeEntry>> entriesByDay = userEntries.stream()
                 .collect(Collectors.groupingBy(entry -> entry.getEntryTimestamp()
@@ -217,12 +260,37 @@ public class ReportService {
                     }
                 }
 
+                List<TimeEntry> dayAllEntries = allEmployeeEntries.stream()
+                    .filter(entry -> entry.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate().equals(date))
+                    .toList();
+
+                List<Displacement> dayDisplacements = userDisplacements.stream()
+                    .filter(d -> d.getStartTimestamp().atZone(ZoneOffset.UTC).toLocalDate().equals(date))
+                    .toList();
+
                 BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dayEntries);
+
+                BigDecimal displacementHours = BigDecimal.ZERO;
+                for (Displacement d : dayDisplacements) {
+                    if (d.getEndTimestamp() != null) {
+                        long seconds = Duration.between(d.getStartTimestamp(), d.getEndTimestamp()).getSeconds();
+                        displacementHours = displacementHours.add(BigDecimal.valueOf(seconds / 3600.0));
+                    }
+                }
+                displacementHours = displacementHours.setScale(2, RoundingMode.HALF_UP);
+                hoursWorked = hoursWorked.add(displacementHours);
+
+                BigDecimal interval = TimeEntryCalculationHelper.calculateIntervalHoursForJob(dayAllEntries, jobId);
+                String displacementAddress = dayDisplacements.isEmpty() ? null : dayDisplacements.get(0).getStartAddress();
+
                 dailyHours.add(JobTimesheetResponseDto.DailyHoursDto.builder()
                     .date(date)
                     .start(startLocalTime)
                     .end(endLocalTime)
                     .hoursWorked(hoursWorked)
+                    .displacement(displacementAddress)
+                    .interval(interval)
+                    .displacementHours(displacementHours)
                     .build());
             }
 

@@ -8,6 +8,7 @@ import br.com.effies.laboris.backend.domain.entity.TimeEntry;
 import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.JobStatus;
 import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
+import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobAssignmentRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
@@ -42,6 +43,8 @@ class TimeEntryServiceTest {
     private JobRepository jobRepository;
     @Mock
     private JobAssignmentRepository jobAssignmentRepository;
+    @Mock
+    private DisplacementRepository displacementRepository;
     @InjectMocks
     private TimeEntryService timeEntryService;
 
@@ -74,6 +77,7 @@ class TimeEntryServiceTest {
         request.setEntryType(TimeEntryType.IN);
         when(jobAssignmentRepository.findById(any(JobAssignmentId.class))).thenReturn(Optional.of(new JobAssignment()));
         when(jobRepository.findById(any(UUID.class))).thenReturn(Optional.of(job));
+        when(displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId())).thenReturn(Optional.empty());
         when(timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId())).thenReturn(Optional.empty());
         when(timeEntryRepository.save(any(TimeEntry.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -111,6 +115,20 @@ class TimeEntryServiceTest {
             // Act & Assert
             IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> timeEntryService.create(request, employee));
             assertThat(thrown.getMessage()).isEqualTo("Só é possível bater o ponto em trabalhos com status 'IN_PROGRESS'.");
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção se houver deslocamento ativo ao bater ponto de entrada")
+        void create_WhenDisplacementIsActiveOnClockIn_ShouldThrowIllegalStateException() {
+            // Arrange
+            request.setEntryType(TimeEntryType.IN);
+            when(jobAssignmentRepository.findById(any(JobAssignmentId.class))).thenReturn(Optional.of(new JobAssignment()));
+            when(jobRepository.findById(any(UUID.class))).thenReturn(Optional.of(job));
+            when(displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId())).thenReturn(Optional.of(new br.com.effies.laboris.backend.domain.entity.Displacement()));
+
+            // Act & Assert
+            IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> timeEntryService.create(request, employee));
+            assertThat(thrown.getMessage()).contains("Não é possível bater ponto de entrada enquanto houver um deslocamento ativo em andamento");
         }
 
         @Test
@@ -157,6 +175,7 @@ class TimeEntryServiceTest {
             lastEntry.setEntryTimestamp(Instant.now().minus(1, ChronoUnit.DAYS));
             when(jobAssignmentRepository.findById(any(JobAssignmentId.class))).thenReturn(Optional.of(new JobAssignment()));
             when(jobRepository.findById(any(UUID.class))).thenReturn(Optional.of(job));
+            when(displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId())).thenReturn(Optional.empty());
             when(timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId())).thenReturn(Optional.of(lastEntry));
             request.setEntryType(TimeEntryType.IN);
 

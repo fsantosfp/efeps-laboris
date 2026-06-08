@@ -8,6 +8,7 @@ import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
 import br.com.effies.laboris.backend.domain.entity.enums.UserRole;
 import br.com.effies.laboris.backend.domain.entity.enums.UserStatus;
+import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.SalaryHistoryRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.domain.repository.UserRepository;
@@ -50,6 +51,9 @@ public class PayrollServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private DisplacementRepository displacementRepository;
 
     @InjectMocks
     private PayrollService payrollService;

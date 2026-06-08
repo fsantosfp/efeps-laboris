@@ -31,5 +31,8 @@ public class JobTimesheetResponseDto {
         private LocalTime start;
         private LocalTime end;
         private BigDecimal hoursWorked;
+        private String displacement;
+        private BigDecimal interval;
+        private BigDecimal displacementHours;
     }
 }

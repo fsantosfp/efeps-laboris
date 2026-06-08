@@ -6,6 +6,7 @@ import br.com.effies.laboris.backend.domain.entity.User;
 import br.com.effies.laboris.backend.domain.entity.enums.JobStatus;
 import br.com.effies.laboris.backend.domain.entity.enums.TimeEntryType;
 import br.com.effies.laboris.backend.domain.repository.JobAssignmentRepository;
+import br.com.effies.laboris.backend.domain.repository.DisplacementRepository;
 import br.com.effies.laboris.backend.domain.repository.JobRepository;
 import br.com.effies.laboris.backend.domain.repository.TimeEntryRepository;
 import br.com.effies.laboris.backend.presentation.dto.request.TimeEntryRequestDto;
@@ -23,15 +24,18 @@ public class TimeEntryService {
     private final TimeEntryRepository timeEntryRepository;
     private final JobRepository jobRepository;
     private final JobAssignmentRepository assignmentRepository;
+    private final DisplacementRepository displacementRepository;
 
     public TimeEntryService(
         TimeEntryRepository entryRepository,
         JobRepository jobRepository,
-        JobAssignmentRepository assignmentRepository
+        JobAssignmentRepository assignmentRepository,
+        DisplacementRepository displacementRepository
     ){
         this.timeEntryRepository = entryRepository;
         this.jobRepository = jobRepository;
         this.assignmentRepository = assignmentRepository;
+        this.displacementRepository = displacementRepository;
     }
 
     public TimeEntry create (TimeEntryRequestDto request, User employee) {
@@ -48,6 +52,12 @@ public class TimeEntryService {
 
         if(job.getStatus() != JobStatus.IN_PROGRESS){
             throw new IllegalStateException("Só é possível bater o ponto em trabalhos com status 'IN_PROGRESS'.");
+        }
+
+        if (request.getEntryType() == TimeEntryType.IN) {
+            if (displacementRepository.findByUser_IdAndEndTimestampIsNull(employee.getId()).isPresent()) {
+                throw new IllegalStateException("Não é possível bater ponto de entrada enquanto houver um deslocamento ativo em andamento. Finalize o deslocamento primeiro.");
+            }
         }
 
         Optional<TimeEntry> lastTimeEntry = timeEntryRepository.findTopByEmployee_IdOrderByEntryTimestampDesc(employee.getId());
