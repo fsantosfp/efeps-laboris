@@ -223,7 +223,7 @@ function ReportsPage() {
                 </button>
             </div>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="alert alert-error">{error}</div>}
 
             {activeTab === 'payroll' && (
                 /* Tab 1: Payroll */
@@ -252,7 +252,7 @@ function ReportsPage() {
                                 />
                             </div>
                         </div>
-                        <button type="submit" className="btn-generate" disabled={loading}>
+                        <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginTop: '10px' }} disabled={loading}>
                             {loading ? 'Gerando...' : 'Gerar Relatório'}
                         </button>
                     </form>
@@ -265,7 +265,7 @@ function ReportsPage() {
                     )}
 
                     {payrollData && !loading && (
-                        <div className="job-report-block">
+                        <div className="job-report-block card-surface">
                             <h3 className="job-report-title">Resumo do Período</h3>
                             <div className="summary-container">
                                 <div className="summary-box">
@@ -363,7 +363,7 @@ function ReportsPage() {
                                 />
                             </div>
                         </div>
-                        <button type="submit" className="btn-generate" disabled={loading || selectedJobIds.length === 0}>
+                        <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginTop: '10px' }} disabled={loading || selectedJobIds.length === 0}>
                             {loading ? 'Gerando...' : 'Gerar Relatório'}
                         </button>
                     </form>
@@ -378,7 +378,7 @@ function ReportsPage() {
                     {jobsCostsData.length > 0 && !loading && (
                         <div className="reports-results-stack">
                             {jobsCostsData.map((report, idx) => (
-                                <div key={report.jobInfo.jobId || idx} className="job-report-block">
+                                <div key={report.jobInfo.jobId || idx} className="job-report-block card-surface">
                                     <h3 className="job-report-title">
                                         Relatório de Custos: {report.jobInfo.clientName || 'Sem Cliente'}
                                     </h3>
@@ -405,7 +405,7 @@ function ReportsPage() {
                                     </div>
 
                                     {report.dailyBreakdown.length === 0 ? (
-                                        <div className="info-message">
+                                        <div className="alert alert-warning">
                                             Não há registros de ponto para este trabalho no período selecionado.
                                         </div>
                                     ) : (
@@ -502,7 +502,7 @@ function ReportsPage() {
                                 />
                             </div>
                         </div>
-                        <button type="submit" className="btn-generate" disabled={loading || selectedEmployeeIds.length === 0}>
+                        <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginTop: '10px' }} disabled={loading || selectedEmployeeIds.length === 0}>
                             {loading ? 'Gerando...' : 'Gerar Relatório'}
                         </button>
                     </form>
@@ -517,13 +517,13 @@ function ReportsPage() {
                     {journeyData.length > 0 && !loading && (
                         <div className="reports-results-stack">
                             {journeyData.map((employeeReport) => (
-                                <div key={employeeReport.employeeId} className="job-report-block">
+                                <div key={employeeReport.employeeId} className="job-report-block card-surface">
                                     <h3 className="job-report-title">
                                         Linha do Tempo: {employeeReport.employeeName}
                                     </h3>
 
                                     {employeeReport.events.length === 0 ? (
-                                        <div className="info-message">
+                                        <div className="alert alert-warning">
                                             Nenhuma atividade registrada (Trabalho, Intervalo ou Deslocamento) no período.
                                         </div>
                                     ) : (

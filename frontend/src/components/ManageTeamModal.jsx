@@ -64,17 +64,17 @@ const ManageTeamModal = ({jobId, currentTeam, onClose, onTeamUpdate}) =>{
     };
 
     return (
-        <div className="manage-team-backdrop" onClick={onClose}>
-            <div className="manage-team-card" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-backdrop" onClick={onClose}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
                 
-                <button className="manage-team-close" onClick={onClose}>&times;</button>
+                <button className="modal-close" onClick={onClose}>&times;</button>
                 
-                <h2 className="manage-team-title">Gerenciar Equipe</h2>
+                <h2 className="modal-title">Gerenciar Equipe</h2>
                 
                 {loading ? (
-                    <div className="manage-team-loading">Carregando funcionários...</div>
+                    <div className="modal-desc">Carregando funcionários...</div>
                 ) : error ? (
-                    <div className="manage-team-error">{error}</div>
+                    <div className="alert alert-error">{error}</div>
                 ) : (
                     <div className="manage-team-list">
                         {allEmployees.map(employee => (
@@ -94,9 +94,9 @@ const ManageTeamModal = ({jobId, currentTeam, onClose, onTeamUpdate}) =>{
                     </div>
                 )}
 
-                <div className="manage-team-actions">
-                    <button className="manage-team-btn manage-team-btn-secondary" onClick={onClose}>Cancelar</button>
-                    <button className="manage-team-btn manage-team-btn-primary" onClick={handleSave}>Salvar</button>
+                <div className="modal-actions">
+                    <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+                    <button className="btn btn-primary" onClick={handleSave}>Salvar</button>
                 </div>
             </div>
         </div>

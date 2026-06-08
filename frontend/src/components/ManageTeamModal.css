@@ -1,82 +1,9 @@
-.manage-team-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: modalFadeIn 0.2s ease-out;
-}
-
-.manage-team-card {
-  background-color: #ffffff;
-  color: #1e293b;
-  padding: 24px;
-  border-radius: 12px;
-  width: 480px;
-  max-width: 90%;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e2e8f0;
-  text-align: left;
-  position: relative;
-  box-sizing: border-box;
-  animation: modalScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-.manage-team-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  border: none;
-  background: transparent;
-  font-size: 20px;
-  color: #64748b;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.15s ease;
-}
-
-.manage-team-close:hover {
-  background-color: #f1f5f9;
-  color: #1e293b;
-}
-
-.manage-team-title {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 12px;
-}
-
-.manage-team-loading,
-.manage-team-error {
-  font-size: 14px;
-  padding: 12px 0;
-  text-align: left;
-}
-
-.manage-team-error {
-  color: #ba1a1a;
-}
+/* ManageTeamModal.css - Custom layout for team selection list */
 
 .manage-team-list {
   max-height: 250px;
   overflow-y: auto;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--border-subtle);
   border-radius: 8px;
   padding: 8px;
   margin-top: 16px;
@@ -122,8 +49,8 @@
 }
 
 .manage-team-checkbox:checked {
-  background-color: #0a52c6;
-  border-color: #0a52c6;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .manage-team-checkbox:checked::after {
@@ -139,60 +66,15 @@
 }
 
 .manage-team-checkbox:focus {
-  border-color: #0a52c6;
+  border-color: var(--color-primary);
 }
 
 .manage-team-label {
   font-size: 14.5px;
   font-weight: 500;
-  color: #1e293b;
+  color: var(--text-main);
   cursor: pointer;
   flex-grow: 1;
-}
-
-.manage-team-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.manage-team-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 18px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
-  text-decoration: none;
-  box-sizing: border-box;
-}
-
-.manage-team-btn:active {
-  transform: scale(0.98);
-}
-
-.manage-team-btn-primary {
-  background-color: #0a52c6;
-  color: #ffffff;
-  border: none;
-}
-
-.manage-team-btn-primary:hover {
-  background-color: #0843a3;
-}
-
-.manage-team-btn-secondary {
-  background-color: #dae2fd;
-  color: #003c98;
-  border: none;
-}
-
-.manage-team-btn-secondary:hover {
-  background-color: #cbd5fc;
 }
 
 /* Scrollbar customizations */
@@ -211,14 +93,4 @@
 
 .manage-team-list::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes modalScaleUp {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
 }

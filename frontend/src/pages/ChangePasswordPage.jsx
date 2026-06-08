@@ -62,18 +62,18 @@ function ChangePasswordPage() {
             <div className="glow-orb orb-1"></div>
             <div className="glow-orb orb-2"></div>
 
-            <div className="glass-card">
+            <div className="glass-card card-surface">
                 <h2>Segurança da Conta</h2>
                 <p className="card-subtitle">Defina uma nova senha definitiva para acessar a plataforma.</p>
 
-                {error && <div className="alert-message alert-error">{error}</div>}
+                {error && <div className="alert alert-error">{error}</div>}
 
                 {success ? (
-                    <div className="alert-message alert-success">
+                    <div className="alert alert-success">
                         <p style={{ fontWeight: '600', margin: '0 0 10px 0', fontSize: '16px' }}>
                             ✓ Senha atualizada com sucesso!
                         </p>
-                        <p style={{ margin: 0, fontSize: '14px', color: '#d1fae5' }}>
+                        <p style={{ margin: 0, fontSize: '14px' }}>
                             Redirecionando para o login em <span className="pulse-count">{countdown}</span> segundos...
                         </p>
                     </div>
@@ -84,7 +84,7 @@ function ChangePasswordPage() {
                             <div className="input-container">
                                 <input
                                     type="password"
-                                    className="input-field"
+                                    className="form-input"
                                     placeholder="Digite a nova senha segura"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
@@ -99,7 +99,7 @@ function ChangePasswordPage() {
                             <div className="input-container">
                                 <input
                                     type="password"
-                                    className="input-field"
+                                    className="form-input"
                                     placeholder="Repita a nova senha"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -122,7 +122,8 @@ function ChangePasswordPage() {
 
                         <button
                             type="submit"
-                            className="submit-button"
+                            className="btn btn-primary"
+                            style={{ width: '100%' }}
                             disabled={!isValid || loading}
                         >
                             {loading ? (

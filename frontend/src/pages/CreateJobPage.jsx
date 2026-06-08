@@ -83,20 +83,20 @@ function CreateJobPage(){
                 <h2 className="job-create-title">Criar Novo Trabalho</h2>
             </header>
 
-            <form onSubmit={handleSubmit} className="job-create-card">
+            <form onSubmit={handleSubmit} className="job-create-card card-surface">
                 <h3>Informações Gerais</h3>
                 <div className="job-create-grid">
-                    <div className="job-create-form-group full-width">
-                        <label className="job-create-label">Endereço:*</label>
+                    <div className="form-group full-width">
+                        <label className="form-label">Endereço:*</label>
                         <PlacesAutocompleteInput onPlaceSelect={handleAddressSelect} />
                     </div>
 
-                    <div className="job-create-form-group">
-                        <label className="job-create-label">Nome do Contratante:*</label>
+                    <div className="form-group">
+                        <label className="form-label">Nome do Contratante:*</label>
                         <input 
                             type="text" 
                             name="clientName" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.clientName} 
                             onChange={handleChange} 
                             required 
@@ -104,12 +104,12 @@ function CreateJobPage(){
                         />
                     </div>
 
-                    <div className="job-create-form-group">
-                        <label className="job-create-label">Valor/Hora (Faturamento):*</label>
+                    <div className="form-group">
+                        <label className="form-label">Valor/Hora (Faturamento):*</label>
                         <input 
                             type="number" 
                             name="billingRate" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.billingRate} 
                             onChange={handleChange} 
                             required 
@@ -118,12 +118,12 @@ function CreateJobPage(){
                         />
                     </div>
 
-                    <div className="job-create-form-group">
-                        <label className="job-create-label">Orçamento:*</label>
+                    <div className="form-group">
+                        <label className="form-label">Orçamento:*</label>
                         <input 
                             type="number" 
                             name="budget" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.budget} 
                             onChange={handleChange} 
                             required 
@@ -132,24 +132,24 @@ function CreateJobPage(){
                         />
                     </div>
 
-                    <div className="job-create-form-group">
-                        <label className="job-create-label">Data de Início:*</label>
+                    <div className="form-group">
+                        <label className="form-label">Data de Início:*</label>
                         <input 
                             type="date" 
                             name="startDate" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.startDate} 
                             onChange={handleChange} 
                             required 
                         />
                     </div>
 
-                    <div className="job-create-form-group full-width">
-                        <label className="job-create-label">Data de Término (Opcional):</label>
+                    <div className="form-group full-width">
+                        <label className="form-label">Data de Término (Opcional):</label>
                         <input 
                             type="date" 
                             name="endDate" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.endDate} 
                             onChange={handleChange} 
                         />
@@ -158,12 +158,12 @@ function CreateJobPage(){
 
                 <h3 style={{ marginTop: '32px' }}>Dados do Responsável</h3>
                 <div className="job-create-grid">
-                    <div className="job-create-form-group">
-                        <label className="job-create-label">Nome do Responsável:*</label>
+                    <div className="form-group">
+                        <label className="form-label">Nome do Responsável:*</label>
                         <input 
                             type="text" 
                             name="responsibleName" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.responsibleName} 
                             onChange={handleChange} 
                             required 
@@ -171,12 +171,12 @@ function CreateJobPage(){
                         />
                     </div>
 
-                    <div className="job-create-form-group">
-                        <label className="job-create-label">Telefone do Responsável:*</label>
+                    <div className="form-group">
+                        <label className="form-label">Telefone do Responsável:*</label>
                         <input 
                             type="text" 
                             name="responsiblePhone" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.responsiblePhone} 
                             onChange={handleChange} 
                             required 
@@ -184,12 +184,12 @@ function CreateJobPage(){
                         />
                     </div>
 
-                    <div className="job-create-form-group full-width">
-                        <label className="job-create-label">E-mail do Responsável (Opcional):</label>
+                    <div className="form-group full-width">
+                        <label className="form-label">E-mail do Responsável (Opcional):</label>
                         <input 
                             type="email" 
                             name="responsibleEmail" 
-                            className="job-create-input" 
+                            className="form-input" 
                             value={formData.responsibleEmail} 
                             onChange={handleChange} 
                             placeholder="email@exemplo.com"
@@ -197,13 +197,13 @@ function CreateJobPage(){
                     </div>
                 </div>
 
-                {error && <div className="job-create-error">{error}</div>}
+                {error && <div className="alert alert-error">{error}</div>}
 
                 <div className="job-create-actions">
-                    <button type="submit" className="job-create-btn job-create-btn-primary" disabled={isSubmitting}>
+                    <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                         {isSubmitting ? 'Salvando...' : 'Salvar Trabalho'}
                     </button>
-                    <button type="button" className="job-create-btn job-create-btn-secondary" onClick={() => navigate('/dashboard')}>
+                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
                         Cancelar
                     </button>
                 </div>
