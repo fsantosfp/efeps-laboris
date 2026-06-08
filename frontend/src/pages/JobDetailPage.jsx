@@ -184,13 +184,13 @@ function JobDetailPage(){
                     <div className="job-detail-grid">
                         {/* Left Card: Info or Edit Form */}
                         {isEditing ? (
-                            <form className="info-card" onSubmit={handleSaveEdit}>
+                            <form className="job-detail-info-card" onSubmit={handleSaveEdit}>
                                 <h3>Editar Informações do Trabalho</h3>
                                 
-                                <div className="edit-form-grid">
-                                    <div className="form-group">
-                                        <label className="form-label">Status:*</label>
-                                        <select className="form-select" name="status" value={editData.status} onChange={handleEditChange} required>
+                                <div className="job-detail-edit-form-grid">
+                                    <div className="job-detail-form-group">
+                                        <label className="job-detail-form-label">Status:*</label>
+                                        <select className="job-detail-form-select" name="status" value={editData.status} onChange={handleEditChange} required>
                                             <option value="PENDING">A fazer</option>
                                             <option value="IN_PROGRESS">Em Andamento</option>
                                             <option value="COMPLETED">Concluído</option>
@@ -198,52 +198,52 @@ function JobDetailPage(){
                                         </select>
                                     </div>
 
-                                    <div className="form-group">
-                                        <label className="form-label">Valor/Hora (Faturamento):*</label>
-                                        <input className="form-input" type="number" name="billingRate" value={editData.billingRate} onChange={handleEditChange} required step="0.01" />
+                                    <div className="job-detail-form-group">
+                                        <label className="job-detail-form-label">Valor/Hora (Faturamento):*</label>
+                                        <input className="job-detail-form-input" type="number" name="billingRate" value={editData.billingRate} onChange={handleEditChange} required step="0.01" />
                                     </div>
 
-                                    <div className="form-group">
-                                        <label className="form-label">Orçamento:*</label>
-                                        <input className="form-input" type="number" name="budget" value={editData.budget} onChange={handleEditChange} required step="0.01" />
+                                    <div className="job-detail-form-group">
+                                        <label className="job-detail-form-label">Orçamento:*</label>
+                                        <input className="job-detail-form-input" type="number" name="budget" value={editData.budget} onChange={handleEditChange} required step="0.01" />
                                     </div>
 
-                                    <div className="form-group">
-                                        <label className="form-label">Data de Início:*</label>
-                                        <input className="form-input" type="date" name="startDate" value={editData.startDate} onChange={handleEditChange} required />
+                                    <div className="job-detail-form-group">
+                                        <label className="job-detail-form-label">Data de Início:*</label>
+                                        <input className="job-detail-form-input" type="date" name="startDate" value={editData.startDate} onChange={handleEditChange} required />
                                     </div>
 
-                                    <div className="form-group">
-                                        <label className="form-label">Data de Término (Estimada):</label>
-                                        <input className="form-input" type="date" name="endDate" value={editData.endDate} onChange={handleEditChange} />
+                                    <div className="job-detail-form-group">
+                                        <label className="job-detail-form-label">Data de Término (Estimada):</label>
+                                        <input className="job-detail-form-input" type="date" name="endDate" value={editData.endDate} onChange={handleEditChange} />
                                     </div>
                                 </div>
 
                                 <h4 style={{ marginTop: '24px' }}>Dados do Responsável</h4>
-                                <div className="edit-form-grid">
-                                    <div className="form-group">
-                                        <label className="form-label">Nome do Responsável:*</label>
-                                        <input className="form-input" type="text" name="responsibleName" value={editData.responsibleName} onChange={handleEditChange} required />
+                                <div className="job-detail-edit-form-grid">
+                                    <div className="job-detail-form-group">
+                                        <label className="job-detail-form-label">Nome do Responsável:*</label>
+                                        <input className="job-detail-form-input" type="text" name="responsibleName" value={editData.responsibleName} onChange={handleEditChange} required />
                                     </div>
 
-                                    <div className="form-group">
-                                        <label className="form-label">Telefone do Responsável:*</label>
-                                        <input className="form-input" type="text" name="responsiblePhone" value={editData.responsiblePhone} onChange={handleEditChange} required />
+                                    <div className="job-detail-form-group">
+                                        <label className="job-detail-form-label">Telefone do Responsável:*</label>
+                                        <input className="job-detail-form-input" type="text" name="responsiblePhone" value={editData.responsiblePhone} onChange={handleEditChange} required />
                                     </div>
 
-                                    <div className="form-group full-width">
-                                        <label className="form-label">E-mail do Responsável (Opcional):</label>
-                                        <input className="form-input" type="email" name="responsibleEmail" value={editData.responsibleEmail} onChange={handleEditChange} />
+                                    <div className="job-detail-form-group full-width">
+                                        <label className="job-detail-form-label">E-mail do Responsável (Opcional):</label>
+                                        <input className="job-detail-form-input" type="email" name="responsibleEmail" value={editData.responsibleEmail} onChange={handleEditChange} />
                                     </div>
                                 </div>
 
-                                <div className="form-actions">
+                                <div className="job-detail-form-actions">
                                     <button className="job-detail-btn job-detail-btn-primary" type="submit">Salvar Alterações</button>
                                     <button className="job-detail-btn job-detail-btn-secondary" type="button" onClick={() => setIsEditing(false)}>Cancelar</button>
                                 </div>
                             </form>
                         ) : (
-                            <div className="info-card">
+                            <div className="job-detail-info-card">
                                 <h3>Informações Gerais</h3>
                                 <ul className="detail-list">
                                     <li className="detail-item">
@@ -307,7 +307,7 @@ function JobDetailPage(){
 
                         {/* Right Cards: Responsible and Team */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="info-card">
+                            <div className="job-detail-info-card">
                                 <h3>Responsável</h3>
                                 <ul className="detail-list">
                                     <li className="detail-item">
@@ -334,7 +334,7 @@ function JobDetailPage(){
                                 </ul>
                             </div>
 
-                            <div className="info-card">
+                            <div className="job-detail-info-card">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px', marginBottom: '16px' }}>
                                     <h3 style={{ borderBottom: 'none', paddingBottom: 0, margin: 0 }}>Equipe</h3>
                                     <button className="job-detail-btn job-detail-btn-secondary" style={{ padding: '6px 12px', fontSize: '12.5px' }} onClick={() => setIsModalOpen(true)}>

@@ -1,0 +1,211 @@
+.job-create-container {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.job-create-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0a52c6;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  transition: color 0.15s ease;
+}
+
+.job-create-back-link:hover {
+  color: #0843a3;
+  text-decoration: underline;
+}
+
+.job-create-back-link svg {
+  flex-shrink: 0;
+}
+
+.job-create-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.job-create-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+.job-create-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+  margin-bottom: 32px;
+}
+
+.job-create-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.job-create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 8px;
+}
+
+.job-create-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.job-create-form-group.full-width {
+  grid-column: span 2;
+}
+
+.job-create-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.job-create-input,
+.job-create-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  color-scheme: light;
+}
+
+.job-create-input:focus,
+.job-create-select:focus {
+  border-color: #0a52c6;
+  background-color: #ffffff;
+}
+
+/* Custom styling for Google Places Autocomplete Web Component */
+gmp-place-autocomplete {
+  width: 100%;
+}
+
+gmp-place-autocomplete::part(input) {
+  width: 100% !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.25s ease !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+gmp-place-autocomplete::part(input):focus {
+  border-color: #0a52c6 !important;
+  background-color: #ffffff !important;
+}
+
+.job-create-error {
+  color: #ba1a1a;
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.job-create-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: flex-start;
+}
+
+.job-create-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.job-create-btn:active {
+  transform: scale(0.98);
+}
+
+.job-create-btn-primary {
+  background-color: #0a52c6;
+  color: #ffffff;
+  border: none;
+}
+
+.job-create-btn-primary:hover {
+  background-color: #0843a3;
+}
+
+.job-create-btn-secondary {
+  background-color: #dae2fd;
+  color: #003c98;
+  border: none;
+}
+
+.job-create-btn-secondary:hover {
+  background-color: #cbd5fc;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .job-create-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .job-create-form-group.full-width {
+    grid-column: unset;
+  }
+
+  .job-create-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .job-create-actions .job-create-btn {
+    width: 100%;
+  }
+}
