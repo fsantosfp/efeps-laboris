@@ -26,10 +26,18 @@ services:
       - "8080:8080"
     depends_on:
       - postgres-db
+    env_file:
+      - ./backend/.env
     environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      - TOKEN_SECRET=${TOKEN_SECRET}
+      - GOOGLE_MAPS_KEY=${GOOGLE_MAPS_KEY}
+      - RESEND_KEY=${RESEND_KEY}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/laboris_db
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - JAVA_OPTS=-Xms512m -Xmx2g # Alocando memória de forma saudável na JVM
     deploy:
