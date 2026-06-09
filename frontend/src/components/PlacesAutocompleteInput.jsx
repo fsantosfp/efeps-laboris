@@ -1,20 +1,20 @@
 import { importLibrary } from "@googlemaps/js-api-loader";
-import React, {useRef, useEffect} from "react";
+import React, { useRef, useEffect } from "react";
 
 const PlacesAutocompleteInput = ({ onPlaceSelect, value }) => {
 
     const containerRef = useRef(null);
     const autocompleteRef = useRef(null);
 
-    useEffect(()=>{
+    useEffect(() => {
 
-        const initAutocomplete = async ()=>{
-        
-            try{
+        const initAutocomplete = async () => {
+
+            try {
 
                 const { PlaceAutocompleteElement } = await importLibrary('places');
 
-                if(containerRef.current && !autocompleteRef.current){
+                if (containerRef.current && !autocompleteRef.current) {
                     const autocompleteElement = new PlaceAutocompleteElement({
                         requestedLanguage: 'pt-BR',
                         requestedRegion: 'BR',
@@ -23,10 +23,10 @@ const PlacesAutocompleteInput = ({ onPlaceSelect, value }) => {
 
                     containerRef.current.appendChild(autocompleteElement)
 
-                    autocompleteElement.addEventListener('gmp-select', async ({placePrediction}) => {
+                    autocompleteElement.addEventListener('gmp-select', async ({ placePrediction }) => {
                         const place = placePrediction.toPlace();
-                        await place.fetchFields({fields: ['formattedAddress', 'location']})
-                        if(place && place.formattedAddress){
+                        await place.fetchFields({ fields: ['formattedAddress', 'location'] })
+                        if (place && place.formattedAddress) {
                             const lat = place.location ? place.location.lat() : null;
                             const lng = place.location ? place.location.lng() : null;
                             onPlaceSelect(place.formattedAddress, lat, lng)
@@ -35,7 +35,7 @@ const PlacesAutocompleteInput = ({ onPlaceSelect, value }) => {
 
                     autocompleteRef.current = autocompleteElement;
                 }
-            } catch(e){
+            } catch (e) {
                 console.error("Erro ao importar a biblioteca 'places':", e)
             }
         };
@@ -44,8 +44,8 @@ const PlacesAutocompleteInput = ({ onPlaceSelect, value }) => {
 
     }, [onPlaceSelect]);
 
-    useEffect(()=>{
-        if(autocompleteRef.current && autocompleteRef.current.input.value !== value){
+    useEffect(() => {
+        if (autocompleteRef.current && autocompleteRef.current.input.value !== value) {
             autocompleteRef.current.input.value = value || '';
         }
     }, [value]);
