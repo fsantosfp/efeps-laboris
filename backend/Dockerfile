@@ -1,9 +1,16 @@
-FROM openjdk:21-jdk-slim
+# Estágio 1: Compilação (O Docker faz o mvn package)
+FROM maven:3.9.6-eclipse-temurin-11 AS build
 
 WORKDIR /app
 
-COPY target/laboris.jar app.jar
+COPY . .
 
+RUN mvn clean package -DskipTests
+
+# Estágio 2: Execução (Java)
+FROM openjdk:21-jdk-slim
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -2,29 +2,40 @@ version: '3.8'
 
 services:
   postgres-db:
-    image: postgres:15-alpine  # imagem oficial e leve do PostgreSQL 15
+    image: postgres:15-alpine
     container_name: laboris-postgres
     ports:
-      - "5432:5432"  # Mapeia a porta do container para a porta da sua máquina
+      - "5432:5432"
     environment:
-      - POSTGRES_USER=admin          # Usuário do banco de dados
-      - POSTGRES_PASSWORD=admin      # Senha do banco de dados
-      - POSTGRES_DB=laboris_db     # Nome do banco de dados que será criado
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin # Dica: Mude para uma senha forte depois!
+      - POSTGRES_DB=laboris_db
     volumes:
-      - laboris-data:/var/lib/postgresql/data # Garante que os dados persistam se o container for reiniciado
+      - laboris-data:/var/lib/postgresql/data
       - ./docker/db:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2000M
 
-  # backend:
-  #   build: ./backend
-  #   container_name: laboris-backend
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - postgres-db
-  #   environment:
-  #     - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/laboris_db
-  #     - SPRING_DATASOURCE_USERNAME=admin
-  #     - SPRING_DATASOURCE_PASSWORD=admin
+  backend:
+    build: ./backend
+    container_name: laboris-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/laboris_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - JAVA_OPTS=-Xms512m -Xmx2g # Alocando memória de forma saudável na JVM
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2500M
 
 volumes:
-  laboris-data: # Define o volume para persistência de dados
+  laboris-data:
