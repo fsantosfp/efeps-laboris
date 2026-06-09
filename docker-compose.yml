@@ -38,5 +38,16 @@ services:
           cpus: '1.0'
           memory: 2500M
 
+  frontend:
+    build: ./frontend
+    container_name: laboris-frontend
+    ports:
+      - "3000:80" # Mapeia a porta 3000 da VPS para a porta 80 do Nginx interno
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 510M
 volumes:
   laboris-data:
