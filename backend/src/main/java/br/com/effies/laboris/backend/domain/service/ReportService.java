@@ -25,6 +25,7 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
 @Service
 public class ReportService {
 
+    private static final ZoneId NY_ZONE = ZoneId.of("America/New_York");
     private final JobRepository jobRepository;
     private final TimeEntryRepository timeEntryRepository;
     private final DisplacementRepository displacementRepository;
@@ -127,7 +129,7 @@ public class ReportService {
             .collect(Collectors.groupingBy(
                 Displacement::getUser,
                 Collectors.groupingBy(d -> d.getStartTimestamp()
-                    .atZone(ZoneOffset.UTC)
+                    .atZone(NY_ZONE)
                     .toLocalDate()
                 )
             ));
@@ -154,7 +156,7 @@ public class ReportService {
             .collect(Collectors.groupingBy(
                 TimeEntry::getEmployee,
                 Collectors.groupingBy( entry -> entry.getEntryTimestamp()
-                    .atZone(ZoneOffset.UTC)
+                    .atZone(NY_ZONE)
                     .toLocalDate()
                 )
             ));
@@ -174,10 +176,10 @@ public class ReportService {
             TimeEntry out = lastOut.get();
 
             if(out.getEntryTimestamp().isAfter(in.getEntryTimestamp())){
-                LocalTime startTime = in.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                LocalTime startTime = in.getEntryTimestamp().atZone(NY_ZONE).toLocalTime()
                     .truncatedTo(ChronoUnit.MINUTES);
 
-                LocalTime endTime = out.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                LocalTime endTime = out.getEntryTimestamp().atZone(NY_ZONE).toLocalTime()
                     .truncatedTo(ChronoUnit.MINUTES);
 
                 BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dailyEntries);
@@ -240,7 +242,7 @@ public class ReportService {
 
             Map<LocalDate, List<TimeEntry>> entriesByDay = userEntries.stream()
                 .collect(Collectors.groupingBy(entry -> entry.getEntryTimestamp()
-                    .atZone(ZoneOffset.UTC)
+                    .atZone(NY_ZONE)
                     .toLocalDate()
                 ));
 
@@ -264,19 +266,19 @@ public class ReportService {
                     TimeEntry in = firstIn.get();
                     TimeEntry out = lastOut.get();
                     if (out.getEntryTimestamp().isAfter(in.getEntryTimestamp())) {
-                        startLocalTime = in.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                        startLocalTime = in.getEntryTimestamp().atZone(NY_ZONE).toLocalTime()
                             .truncatedTo(ChronoUnit.MINUTES);
-                        endLocalTime = out.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalTime()
+                        endLocalTime = out.getEntryTimestamp().atZone(NY_ZONE).toLocalTime()
                             .truncatedTo(ChronoUnit.MINUTES);
                     }
                 }
 
                 List<TimeEntry> dayAllEntries = allEmployeeEntries.stream()
-                    .filter(entry -> entry.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate().equals(date))
+                    .filter(entry -> entry.getEntryTimestamp().atZone(NY_ZONE).toLocalDate().equals(date))
                     .toList();
 
                 List<Displacement> dayDisplacements = userDisplacements.stream()
-                    .filter(d -> d.getStartTimestamp().atZone(ZoneOffset.UTC).toLocalDate().equals(date))
+                    .filter(d -> d.getStartTimestamp().atZone(NY_ZONE).toLocalDate().equals(date))
                     .toList();
 
                 BigDecimal hoursWorked = TimeEntryCalculationHelper.calculateHoursWorked(dayEntries);
@@ -351,7 +353,7 @@ public class ReportService {
                 if (d.getEndTimestamp() != null) {
                     events.add(JourneyEventDto.builder()
                         .type("DISPLACEMENT")
-                        .date(d.getStartTimestamp().atZone(ZoneOffset.UTC).toLocalDate())
+                        .date(d.getStartTimestamp().atZone(NY_ZONE).toLocalDate())
                         .startTimestamp(d.getStartTimestamp())
                         .endTimestamp(d.getEndTimestamp())
                         .originAddress(d.getStartAddress())
@@ -368,8 +370,8 @@ public class ReportService {
                 if (entry.getEntryType() == TimeEntryType.IN) {
                     if (lastOut != null && lastOut.getJob() != null && entry.getJob() != null &&
                             lastOut.getJob().getId().equals(entry.getJob().getId())) {
-                        LocalDate outDate = lastOut.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate();
-                        LocalDate inDate = entry.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate();
+                        LocalDate outDate = lastOut.getEntryTimestamp().atZone(NY_ZONE).toLocalDate();
+                        LocalDate inDate = entry.getEntryTimestamp().atZone(NY_ZONE).toLocalDate();
                         if (outDate.equals(inDate)) {
                             events.add(JourneyEventDto.builder()
                                 .type("BREAK")
@@ -386,7 +388,7 @@ public class ReportService {
                     if (lastIn != null) {
                         events.add(JourneyEventDto.builder()
                             .type("WORK")
-                            .date(lastIn.getEntryTimestamp().atZone(ZoneOffset.UTC).toLocalDate())
+                            .date(lastIn.getEntryTimestamp().atZone(NY_ZONE).toLocalDate())
                             .startTimestamp(lastIn.getEntryTimestamp())
                             .endTimestamp(entry.getEntryTimestamp())
                             .jobAddress(entry.getJob().getAddress())
