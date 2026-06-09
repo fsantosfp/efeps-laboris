@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
-import PlacesAutocompleteInput from "../components/PlacesAutoCompleteInput";
+import PlacesAutocompleteInput from "../components/PlacesAutocompleteInput";
 import "./CreateJobPage.css";
 
-function CreateJobPage(){
+function CreateJobPage() {
     const [formData, setFormData] = useState({
         address: '',
         clientName: '',
@@ -24,7 +24,7 @@ function CreateJobPage(){
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData(prevState => ({
             ...prevState,
             [name]: value
@@ -42,7 +42,7 @@ function CreateJobPage(){
             return;
         }
 
-        try{
+        try {
             const dataToSend = {
                 ...formData,
                 billingRate: parseFloat(formData.billingRate),
@@ -59,11 +59,11 @@ function CreateJobPage(){
             alert("Trabalho criado com sucesso");
             navigate('/dashboard');
 
-        }catch(err){
+        } catch (err) {
             console.error("Erro ao criar trabalho:", err);
             const errorMsg = err.response?.data?.message || 'Falha ao criar o trabalho. Verifique os dados e tente novamente.';
             setError(errorMsg);
-        } finally{
+        } finally {
             setIsSubmitting(false);
         }
     }
@@ -93,65 +93,65 @@ function CreateJobPage(){
 
                     <div className="form-group">
                         <label className="form-label">Nome do Contratante:*</label>
-                        <input 
-                            type="text" 
-                            name="clientName" 
-                            className="form-input" 
-                            value={formData.clientName} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="text"
+                            name="clientName"
+                            className="form-input"
+                            value={formData.clientName}
+                            onChange={handleChange}
+                            required
                             placeholder="Digite o nome do contratante"
                         />
                     </div>
 
                     <div className="form-group">
                         <label className="form-label">Valor/Hora (Faturamento):*</label>
-                        <input 
-                            type="number" 
-                            name="billingRate" 
-                            className="form-input" 
-                            value={formData.billingRate} 
-                            onChange={handleChange} 
-                            required 
-                            step="0.01" 
+                        <input
+                            type="number"
+                            name="billingRate"
+                            className="form-input"
+                            value={formData.billingRate}
+                            onChange={handleChange}
+                            required
+                            step="0.01"
                             placeholder="0.00"
                         />
                     </div>
 
                     <div className="form-group">
                         <label className="form-label">Orçamento:*</label>
-                        <input 
-                            type="number" 
-                            name="budget" 
-                            className="form-input" 
-                            value={formData.budget} 
-                            onChange={handleChange} 
-                            required 
-                            step="0.01" 
+                        <input
+                            type="number"
+                            name="budget"
+                            className="form-input"
+                            value={formData.budget}
+                            onChange={handleChange}
+                            required
+                            step="0.01"
                             placeholder="0.00"
                         />
                     </div>
 
                     <div className="form-group">
                         <label className="form-label">Data de Início:*</label>
-                        <input 
-                            type="date" 
-                            name="startDate" 
-                            className="form-input" 
-                            value={formData.startDate} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="date"
+                            name="startDate"
+                            className="form-input"
+                            value={formData.startDate}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
 
                     <div className="form-group full-width">
                         <label className="form-label">Data de Término (Opcional):</label>
-                        <input 
-                            type="date" 
-                            name="endDate" 
-                            className="form-input" 
-                            value={formData.endDate} 
-                            onChange={handleChange} 
+                        <input
+                            type="date"
+                            name="endDate"
+                            className="form-input"
+                            value={formData.endDate}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -160,38 +160,38 @@ function CreateJobPage(){
                 <div className="job-create-grid">
                     <div className="form-group">
                         <label className="form-label">Nome do Responsável:*</label>
-                        <input 
-                            type="text" 
-                            name="responsibleName" 
-                            className="form-input" 
-                            value={formData.responsibleName} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="text"
+                            name="responsibleName"
+                            className="form-input"
+                            value={formData.responsibleName}
+                            onChange={handleChange}
+                            required
                             placeholder="Digite o nome do responsável"
                         />
                     </div>
 
                     <div className="form-group">
                         <label className="form-label">Telefone do Responsável:*</label>
-                        <input 
-                            type="text" 
-                            name="responsiblePhone" 
-                            className="form-input" 
-                            value={formData.responsiblePhone} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="text"
+                            name="responsiblePhone"
+                            className="form-input"
+                            value={formData.responsiblePhone}
+                            onChange={handleChange}
+                            required
                             placeholder="(00) 00000-0000"
                         />
                     </div>
 
                     <div className="form-group full-width">
                         <label className="form-label">E-mail do Responsável (Opcional):</label>
-                        <input 
-                            type="email" 
-                            name="responsibleEmail" 
-                            className="form-input" 
-                            value={formData.responsibleEmail} 
-                            onChange={handleChange} 
+                        <input
+                            type="email"
+                            name="responsibleEmail"
+                            className="form-input"
+                            value={formData.responsibleEmail}
+                            onChange={handleChange}
                             placeholder="email@exemplo.com"
                         />
                     </div>
