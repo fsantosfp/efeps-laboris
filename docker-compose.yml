@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15-alpine  # imagem oficial e leve do PostgreSQL 15
+    container_name: laboris-postgres
+    ports:
+      - "5432:5432"  # Mapeia a porta do container para a porta da sua máquina
+    environment:
+      - POSTGRES_USER=admin          # Usuário do banco de dados
+      - POSTGRES_PASSWORD=admin      # Senha do banco de dados
+      - POSTGRES_DB=laboris_db     # Nome do banco de dados que será criado
+    volumes:
+      - laboris-data:/var/lib/postgresql/data # Garante que os dados persistam se o container for reiniciado
+      - ./docker/db:/docker-entrypoint-initdb.d
+
+  # backend:
+  #   build: ./backend
+  #   container_name: laboris-backend
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - postgres-db
+  #   environment:
+  #     - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/laboris_db
+  #     - SPRING_DATASOURCE_USERNAME=admin
+  #     - SPRING_DATASOURCE_PASSWORD=admin
+
+volumes:
+  laboris-data: # Define o volume para persistência de dados

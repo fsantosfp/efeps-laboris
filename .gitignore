@@ -19,6 +19,7 @@
 **/.mvn/
 **/.gradle/
 **/HELP.md
+**/application.properties.local
 
 # Maven Wrapper scripts
 **/mvnw
@@ -125,3 +126,9 @@ xcuserdata
 .vscode/
 *.swp
 *.swo
+
+# ================
+# IA Docs
+# ================
+docs/*
+specs/*
