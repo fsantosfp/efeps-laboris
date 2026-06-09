@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -46,6 +47,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
 //                .requestMatchers(HttpMethod.POST, "/api/v1/admin/companies").hasRole("SAAS_OWNER")
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"error\": \"UNAUTHORIZED\", \"message\": \"Full authentication is required to access this resource.\"}");
+                })
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
