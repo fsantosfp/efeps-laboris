@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
-import PlacesAutocompleteInput from "../components/PlacesAutoCompleteInput";
+import PlacesAutocompleteInput from "../components/PlacesAutocompleteInput";
 import "./CreateJobPage.css";
 
 function CreateJobPage() {
