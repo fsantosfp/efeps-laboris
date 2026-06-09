@@ -1,20 +1,8 @@
 import React, { useState, useEffect } from "react";
 import api from '../services/api';
-import { formatDecimalHours } from "../utils/formatters";
+import { formatDecimalHours, formatDateET, formatTimeET, formatCurrencyUS, toETDayStart, toETDayEnd } from "../utils/formatters";
 import MultiSelectComboBox from "../components/MultiSelectComboBox";
 import './ReportsPage.css';
-
-const formatTime = (isoString) => {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-};
-
-const formatDate = (isoString) => {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 
 function ReportsPage() {
     const [activeTab, setActiveTab] = useState('payroll'); // 'payroll', 'jobCosts' or 'journey'
@@ -45,7 +33,7 @@ function ReportsPage() {
     const [journeyData, setJourneyData] = useState([]);
     const [loadingEmployees, setLoadingEmployees] = useState(false);
 
-    const lastHourOfDay = "T23:59:59.999Z";
+    const lastHourOfDay = "T23:59:59.999Z"; // kept for reference, replaced by toETDayEnd
 
     // Fetch jobs for multi-select on mount or tab change
     useEffect(() => {
@@ -104,8 +92,8 @@ function ReportsPage() {
         setPayrollData(null);
 
         try {
-            const startISO = new Date(payrollStart).toISOString();
-            const endISO = new Date(payrollEnd + lastHourOfDay).toISOString();
+            const startISO = toETDayStart(payrollStart);
+            const endISO = toETDayEnd(payrollEnd);
 
             const response = await api.get(`/reports/payroll?start=${startISO}&end=${endISO}`);
             setPayrollData(response.data);
@@ -134,8 +122,8 @@ function ReportsPage() {
         setJobsCostsData([]);
 
         try {
-            const startISO = new Date(costStart).toISOString();
-            const endISO = new Date(costEnd + lastHourOfDay).toISOString();
+            const startISO = toETDayStart(costStart);
+            const endISO = toETDayEnd(costEnd);
 
             const reports = await Promise.all(
                 selectedJobIds.map(async (id) => {
@@ -169,8 +157,8 @@ function ReportsPage() {
         setJourneyData([]);
 
         try {
-            const startISO = new Date(journeyStart).toISOString();
-            const endISO = new Date(journeyEnd + lastHourOfDay).toISOString();
+            const startISO = toETDayStart(journeyStart);
+            const endISO = toETDayEnd(journeyEnd);
             const empIdsParam = selectedEmployeeIds.join(',');
 
             const response = await api.get(`/reports/employee-journey?employeeIds=${empIdsParam}&start=${startISO}&end=${endISO}`);
@@ -292,7 +280,7 @@ function ReportsPage() {
                                 </div>
                                 <div className="summary-box">
                                     <span className="summary-label">Valor Total a Pagar</span>
-                                    <span className="summary-value">$ {filteredPayrollData.periodTotals.totalAmount.toFixed(2)}</span>
+                                    <span className="summary-value">{formatCurrencyUS(filteredPayrollData.periodTotals.totalAmount)}</span>
                                 </div>
                             </div>
 
@@ -311,7 +299,7 @@ function ReportsPage() {
                                             <tr key={data.employeeId}>
                                                 <td>{data.employeeName}</td>
                                                 <td className="text-right">{formatDecimalHours(data.totalHours)}</td>
-                                                <td className="text-right">$ {data.totalAmount.toFixed(2)}</td>
+                                                <td className="text-right">{formatCurrencyUS(data.totalAmount)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -388,7 +376,7 @@ function ReportsPage() {
                                         <div className="info-item">
                                             <span className="info-label">Valor/Hora Base</span>
                                             <span className="info-value">
-                                                $ {report.jobInfo.billingRate !== null && report.jobInfo.billingRate !== undefined ? report.jobInfo.billingRate.toFixed(2) : '0.00'}
+                                                {formatCurrencyUS(report.jobInfo.billingRate)}
                                             </span>
                                         </div>
                                         <div className="info-item">
@@ -397,7 +385,7 @@ function ReportsPage() {
                                         </div>
                                         <div className="info-item">
                                             <span className="info-label">Custo Total</span>
-                                            <span className="info-value">$ {report.periodTotals.totalAmount.toFixed(2)}</span>
+                                            <span className="info-value">{formatCurrencyUS(report.periodTotals.totalAmount)}</span>
                                         </div>
                                     </div>
 
@@ -426,7 +414,7 @@ function ReportsPage() {
                                                             <td>{item.end} h</td>
                                                             <td className="text-right">{item.employeesCount}</td>
                                                             <td className="text-right">{formatDecimalHours(item.hoursWorked)}</td>
-                                                            <td className="text-right">$ {item.amountToBill.toFixed(2)}</td>
+                                                            <td className="text-right">{formatCurrencyUS(item.amountToBill)}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -506,8 +494,8 @@ function ReportsPage() {
                                         <div className="timeline-container">
                                             <div className="timeline-wrapper">
                                                 {employeeReport.events.map((event, eventIdx) => {
-                                                    const eventTime = `${formatTime(event.startTimestamp)} - ${formatTime(event.endTimestamp)}`;
-                                                    const eventDate = formatDate(event.startTimestamp);
+                                                    const eventTime = `${formatTimeET(event.startTimestamp)} - ${formatTimeET(event.endTimestamp)}`;
+                                                    const eventDate = formatDateET(event.startTimestamp);
 
                                                     let eventBadgeClass = "";
                                                     let eventTypeLabel = "";

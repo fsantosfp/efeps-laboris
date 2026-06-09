@@ -31,12 +31,22 @@ const HistoryScreen = () => {
 
         try {
 
-            const startISO = new Date(startDate + "T00:00:00.000Z").toISOString();
-            const endISO = new Date(endDate + "T23:59:59.999Z").toISOString();
+            const startISO = new Date(`${startDate}T00:00:00`).toLocaleString('en-US', { timeZone: 'America/New_York' });
+            // Build ET-aware day boundaries using Intl offset calculation
+            const buildETBoundary = (dateStr, hour, minute, second, ms) => {
+                // Parse in local time of the machine, then adjust to NY offset
+                const dt = new Date(`${dateStr}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:${String(second).padStart(2,'0')}.${String(ms).padStart(3,'0')}`);
+                const nyStr = dt.toLocaleString('en-US', { timeZone: 'America/New_York' });
+                const localStr = dt.toLocaleString('en-US');
+                const offsetMs = new Date(localStr) - new Date(nyStr);
+                return new Date(dt.getTime() + offsetMs).toISOString();
+            };
+            const startISOStr = buildETBoundary(startDate, 0, 0, 0, 0);
+            const endISOStr = buildETBoundary(endDate, 23, 59, 59, 999);
 
             const [entriesRes, displacementsRes] = await Promise.all([
-                api.get(`/time-entries/me?start=${startISO}&end=${endISO}`),
-                api.get(`/displacements/me?start=${startISO}&end=${endISO}`).catch(err => {
+                api.get(`/time-entries/me?start=${startISOStr}&end=${endISOStr}`),
+                api.get(`/displacements/me?start=${startISOStr}&end=${endISOStr}`).catch(err => {
                     console.error("Erro ao buscar deslocamentos:", err);
                     return { data: [] };
                 })
@@ -62,9 +72,15 @@ const HistoryScreen = () => {
             const combinedList = [...mappedEntries, ...mappedDisplacements];
 
             const groupedByDate = combinedList.reduce((acc, item) => {
-                const date = new Date(item.timestamp).toISOString().split('T')[0];
+                // Group by local date in America/New_York timezone
+                const date = new Date(item.timestamp).toLocaleDateString('en-US', {
+                    timeZone: 'America/New_York',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                });
                 if (!acc[date]) {
-                    acc[date] = []
+                    acc[date] = [];
                 }
                 acc[date].push(item);
                 return acc;
@@ -73,10 +89,10 @@ const HistoryScreen = () => {
             const formattedSections = Object.keys(groupedByDate).map(date => {
                 const sortedDayData = groupedByDate[date].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
                 return {
-                    title: new Date(date).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
+                    title: date, // already formatted as MM/DD/YYYY by Intl
                     data: sortedDayData
                 };
-            }).sort((a, b) => b.title.localeCompare(a.title));
+            }).sort((a, b) => new Date(b.title) - new Date(a.title));
 
             setSections(formattedSections);
 
@@ -103,8 +119,13 @@ const HistoryScreen = () => {
     };
 
     const formatTime = (timestamp) => {
-        return new Date(timestamp).toLocaleTimeString('pt-BR')
-    }
+        return new Date(timestamp).toLocaleTimeString('en-US', {
+            timeZone: 'America/New_York',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    };
 
     const style = StyleSheet.create({
         container: {
