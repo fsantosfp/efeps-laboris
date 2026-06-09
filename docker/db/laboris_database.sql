@@ -97,8 +97,8 @@ CREATE TABLE time_entries (
 -- Criando um índice para otimizar a busca por salário em uma data específica, analisar primeiro o desempenho
 -- CREATE INDEX idx_salary_history_user_date ON salary_history (user_id, effective_date DESC);
 
-INSERT INTO users (name, email, password_hash, "role")
-VALUES ('Admin SaaS', 'admin@laboris.com', '$2a$10$p8s27fACTFqP4fz3iD0z0.c8zHyCxEEEN/BuLNGzKAUgtNXs0SqcS', 'SAAS_OWNER')
+INSERT INTO users (id, name, email, password_hash, "role", password_reset_required, "status")
+VALUES ('82dae297-eb78-42ae-9ffb-1821d207f364','Admin SaaS', 'admin@laboris.com', '$2a$10$p8s27fACTFqP4fz3iD0z0.c8zHyCxEEEN/BuLNGzKAUgtNXs0SqcS', 'SAAS_OWNER', FALSE, 'ACTIVE')
 ON CONFLICT (email) DO NOTHING;
 
 -- Tabela para armazenar deslocamentos (translados) entre trabalhos
